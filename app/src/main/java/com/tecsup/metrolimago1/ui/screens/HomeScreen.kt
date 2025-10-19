@@ -8,10 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.tecsup.metrolimago1.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+// *** MODIFICADO: Ahora recibe el NavController ***
+fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("MetroLima GO") })
@@ -32,20 +35,35 @@ fun HomeScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 3 Cards/Botones principales (Usamos un Composable de apoyo)
-            NavigationCard(title = "Estaciones", description = "Ver lista de estaciones")
+            // 3 Cards/Botones principales
+            NavigationCard(
+                title = "Estaciones",
+                description = "Ver lista de estaciones",
+                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
+                onClick = { navController.navigate(Screen.Estaciones.route) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            NavigationCard(title = "Rutas", description = "Planificar un trayecto")
+            NavigationCard(
+                title = "Rutas",
+                description = "Planificar un trayecto",
+                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
+                onClick = { navController.navigate(Screen.Rutas.route) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            NavigationCard(title = "Configuración", description = "Ajustes de la aplicación")
+            NavigationCard(
+                title = "Configuración",
+                description = "Ajustes de la aplicación",
+                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
+                onClick = { navController.navigate(Screen.Configuracion.route) }
+            )
         }
     }
 }
 
 @Composable
-fun NavigationCard(title: String, description: String) {
+fun NavigationCard(title: String, description: String, onClick: () -> Unit) {
     Card(
-        onClick = { /* Navegación se implementa en el Commit 3 */ },
+        onClick = onClick, // *** USA EL onClick AQUÍ ***
         modifier = Modifier.fillMaxWidth().height(90.dp)
     ) {
         Column(
