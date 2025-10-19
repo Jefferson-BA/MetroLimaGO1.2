@@ -13,7 +13,6 @@ import com.tecsup.metrolimago1.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-// *** MODIFICADO: Ahora recibe el NavController ***
 fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
@@ -35,25 +34,21 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 3 Cards/Botones principales
             NavigationCard(
                 title = "Estaciones",
                 description = "Ver lista de estaciones",
-                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
                 onClick = { navController.navigate(Screen.Estaciones.route) }
             )
             Spacer(modifier = Modifier.height(16.dp))
             NavigationCard(
                 title = "Rutas",
                 description = "Planificar un trayecto",
-                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
                 onClick = { navController.navigate(Screen.Rutas.route) }
             )
             Spacer(modifier = Modifier.height(16.dp))
             NavigationCard(
                 title = "Configuración",
                 description = "Ajustes de la aplicación",
-                // *** IMPLEMENTACIÓN DE NAVEGACIÓN ***
                 onClick = { navController.navigate(Screen.Configuracion.route) }
             )
         }
@@ -63,7 +58,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun NavigationCard(title: String, description: String, onClick: () -> Unit) {
     Card(
-        onClick = onClick, // *** USA EL onClick AQUÍ ***
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(90.dp)
     ) {
         Column(
