@@ -2,12 +2,11 @@ package com.tecsup.metrolimago1.ui.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Train
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Train
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
+import com.tecsup.metrolimago1.components.MenuCard
 import com.tecsup.metrolimago1.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +55,7 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
             )
 
-            // Cards con íconos y gradiente leve
+            // Cards de menú
             MenuCard(
                 title = "Estaciones",
                 description = "Explora todas las estaciones disponibles",
@@ -76,44 +76,6 @@ fun HomeScreen(navController: NavController) {
                 icon = Icons.Default.Settings,
                 onClick = { navController.navigate(Screen.Configuracion.route) }
             )
-        }
-    }
-}
-
-/**
- * Card reutilizable para el menú principal
- */
-@Composable
-fun MenuCard(
-    title: String,
-    description: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().height(100.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color(0xFF3F51B5),
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(description, style = MaterialTheme.typography.bodySmall)
-            }
         }
     }
 }
