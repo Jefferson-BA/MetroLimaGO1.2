@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.tecsup.metrolimago1.ui.screens.ConfiguracionScreen
-import com.tecsup.metrolimago1.ui.screens.HomeScreen
-import com.tecsup.metrolimago1.ui.screens.ListaEstacionesScreen
-import com.tecsup.metrolimago1.ui.screens.PlanificadorRutaScreen
+import com.tecsup.metrolimago1.ui.screens.configuracion.ConfiguracionScreen
+import com.tecsup.metrolimago1.ui.screens.home.HomeScreen
+import com.tecsup.metrolimago1.ui.screens.estaciones.ListaEstacionesScreen
+import com.tecsup.metrolimago1.ui.screens.rutas.PlanificadorRutaScreen
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")

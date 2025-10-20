@@ -1,4 +1,4 @@
-package com.tecsup.metrolimago1.ui.screens
+package com.tecsup.metrolimago1.ui.screens.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
