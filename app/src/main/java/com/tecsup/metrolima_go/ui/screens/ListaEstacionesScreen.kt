@@ -51,7 +51,7 @@ fun ListaEstacionesScreen(
     var busqueda by remember { mutableStateOf("") }
     var filtroSeleccionado by remember { mutableStateOf("Todas") }
     
-    val filtros = listOf("Todas", "Línea 1", "Línea 2", "Metropolitano")
+    val filtros = listOf("Todas", "Línea 1", "Línea 2")
     
     val estacionesFiltradas = EstacionesMock.estaciones.filter { estacion ->
         val coincideBusqueda = estacion.nombre.contains(busqueda, ignoreCase = true) ||
@@ -61,7 +61,6 @@ fun ListaEstacionesScreen(
             "Todas" -> true
             "Línea 1" -> estacion.linea == "Línea 1"
             "Línea 2" -> estacion.linea == "Línea 2"
-            "Metropolitano" -> estacion.linea == "Metropolitano"
             else -> true
         }
         

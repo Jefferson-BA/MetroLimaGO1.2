@@ -117,7 +117,7 @@ object EstacionesMock {
             nombre = "Miguel Grau",
             subtexto = "Lima",
             linea = "Línea 2",
-            tiempo = "12 min",
+            tiempo = "En construcción",
             direccion = "Av. Miguel Grau con Av. Abancay",
             horario = "En construcción - Apertura estimada 2026",
             servicios = listOf("En construcción"),
