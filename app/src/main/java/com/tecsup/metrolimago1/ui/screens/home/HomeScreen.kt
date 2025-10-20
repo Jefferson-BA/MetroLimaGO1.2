@@ -10,13 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
+import com.tecsup.metrolimago1.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("MetroLima GO") })
+            TopBar(title = "MetroLima GO")
         }
     ) { paddingValues ->
         Column(
