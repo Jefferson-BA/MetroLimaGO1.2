@@ -1,4 +1,4 @@
-package com.tecsup.metrolimago1.ui.screens
+package com.tecsup.metrolimago1.ui.screens.rutas
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,16 +9,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConfiguracionScreen(navController: NavController) {
+fun PlanificadorRutaScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Configuración") },
+                title = { Text("Planificador de Rutas") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
@@ -34,7 +33,7 @@ fun ConfiguracionScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Aquí irán los ajustes de la app (WIP)",
+                text = "Aquí irá la lógica de rutas (WIP)",
                 style = MaterialTheme.typography.titleLarge
             )
         }
