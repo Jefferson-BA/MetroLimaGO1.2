@@ -39,7 +39,6 @@ fun HomeScreen(navController: NavController) {
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Icono grande central
             Icon(
                 imageVector = Icons.Default.Train,
                 contentDescription = "Metro Icono",
@@ -55,7 +54,6 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
             )
 
-            // Cards de menú
             MenuCard(
                 title = "Estaciones",
                 description = "Explora todas las estaciones disponibles",

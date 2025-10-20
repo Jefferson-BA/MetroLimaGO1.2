@@ -49,7 +49,6 @@ fun ListaEstacionesScreen(navController: NavController) {
             var query by remember { mutableStateOf("") }
             var selectedLine by remember { mutableStateOf<String?>(null) }
 
-            // Search + simple filter row
             Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                 OutlinedTextField(
                     value = query,
@@ -60,7 +59,6 @@ fun ListaEstacionesScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Simple filter buttons
             Row(modifier = Modifier.fillMaxWidth()) {
                 val lines = MockStations.stations.map { it.line }.distinct()
                 for (line in lines) {
