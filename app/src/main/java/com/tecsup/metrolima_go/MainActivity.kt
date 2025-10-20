@@ -36,12 +36,12 @@ fun MetroLimaApp() {
     var estacionSeleccionada by remember { mutableStateOf<Estacion?>(null) }
     
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        if (estacionSeleccionada != null) {
+        estacionSeleccionada?.let { estacion ->
             DetalleEstacionScreen(
-                estacion = estacionSeleccionada!!,
+                estacion = estacion,
                 modifier = Modifier.padding(innerPadding)
             )
-        } else {
+        } ?: run {
             ListaEstacionesScreen(
                 onEstacionClick = { estacion ->
                     estacionSeleccionada = estacion
