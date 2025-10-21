@@ -11,8 +11,10 @@ import com.tecsup.metrolimago1.ui.screens.home.HomeScreen
 import com.tecsup.metrolimago1.ui.screens.estaciones.ListaEstacionesScreen
 import com.tecsup.metrolimago1.ui.screens.rutas.PlanificadorRutaScreen
 import com.tecsup.metrolimago1.ui.screens.chat.ChatScreen
+import com.tecsup.metrolimago1.ui.screens.splash.SplashScreen
 
 sealed class Screen(val route: String) {
+    object Splash : Screen("splash")
     object Home : Screen("home")
     object Estaciones : Screen("estaciones")
     object EstacionDetail : Screen("estaciones/{estacionId}") {
@@ -29,8 +31,12 @@ fun MainNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Splash.route
     ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
+        }
+
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
         }
