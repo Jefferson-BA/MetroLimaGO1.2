@@ -1,8 +1,10 @@
 package com.tecsup.metrolimago1.ui.screens.configuracion
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,89 +12,306 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.navigation.Screen
+import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfiguracionScreen(navController: NavController) {
-    var notificaciones by remember { mutableStateOf(true) }
-    var modoOscuro by remember { mutableStateOf(false) }
-    var ubicacion by remember { mutableStateOf(true) }
-
+    val themeState = LocalThemeState.current
+    var selectedLanguage by remember { mutableStateOf("es") }
+    
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Configuración") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                }
-            )
+        bottomBar = {
+            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Configuracion.route)
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(DarkGray)
                 .padding(paddingValues)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+                .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
+            // Título principal
             Text(
-                text = "Preferencias del usuario",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 16.dp)
+                text = "Configuración",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = White
+                ),
+                modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Notificaciones")
-                Switch(checked = notificaciones, onCheckedChange = { notificaciones = it })
-            }
-
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Modo oscuro")
-                Switch(checked = modoOscuro, onCheckedChange = { modoOscuro = it })
-            }
-
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Permitir ubicación")
-                Switch(checked = ubicacion, onCheckedChange = { ubicacion = it })
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = { /* Acción simulada de cerrar sesión */ },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Cerrar sesión", color = MaterialTheme.colorScheme.onPrimary)
-            }
+            // Sección Apariencia
+            AppearanceSection(isDarkMode = themeState.isDarkMode, onDarkModeToggle = { themeState.updateDarkMode(it) })
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Versión de la app: 1.0.0",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            // Sección Idioma
+            LanguageSection(selectedLanguage = selectedLanguage, onLanguageChange = { selectedLanguage = it })
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sección Acerca de
+            AboutSection()
+        }
+    }
+}
+
+@Composable
+fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) {
+    Column {
+        Text(
+            text = "Apariencia",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = White
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardGray),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DarkMode,
+                    contentDescription = "Modo Oscuro",
+                    tint = White,
+                    modifier = Modifier.size(24.dp)
+                )
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Modo Oscuro",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    )
+                    Text(
+                        text = "Cambia el tema de la aplicación",
+                        style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                    )
+                }
+                
+                Switch(
+                    checked = isDarkMode,
+                    onCheckedChange = onDarkModeToggle,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = White,
+                        checkedTrackColor = MetroOrange,
+                        uncheckedThumbColor = LightGray,
+                        uncheckedTrackColor = DarkGray
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit) {
+    Column {
+        Text(
+            text = "Idioma",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = White
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardGray),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = "Idioma",
+                        tint = White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Idioma",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = White
+                            )
+                        )
+                        Text(
+                            text = "Selecciona tu idioma preferido",
+                            style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { onLanguageChange("es") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedLanguage == "es") MetroOrange else LightGray
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Es Español",
+                            color = if (selectedLanguage == "es") White else DarkGray
+                        )
+                    }
+                    
+                    Button(
+                        onClick = { onLanguageChange("en") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedLanguage == "en") MetroOrange else LightGray
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Us Inglés",
+                            color = if (selectedLanguage == "en") White else DarkGray
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AboutSection() {
+    Column {
+        Text(
+            text = "Acerca de",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = White
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardGray),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "MetroLima GO",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = White
+                    )
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = DarkGray),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Text(
+                        text = "Version 1.0.0",
+                        style = MaterialTheme.typography.bodySmall.copy(color = LightGray),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = "MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = White)
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Divider(color = LightGray, thickness = 1.dp)
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Contacto
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Contacto",
+                        tint = White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Contacto",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    )
+                }
+                
+                Text(
+                    text = "soporte@metrolimago.pe",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = White),
+                    modifier = Modifier.padding(start = 28.dp, top = 4.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Desarrollador
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Security,
+                        contentDescription = "Desarrollador",
+                        tint = White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Desarrollador",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    )
+                }
+                
+                Text(
+                    text = "MetroLima Development Team",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = White),
+                    modifier = Modifier.padding(start = 28.dp, top = 4.dp)
+                )
+            }
         }
     }
 }
