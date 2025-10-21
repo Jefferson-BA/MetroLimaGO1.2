@@ -30,8 +30,8 @@ fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(key1 = true) {
         startAnimation = true
-        delay(3000) // Mostrar splash por 3 segundos
-        navController.navigate(Screen.Home.route) {
+        delay(3000)
+        navController.navigate(Screen.Intro.route) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
@@ -47,7 +47,6 @@ fun Splash(alpha: Float) {
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.fondo),
             contentDescription = "Fondo MetroLima",
@@ -55,8 +54,7 @@ fun Splash(alpha: Float) {
                 .fillMaxSize()
                 .alpha(alpha)
         )
-        
-        // Logo centrado
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -88,14 +86,13 @@ fun Splash(alpha: Float) {
                 modifier = Modifier.alpha(alpha)
             )
         }
-        
-        // Indicador de carga en la parte inferior
+
         CircularProgressIndicator(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 80.dp)
                 .alpha(alpha),
-            color = Color(0xFFFF6B35), // MetroOrange
+            color = Color(0xFFFF6B35),
             strokeWidth = 3.dp
         )
     }

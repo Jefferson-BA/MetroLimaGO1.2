@@ -1,5 +1,6 @@
 package com.tecsup.metrolimago1.navigation
 
+import com.tecsup.metrolimago1.ui.screens.intro.IntroScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,6 +17,7 @@ import com.tecsup.metrolimago1.ui.screens.vivo.VivoScreen
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
+    object Intro : Screen("intro")               // 👈 nueva ruta para tu GlassIntroScreen
     object Home : Screen("home")
     object Estaciones : Screen("estaciones")
     object EstacionDetail : Screen("estaciones/{estacionId}") {
@@ -35,10 +37,17 @@ fun MainNavGraph() {
         navController = navController,
         startDestination = Screen.Splash.route
     ) {
+        // 🟡 Pantalla de carga
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
         }
 
+        // 🟢 Nueva pantalla de introducción
+        composable(Screen.Intro.route) {
+            IntroScreen(navController = navController)
+        }
+
+        // 🔵 Pantalla principal
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
         }

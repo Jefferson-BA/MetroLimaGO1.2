@@ -74,7 +74,7 @@ fun ChatScreen(navController: NavController) {
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            painter = painterResource(id = R.drawable.robot),
+                            painter = painterResource(id = R.drawable.ia),
                             contentDescription = "Robot IA",
                             modifier = Modifier.size(32.dp)
                         )

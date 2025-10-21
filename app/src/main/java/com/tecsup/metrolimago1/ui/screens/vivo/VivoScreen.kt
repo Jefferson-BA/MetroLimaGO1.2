@@ -23,8 +23,7 @@ import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 @Composable
 fun VivoScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    
-    // Colores dinámicos según el tema
+
     val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
@@ -57,21 +56,18 @@ fun VivoScreen(navController: NavController) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Estado del Servicio
             ServiceStatusCard(
                 cardColor = cardColor,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
-            // Horario de Operación
+
             OperatingHoursCard(
                 cardColor = cardColor,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
-            // Alertas y Avisos
+
             AlertsCard(
                 cardColor = cardColor,
                 textColor = textColor,
@@ -95,7 +91,6 @@ fun ServiceStatusCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Título
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -120,8 +115,7 @@ fun ServiceStatusCard(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
-            // Línea 1 - Operando
+
             ServiceLineItem(
                 lineName = "Linea 1",
                 status = "Servicio operando con normalidad",
@@ -131,8 +125,7 @@ fun ServiceStatusCard(
             )
             
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Línea 2 - En construcción
+
             ServiceLineItem(
                 lineName = "Linea 2",
                 status = "En construcción - Apertura estimada 2026",
@@ -156,7 +149,6 @@ fun ServiceLineItem(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Icono de estado
         Icon(
             imageVector = if (isOperating) Icons.Default.CheckCircle else Icons.Default.Cancel,
             contentDescription = "Estado",
@@ -165,8 +157,7 @@ fun ServiceLineItem(
         )
         
         Spacer(modifier = Modifier.width(12.dp))
-        
-        // Información de la línea
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = lineName,
@@ -179,8 +170,7 @@ fun ServiceLineItem(
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        
-        // Badge de estado
+
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = if (isOperating) MetroGreen else Color(0xFFE53E3E)
@@ -211,7 +201,6 @@ fun OperatingHoursCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Título
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -229,8 +218,7 @@ fun OperatingHoursCard(
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
-            
-            // Lunes - Viernes
+
             OperatingHoursItem(
                 dayType = "Lunes - Viernes",
                 description = "Días laborales",
@@ -240,8 +228,7 @@ fun OperatingHoursCard(
             )
             
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Sábados
+
             OperatingHoursItem(
                 dayType = "Sábados",
                 description = "Fin de semana",
@@ -251,8 +238,7 @@ fun OperatingHoursCard(
             )
             
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Domingos y Feriados
+
             OperatingHoursItem(
                 dayType = "Domingos y Feriados",
                 description = "Horario reducido",
@@ -311,7 +297,6 @@ fun AlertsCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Título
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -329,8 +314,7 @@ fun AlertsCard(
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
-            
-            // Alerta 1
+
             AlertItem(
                 title = "Mantenimiento Programado",
                 description = "El domingo 20 de octubre habrá mantenimiento en la estación Grau de 6:00 AM a 8:00 AM",
@@ -340,8 +324,7 @@ fun AlertsCard(
             )
             
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Alerta 2
+
             AlertItem(
                 title = "Mantenimiento Programado",
                 description = "El domingo 20 de octubre habrá mantenimiento",

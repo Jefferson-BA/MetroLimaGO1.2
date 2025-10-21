@@ -3,8 +3,6 @@ package com.tecsup.metrolimago1.ui.screens.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,12 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.navigation.Screen
@@ -34,7 +30,6 @@ import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 fun HomeScreen(navController: NavController) {
     val themeState = LocalThemeState.current
     
-    // Colores dinámicos según el tema
     val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
@@ -52,7 +47,6 @@ fun HomeScreen(navController: NavController) {
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
-            // Título principal
             Text(
                 text = "MetroLima GO",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -62,10 +56,8 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Barra de búsqueda
             SearchBar(
                 onSearchClick = { query ->
-                    // Navegar a estaciones con la consulta de búsqueda
                     navController.navigate(Screen.Estaciones.route)
                 },
                 cardColor = cardColor,
@@ -75,7 +67,6 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Sección Próximas Llegadas
             NextArrivalsSection(
                 cardColor = cardColor,
                 textColor = textColor,
@@ -84,7 +75,6 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección Notificaciones
             NotificationsSection(
                 cardColor = cardColor,
                 textColor = textColor,
@@ -93,7 +83,6 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección IA
             AISection(
                 navController = navController,
                 cardColor = cardColor,
@@ -156,7 +145,6 @@ fun SearchBar(
                 singleLine = true
             )
             
-            // Botón de búsqueda
             if (searchQuery.isNotEmpty()) {
                 IconButton(
                     onClick = { 
@@ -216,7 +204,6 @@ fun NextArrivalsSection(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Lista de llegadas
             ArrivalItem(
                 stationName = "Villa El Salvador",
                 direction = "hacia San Martin",
@@ -257,7 +244,6 @@ fun ArrivalItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Línea naranja vertical
             Box(
                 modifier = Modifier
                     .width(4.dp)
@@ -290,7 +276,6 @@ fun ArrivalItem(
                 }
             }
             
-            // Indicador de tiempo
             Card(
                 colors = CardDefaults.cardColors(containerColor = MetroGreen),
                 shape = RoundedCornerShape(6.dp)
