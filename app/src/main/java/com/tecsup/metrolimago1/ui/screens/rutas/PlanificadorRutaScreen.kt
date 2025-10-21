@@ -1,19 +1,23 @@
 package com.tecsup.metrolimago1.ui.screens.rutas
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanificadorRutaScreen(navController: NavController) {
+    var origen by remember { mutableStateOf("") }
+    var destino by remember { mutableStateOf("") }
+    var mensaje by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -26,16 +30,58 @@ fun PlanificadorRutaScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Aquí irá la lógica de rutas (WIP)",
-                style = MaterialTheme.typography.titleLarge
+                text = "Planifica tu trayecto 🚉",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = origen,
+                onValueChange = { origen = it },
+                label = { Text("Estación de origen") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = destino,
+                onValueChange = { destino = it },
+                label = { Text("Estación de destino") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    mensaje = if (origen.isNotBlank() && destino.isNotBlank()) {
+                        "Ruta planificada de $origen a $destino"
+                    } else {
+                        "Por favor ingresa ambas estaciones"
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Calcular Ruta")
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            if (mensaje.isNotBlank()) {
+                Text(
+                    text = mensaje,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }
