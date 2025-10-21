@@ -434,7 +434,7 @@ fun AISection(
 @Composable
 fun RobotImage(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(id = R.drawable.robot),
+        painter = painterResource(id = R.drawable.ia),
         contentDescription = "Robot IA",
         modifier = modifier.size(130.dp)
     )

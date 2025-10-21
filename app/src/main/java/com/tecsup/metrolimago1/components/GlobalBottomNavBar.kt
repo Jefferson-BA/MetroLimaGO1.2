@@ -126,18 +126,37 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 }
             }
             
-            // Signal Icon
-            IconButton(
-                onClick = { /* TODO: Implementar pantalla de conexión */ },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Wifi,
-                    contentDescription = "Conexión",
-                    tint = LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+                    // Signal Icon (En vivo)
+                    if (currentRoute == Screen.Vivo.route) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(
+                                    MetroOrange,
+                                    RoundedCornerShape(24.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Wifi,
+                                contentDescription = "En vivo",
+                                tint = White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { navController.navigate(Screen.Vivo.route) },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Wifi,
+                                contentDescription = "En vivo",
+                                tint = LightGray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
             
             // Settings Icon
             if (currentRoute == Screen.Configuracion.route) {
