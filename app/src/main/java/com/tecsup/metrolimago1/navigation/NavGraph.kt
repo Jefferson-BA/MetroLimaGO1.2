@@ -10,6 +10,7 @@ import com.tecsup.metrolimago1.ui.screens.configuracion.ConfiguracionScreen
 import com.tecsup.metrolimago1.ui.screens.home.HomeScreen
 import com.tecsup.metrolimago1.ui.screens.estaciones.ListaEstacionesScreen
 import com.tecsup.metrolimago1.ui.screens.rutas.PlanificadorRutaScreen
+import com.tecsup.metrolimago1.ui.screens.chat.ChatScreen
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -19,6 +20,7 @@ sealed class Screen(val route: String) {
     }
     object Rutas : Screen("rutas")
     object Configuracion : Screen("configuracion")
+    object Chat : Screen("chat")
 }
 
 @Composable
@@ -54,6 +56,10 @@ fun MainNavGraph() {
 
         composable(Screen.Configuracion.route) {
             ConfiguracionScreen(navController = navController)
+        }
+
+        composable(Screen.Chat.route) {
+            ChatScreen(navController = navController)
         }
     }
 }

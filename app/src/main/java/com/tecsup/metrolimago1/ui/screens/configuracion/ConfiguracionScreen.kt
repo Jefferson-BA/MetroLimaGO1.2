@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,6 +24,12 @@ fun ConfiguracionScreen(navController: NavController) {
     val themeState = LocalThemeState.current
     var selectedLanguage by remember { mutableStateOf("es") }
     
+    // Colores dinámicos según el tema
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
+    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
+    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    
     Scaffold(
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Configuracion.route)
@@ -31,7 +38,7 @@ fun ConfiguracionScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DarkGray)
+                .background(backgroundColor)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
@@ -40,42 +47,64 @@ fun ConfiguracionScreen(navController: NavController) {
                 text = "Configuración",
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    color = White
+                    color = textColor
                 ),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
             // Sección Apariencia
-            AppearanceSection(isDarkMode = themeState.isDarkMode, onDarkModeToggle = { themeState.updateDarkMode(it) })
+            AppearanceSection(
+                isDarkMode = themeState.isDarkMode, 
+                onDarkModeToggle = { themeState.updateDarkMode(it) },
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección Idioma
-            LanguageSection(selectedLanguage = selectedLanguage, onLanguageChange = { selectedLanguage = it })
+            LanguageSection(
+                selectedLanguage = selectedLanguage, 
+                onLanguageChange = { selectedLanguage = it },
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección Acerca de
-            AboutSection()
+            AboutSection(
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
         }
     }
 }
 
 @Composable
-fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) {
+fun AppearanceSection(
+    isDarkMode: Boolean, 
+    onDarkModeToggle: (Boolean) -> Unit,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Column {
         Text(
             text = "Apariencia",
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = White
+                color = textColor
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = CardGray),
+            colors = CardDefaults.cardColors(containerColor = cardColor),
             shape = RoundedCornerShape(12.dp)
         ) {
             Row(
@@ -87,7 +116,7 @@ fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) 
                 Icon(
                     imageVector = Icons.Default.DarkMode,
                     contentDescription = "Modo Oscuro",
-                    tint = White,
+                    tint = textColor,
                     modifier = Modifier.size(24.dp)
                 )
                 
@@ -98,12 +127,12 @@ fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) 
                         text = "Modo Oscuro",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = White
+                            color = textColor
                         )
                     )
                     Text(
                         text = "Cambia el tema de la aplicación",
-                        style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
                 
@@ -113,8 +142,8 @@ fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) 
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = White,
                         checkedTrackColor = MetroOrange,
-                        uncheckedThumbColor = LightGray,
-                        uncheckedTrackColor = DarkGray
+                        uncheckedThumbColor = secondaryTextColor,
+                        uncheckedTrackColor = if (isDarkMode) DarkGray else Color(0xFFE0E0E0)
                     )
                 )
             }
@@ -123,20 +152,26 @@ fun AppearanceSection(isDarkMode: Boolean, onDarkModeToggle: (Boolean) -> Unit) 
 }
 
 @Composable
-fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit) {
+fun LanguageSection(
+    selectedLanguage: String, 
+    onLanguageChange: (String) -> Unit,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Column {
         Text(
             text = "Idioma",
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = White
+                color = textColor
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = CardGray),
+            colors = CardDefaults.cardColors(containerColor = cardColor),
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
@@ -148,7 +183,7 @@ fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit
                     Icon(
                         imageVector = Icons.Default.Language,
                         contentDescription = "Idioma",
-                        tint = White,
+                        tint = textColor,
                         modifier = Modifier.size(24.dp)
                     )
                     
@@ -159,12 +194,12 @@ fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit
                             text = "Idioma",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = White
+                                color = textColor
                             )
                         )
                         Text(
                             text = "Selecciona tu idioma preferido",
-                            style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                            style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                         )
                     }
                 }
@@ -178,28 +213,28 @@ fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit
                     Button(
                         onClick = { onLanguageChange("es") },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedLanguage == "es") MetroOrange else LightGray
+                            containerColor = if (selectedLanguage == "es") MetroOrange else secondaryTextColor
                         ),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
                             text = "Es Español",
-                            color = if (selectedLanguage == "es") White else DarkGray
+                            color = if (selectedLanguage == "es") White else textColor
                         )
                     }
                     
                     Button(
                         onClick = { onLanguageChange("en") },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedLanguage == "en") MetroOrange else LightGray
+                            containerColor = if (selectedLanguage == "en") MetroOrange else secondaryTextColor
                         ),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
                             text = "Us Inglés",
-                            color = if (selectedLanguage == "en") White else DarkGray
+                            color = if (selectedLanguage == "en") White else textColor
                         )
                     }
                 }
@@ -209,20 +244,24 @@ fun LanguageSection(selectedLanguage: String, onLanguageChange: (String) -> Unit
 }
 
 @Composable
-fun AboutSection() {
+fun AboutSection(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Column {
         Text(
             text = "Acerca de",
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = White
+                color = textColor
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = CardGray),
+            colors = CardDefaults.cardColors(containerColor = cardColor),
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
@@ -232,19 +271,19 @@ fun AboutSection() {
                     text = "MetroLima GO",
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = textColor
                     )
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = DarkGray),
+                    colors = CardDefaults.cardColors(containerColor = if (textColor == White) DarkGray else Color(0xFFE0E0E0)),
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
                         text = "Version 1.0.0",
-                        style = MaterialTheme.typography.bodySmall.copy(color = LightGray),
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -253,12 +292,12 @@ fun AboutSection() {
                 
                 Text(
                     text = "MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = White)
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                Divider(color = LightGray, thickness = 1.dp)
+                Divider(color = secondaryTextColor, thickness = 1.dp)
                 
                 Spacer(modifier = Modifier.height(12.dp))
                 
@@ -267,7 +306,7 @@ fun AboutSection() {
                     Icon(
                         imageVector = Icons.Default.Email,
                         contentDescription = "Contacto",
-                        tint = White,
+                        tint = textColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -275,14 +314,14 @@ fun AboutSection() {
                         text = "Contacto",
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = White
+                            color = textColor
                         )
                     )
                 }
                 
                 Text(
                     text = "soporte@metrolimago.pe",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = White),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
                 
@@ -293,7 +332,7 @@ fun AboutSection() {
                     Icon(
                         imageVector = Icons.Default.Security,
                         contentDescription = "Desarrollador",
-                        tint = White,
+                        tint = textColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -301,14 +340,14 @@ fun AboutSection() {
                         text = "Desarrollador",
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = White
+                            color = textColor
                         )
                     )
                 }
                 
                 Text(
                     text = "MetroLima Development Team",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = White),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
             }

@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.tecsup.metrolimago1.navigation.MainNavGraph
@@ -21,9 +22,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themeState = ThemeState()
+            val themeState = remember { ThemeState() }
             CompositionLocalProvider(LocalThemeState provides themeState) {
-                MetroLimaGO1Theme(darkTheme = LocalThemeState.current.isDarkMode) {
+                MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background

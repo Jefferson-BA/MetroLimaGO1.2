@@ -1,5 +1,6 @@
 package com.tecsup.metrolimago1.ui.screens.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,17 +14,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
+    val themeState = LocalThemeState.current
+    
+    // Colores dinámicos según el tema
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
+    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
+    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    
     Scaffold(
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Home.route)
@@ -32,7 +44,7 @@ fun HomeScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DarkGray)
+                .background(backgroundColor)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
@@ -41,41 +53,62 @@ fun HomeScreen(navController: NavController) {
                 text = "MetroLima GO",
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    color = White
+                    color = textColor
                 ),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
             // Barra de búsqueda
             SearchBar(
-                onSearchClick = { /* TODO: Implementar búsqueda */ }
+                onSearchClick = { /* TODO: Implementar búsqueda */ },
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Sección Próximas Llegadas
-            NextArrivalsSection()
+            NextArrivalsSection(
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección Notificaciones
-            NotificationsSection()
+            NotificationsSection(
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección IA
-            AISection(navController)
+            AISection(
+                navController = navController,
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
         }
     }
 }
 
 @Composable
-fun SearchBar(onSearchClick: () -> Unit) {
+fun SearchBar(
+    onSearchClick: () -> Unit,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -87,13 +120,13 @@ fun SearchBar(onSearchClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
-                tint = LightGray,
+                tint = secondaryTextColor,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = "¿A dónde vas?",
-                color = LightGray,
+                color = secondaryTextColor,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -101,10 +134,14 @@ fun SearchBar(onSearchClick: () -> Unit) {
 }
 
 @Composable
-fun NextArrivalsSection() {
+fun NextArrivalsSection(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -125,14 +162,14 @@ fun NextArrivalsSection() {
                     text = "Próximas Llegadas",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = textColor
                     )
                 )
             }
             
             Text(
                 text = "Información en tiempo real",
-                style = MaterialTheme.typography.bodySmall.copy(color = LightGray),
+                style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -140,7 +177,9 @@ fun NextArrivalsSection() {
             ArrivalItem(
                 stationName = "Villa El Salvador",
                 direction = "hacia San Martin",
-                time = "3 min"
+                time = "3 min",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -148,17 +187,25 @@ fun NextArrivalsSection() {
             ArrivalItem(
                 stationName = "Angamos",
                 direction = "hacia San Martin", 
-                time = "5 min"
+                time = "5 min",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
         }
     }
 }
 
 @Composable
-fun ArrivalItem(stationName: String, direction: String, time: String) {
+fun ArrivalItem(
+    stationName: String, 
+    direction: String, 
+    time: String,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = DarkGray),
+        colors = CardDefaults.cardColors(containerColor = if (textColor == White) DarkGray else Color(0xFFF0F0F0)),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -182,20 +229,20 @@ fun ArrivalItem(stationName: String, direction: String, time: String) {
                     text = stationName,
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = textColor
                     )
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.ArrowForward,
                         contentDescription = "Dirección",
-                        tint = LightGray,
+                        tint = secondaryTextColor,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = direction,
-                        style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
             }
@@ -217,10 +264,14 @@ fun ArrivalItem(stationName: String, direction: String, time: String) {
 }
 
 @Composable
-fun NotificationsSection() {
+fun NotificationsSection(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -240,7 +291,7 @@ fun NotificationsSection() {
                 )
                 Text(
                     text = "Ver más",
-                    style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+                    style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
             }
             
@@ -248,41 +299,55 @@ fun NotificationsSection() {
             
             NotificationItem(
                 title = "Servicio Normal",
-                description = "Todas las líneas operando con normalidad"
+                description = "Todas las líneas operando con normalidad",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             NotificationItem(
                 title = "Mantenimiento Programado",
-                description = "Línea 1: Horario reducido el domingo 20 de octubre"
+                description = "Línea 1: Horario reducido el domingo 20 de octubre",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
         }
     }
 }
 
 @Composable
-fun NotificationItem(title: String, description: String) {
+fun NotificationItem(
+    title: String, 
+    description: String,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Column {
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.Bold,
-                color = White
+                color = textColor
             )
         )
         Text(
             text = description,
-            style = MaterialTheme.typography.bodySmall.copy(color = LightGray)
+            style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
         )
     }
 }
 
 @Composable
-fun AISection(navController: NavController) {
+fun AISection(
+    navController: NavController,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -299,11 +364,11 @@ fun AISection(navController: NavController) {
                 )
                 Text(
                     text = "Usar un chat de ayuda o asistente.",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = White),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
                 Button(
-                    onClick = { /* TODO: Implementar chat IA */ },
+                    onClick = { navController.navigate(Screen.Chat.route) },
                     colors = ButtonDefaults.buttonColors(containerColor = White),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -315,12 +380,19 @@ fun AISection(navController: NavController) {
                 }
             }
             
-            // Icono de robot (usando emoji como placeholder)
-            Text(
-                text = "🤖",
-                style = MaterialTheme.typography.headlineLarge,
+            // Imagen del robot personalizado
+            RobotImage(
                 modifier = Modifier.padding(start = 16.dp)
             )
         }
     }
+}
+
+@Composable
+fun RobotImage(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.robot),
+        contentDescription = "Robot IA",
+        modifier = modifier.size(130.dp)
+    )
 }
