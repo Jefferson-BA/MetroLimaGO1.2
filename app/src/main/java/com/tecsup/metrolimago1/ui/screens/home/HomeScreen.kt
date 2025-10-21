@@ -326,68 +326,89 @@ fun AISection(navController: NavController) {
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-    NavigationBar(
-        containerColor = CardGray,
-        contentColor = White
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = CardGray),
+        shape = RoundedCornerShape(50.dp)
     ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-            label = { Text("Inicio") },
-            selected = true,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                selectedTextColor = White,
-                indicatorColor = MetroOrange
-            )
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.LocationOn, contentDescription = "Ubicación") },
-            label = { Text("Ubicación") },
-            selected = false,
-            onClick = { navController.navigate(Screen.Estaciones.route) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                selectedTextColor = White,
-                unselectedIconColor = LightGray,
-                unselectedTextColor = LightGray
-            )
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Directions, contentDescription = "Rutas") },
-            label = { Text("Rutas") },
-            selected = false,
-            onClick = { navController.navigate(Screen.Rutas.route) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                selectedTextColor = White,
-                unselectedIconColor = LightGray,
-                unselectedTextColor = LightGray
-            )
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.SignalCellular4Bar, contentDescription = "Conexión") },
-            label = { Text("Conexión") },
-            selected = false,
-            onClick = { /* TODO: Implementar pantalla de conexión */ },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                selectedTextColor = White,
-                unselectedIconColor = LightGray,
-                unselectedTextColor = LightGray
-            )
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración") },
-            selected = false,
-            onClick = { navController.navigate(Screen.Configuracion.route) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                selectedTextColor = White,
-                unselectedIconColor = LightGray,
-                unselectedTextColor = LightGray
-            )
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Home Icon (Selected)
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        MetroOrange,
+                        RoundedCornerShape(24.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Inicio",
+                    tint = White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            // Location Icon
+            IconButton(
+                onClick = { navController.navigate(Screen.Estaciones.route) },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Ubicación",
+                    tint = LightGray,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            // Routes Icon (Two pins connected)
+            IconButton(
+                onClick = { navController.navigate(Screen.Rutas.route) },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Route,
+                    contentDescription = "Rutas",
+                    tint = LightGray,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            // Signal Icon (WiFi style)
+            IconButton(
+                onClick = { /* TODO: Implementar pantalla de conexión */ },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Wifi,
+                    contentDescription = "Conexión",
+                    tint = LightGray,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            // Settings Icon
+            IconButton(
+                onClick = { navController.navigate(Screen.Configuracion.route) },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Configuración",
+                    tint = LightGray,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
     }
 }
