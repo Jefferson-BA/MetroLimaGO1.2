@@ -20,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.components.EstacionCard
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.dp
@@ -27,32 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.tecsup.metrolimago1.components.EstacionCard
 import com.tecsup.metrolimago1.components.TopBar
 import com.tecsup.metrolimago1.navigation.Screen
-import com.tecsup.metrolimago1.data.database.DatabaseModule
-import com.tecsup.metrolimago1.data.repository.StationRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaEstacionesScreen(
-    navController: NavController
-) {
-    val context = LocalContext.current
-    val viewModel = remember {
-        val stationDao = DatabaseModule.getStationDao(context)
-        val repository = StationRepository(stationDao)
-        ListaEstacionesViewModel(repository)
-    }
-    val stations by viewModel.stations.collectAsStateWithLifecycle()
-    val availableLines by viewModel.availableLines.collectAsStateWithLifecycle()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val selectedLine by viewModel.selectedLine.collectAsStateWithLifecycle()
-
+fun ListaEstacionesScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopBar(
@@ -71,47 +53,38 @@ fun ListaEstacionesScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Search field
+            var query by remember { mutableStateOf("") }
+            var selectedLine by remember { mutableStateOf<String?>(null) }
+
+            // Search + simple filter row
             Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                 OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { viewModel.updateSearchQuery(it) },
+                    value = query,
+                    onValueChange = { query = it },
                     label = { Text("Buscar estación") },
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Filter buttons for lines
+            // Simple filter buttons
             Row(modifier = Modifier.fillMaxWidth()) {
-                for (line in availableLines) {
+                val lines = MockStations.stations.map { it.line }.distinct()
+                for (line in lines) {
                     val isSelected = selectedLine == line
-                    Button(
-                        onClick = { viewModel.selectLine(if (isSelected) null else line) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
+                    Button(onClick = { selectedLine = if (isSelected) null else line }, modifier = Modifier.padding(end = 8.dp)) {
                         Text(text = line)
                     }
                 }
             }
 
-            // Loading indicator
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                // Stations list
-                LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
-                    items(stations) { station ->
-                        EstacionCard(
-                            station = station,
-                            onClick = { navController.navigate(Screen.EstacionDetail.createRoute(station.id)) }
-                        )
-                    }
+            val filtered = MockStations.stations.filter {
+                (selectedLine == null || it.line == selectedLine) && (query.isBlank() || it.name.contains(query, true) || it.id.contains(query, true))
+            }
+
+            LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                items(filtered) { station ->
+                    EstacionCard(station = station, onClick = { navController.navigate(Screen.EstacionDetail.createRoute(station.id)) })
                 }
             }
         }
