@@ -19,13 +19,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Home.route)
         }
     ) { paddingValues ->
         Column(
@@ -320,95 +321,6 @@ fun AISection(navController: NavController) {
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(start = 16.dp)
             )
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
-        shape = RoundedCornerShape(50.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Home Icon (Selected)
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        MetroOrange,
-                        RoundedCornerShape(24.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Inicio",
-                    tint = White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            
-            // Location Icon
-            IconButton(
-                onClick = { navController.navigate(Screen.Estaciones.route) },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Ubicación",
-                    tint = LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            
-            // Routes Icon (Two pins connected)
-            IconButton(
-                onClick = { navController.navigate(Screen.Rutas.route) },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Route,
-                    contentDescription = "Rutas",
-                    tint = LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            
-            // Signal Icon (WiFi style)
-            IconButton(
-                onClick = { /* TODO: Implementar pantalla de conexión */ },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Wifi,
-                    contentDescription = "Conexión",
-                    tint = LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            
-            // Settings Icon
-            IconButton(
-                onClick = { navController.navigate(Screen.Configuracion.route) },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Configuración",
-                    tint = LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
     }
 }

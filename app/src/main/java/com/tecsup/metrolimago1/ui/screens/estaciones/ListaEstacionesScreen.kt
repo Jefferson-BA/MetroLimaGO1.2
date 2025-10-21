@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.components.TopBar
+import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +39,9 @@ fun ListaEstacionesScreen(navController: NavController) {
                     }
                 }
             )
+        },
+        bottomBar = {
+            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Estaciones.route)
         }
     ) { paddingValues ->
         Column(
