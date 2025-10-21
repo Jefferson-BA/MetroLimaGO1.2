@@ -10,6 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +64,10 @@ fun HomeScreen(navController: NavController) {
 
             // Barra de búsqueda
             SearchBar(
-                onSearchClick = { /* TODO: Implementar búsqueda */ },
+                onSearchClick = { query ->
+                    // Navegar a estaciones con la consulta de búsqueda
+                    navController.navigate(Screen.Estaciones.route)
+                },
                 cardColor = cardColor,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
@@ -99,11 +106,13 @@ fun HomeScreen(navController: NavController) {
 
 @Composable
 fun SearchBar(
-    onSearchClick: () -> Unit,
+    onSearchClick: (String) -> Unit,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -124,11 +133,45 @@ fun SearchBar(
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "¿A dónde vas?",
-                color = secondaryTextColor,
-                style = MaterialTheme.typography.bodyLarge
+            
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = {
+                    Text(
+                        text = "¿A dónde vas?",
+                        color = secondaryTextColor
+                    )
+                },
+                modifier = Modifier.weight(1f),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                singleLine = true
             )
+            
+            // Botón de búsqueda
+            if (searchQuery.isNotEmpty()) {
+                IconButton(
+                    onClick = { 
+                        onSearchClick(searchQuery)
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = "Buscar",
+                        tint = MetroOrange,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
     }
 }
