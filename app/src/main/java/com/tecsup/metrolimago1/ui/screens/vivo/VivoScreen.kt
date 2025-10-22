@@ -46,14 +46,20 @@ fun VivoScreen(navController: NavController) {
         },
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Vivo.route)
-        }
+        },
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 0.dp // Sin padding inferior para permitir contenido detrás de la barra
+                )
+                .padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ServiceStatusCard(
@@ -73,6 +79,9 @@ fun VivoScreen(navController: NavController) {
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
+            
+            // Espacio para la barra de navegación transparente
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }

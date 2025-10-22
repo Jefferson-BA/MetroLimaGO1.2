@@ -1,5 +1,6 @@
 package com.tecsup.metrolimago1.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,19 +10,47 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
 @Composable
 fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
+    val themeState = LocalThemeState.current
+    
+    // Colores transparentes según el tema
+    val transparentBackground = if (themeState.isDarkMode) 
+        Color.Black.copy(alpha = 0.3f) 
+    else 
+        Color.White.copy(alpha = 0.4f) // Más opaco en modo claro
+    
+    // Borde para mejor visibilidad
+    val borderColor = if (themeState.isDarkMode) 
+        Color.White.copy(alpha = 0.2f)
+    else 
+        Color.Black.copy(alpha = 0.15f) // Borde sutil en modo claro
+    
+    // Colores para iconos inactivos con mejor contraste
+    val inactiveIconColor = if (themeState.isDarkMode) 
+        Color.White.copy(alpha = 0.7f)
+    else 
+        Color.Black.copy(alpha = 0.7f)
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = CardGray),
-        shape = RoundedCornerShape(50.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .blur(radius = 0.dp), // Sin blur para mantener nitidez
+        colors = CardDefaults.cardColors(containerColor = transparentBackground),
+        shape = RoundedCornerShape(50.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = borderColor
+        )
     ) {
         Row(
             modifier = Modifier
@@ -56,7 +85,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     Icon(
                         imageVector = Icons.Default.Home,
                         contentDescription = "Inicio",
-                        tint = LightGray,
+                        tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -88,7 +117,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = "Ubicación",
-                        tint = LightGray,
+                        tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -120,7 +149,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     Icon(
                         imageVector = Icons.Default.Route,
                         contentDescription = "Rutas",
-                        tint = LightGray,
+                        tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -152,7 +181,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                             Icon(
                                 imageVector = Icons.Default.Wifi,
                                 contentDescription = "En vivo",
-                                tint = LightGray,
+                                tint = inactiveIconColor,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -184,7 +213,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Configuración",
-                        tint = LightGray,
+                        tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }

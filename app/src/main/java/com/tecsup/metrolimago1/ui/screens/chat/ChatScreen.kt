@@ -100,13 +100,19 @@ fun ChatScreen(navController: NavController) {
         },
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Chat.route)
-        }
+        },
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(paddingValues)
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = 0.dp,
+                    end = 0.dp,
+                    bottom = 0.dp // Sin padding inferior para permitir contenido detrás de la barra
+                )
         ) {
             // Lista de mensajes
             LazyColumn(
@@ -263,6 +269,9 @@ fun MessageInputBar(
                 )
             }
         }
+        
+        // Espacio para la barra de navegación transparente
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 

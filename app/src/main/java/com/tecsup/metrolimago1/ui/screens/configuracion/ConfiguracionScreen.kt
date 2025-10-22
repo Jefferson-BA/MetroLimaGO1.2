@@ -33,14 +33,20 @@ fun ConfiguracionScreen(navController: NavController) {
     Scaffold(
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Configuracion.route)
-        }
+        },
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 0.dp // Sin padding inferior para permitir contenido detrás de la barra
+                )
+                .padding(vertical = 24.dp)
         ) {
             // Título principal
             Text(
@@ -80,6 +86,9 @@ fun ConfiguracionScreen(navController: NavController) {
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
+            
+            // Espacio para la barra de navegación transparente
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
