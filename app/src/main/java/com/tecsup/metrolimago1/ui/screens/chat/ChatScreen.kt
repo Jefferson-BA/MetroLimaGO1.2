@@ -53,8 +53,7 @@ fun ChatScreen(navController: NavController) {
             )
         }
     }
-    
-    // Simular respuesta de IA cuando isLoading es true
+
     LaunchedEffect(isLoading) {
         if (isLoading) {
             kotlinx.coroutines.delay(1500)
@@ -218,7 +217,7 @@ fun MessageInputBar(
             .fillMaxWidth()
             .padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(28.dp)
     ) {
         Row(
             modifier = Modifier
@@ -253,7 +252,7 @@ fun MessageInputBar(
                     .size(40.dp)
                     .background(
                         MetroOrange,
-                        RoundedCornerShape(20.dp)
+                        RoundedCornerShape(28.dp)
                     )
             ) {
                 Icon(
@@ -275,7 +274,7 @@ fun TypingIndicator(
     Card(
         modifier = Modifier.widthIn(max = 100.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(28.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),

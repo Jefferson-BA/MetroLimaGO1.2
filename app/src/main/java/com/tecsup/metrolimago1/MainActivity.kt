@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeState = remember { ThemeState() }
             CompositionLocalProvider(LocalThemeState provides themeState) {
-                MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+                MetroLimaGO1Theme(darkTheme = themeState.isDarkMode, blancoYNegro = true) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background

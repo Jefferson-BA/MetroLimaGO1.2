@@ -23,13 +23,13 @@ import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 fun ConfiguracionScreen(navController: NavController) {
     val themeState = LocalThemeState.current
     var selectedLanguage by remember { mutableStateOf("es") }
-    
+
     // Colores dinámicos según el tema
     val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
-    
+
     Scaffold(
         bottomBar = {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Configuracion.route)
@@ -54,7 +54,7 @@ fun ConfiguracionScreen(navController: NavController) {
 
             // Sección Apariencia
             AppearanceSection(
-                isDarkMode = themeState.isDarkMode, 
+                isDarkMode = themeState.isDarkMode,
                 onDarkModeToggle = { themeState.updateDarkMode(it) },
                 cardColor = cardColor,
                 textColor = textColor,
@@ -65,7 +65,7 @@ fun ConfiguracionScreen(navController: NavController) {
 
             // Sección Idioma
             LanguageSection(
-                selectedLanguage = selectedLanguage, 
+                selectedLanguage = selectedLanguage,
                 onLanguageChange = { selectedLanguage = it },
                 cardColor = cardColor,
                 textColor = textColor,
@@ -86,7 +86,7 @@ fun ConfiguracionScreen(navController: NavController) {
 
 @Composable
 fun AppearanceSection(
-    isDarkMode: Boolean, 
+    isDarkMode: Boolean,
     onDarkModeToggle: (Boolean) -> Unit,
     cardColor: Color,
     textColor: Color,
@@ -101,11 +101,11 @@ fun AppearanceSection(
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(28.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -119,9 +119,9 @@ fun AppearanceSection(
                     tint = textColor,
                     modifier = Modifier.size(24.dp)
                 )
-                
+
                 Spacer(modifier = Modifier.width(12.dp))
-                
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Modo Oscuro",
@@ -135,7 +135,7 @@ fun AppearanceSection(
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
-                
+
                 Switch(
                     checked = isDarkMode,
                     onCheckedChange = onDarkModeToggle,
@@ -153,7 +153,7 @@ fun AppearanceSection(
 
 @Composable
 fun LanguageSection(
-    selectedLanguage: String, 
+    selectedLanguage: String,
     onLanguageChange: (String) -> Unit,
     cardColor: Color,
     textColor: Color,
@@ -168,11 +168,11 @@ fun LanguageSection(
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(28.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -186,9 +186,9 @@ fun LanguageSection(
                         tint = textColor,
                         modifier = Modifier.size(24.dp)
                     )
-                    
+
                     Spacer(modifier = Modifier.width(12.dp))
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Idioma",
@@ -203,9 +203,9 @@ fun LanguageSection(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -223,7 +223,7 @@ fun LanguageSection(
                             color = if (selectedLanguage == "es") White else textColor
                         )
                     }
-                    
+
                     Button(
                         onClick = { onLanguageChange("en") },
                         colors = ButtonDefaults.buttonColors(
@@ -258,11 +258,11 @@ fun AboutSection(
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(28.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -274,9 +274,9 @@ fun AboutSection(
                         color = textColor
                     )
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Card(
                     colors = CardDefaults.cardColors(containerColor = if (textColor == White) DarkGray else Color(0xFFE0E0E0)),
                     shape = RoundedCornerShape(6.dp)
@@ -287,20 +287,20 @@ fun AboutSection(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Text(
                     text = "MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.",
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Divider(color = secondaryTextColor, thickness = 1.dp)
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // Contacto
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -318,15 +318,15 @@ fun AboutSection(
                         )
                     )
                 }
-                
+
                 Text(
                     text = "soporte@metrolimago.pe",
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // Desarrollador
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -344,7 +344,7 @@ fun AboutSection(
                         )
                     )
                 }
-                
+
                 Text(
                     text = "MetroLima Development Team",
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor),

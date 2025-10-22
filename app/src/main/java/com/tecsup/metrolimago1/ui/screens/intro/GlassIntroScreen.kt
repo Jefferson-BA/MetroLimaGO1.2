@@ -32,18 +32,16 @@ fun IntroScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color(0xFF0E0E0E))
     ) {
-        // 🔹 Imagen inferior (degradado o fondo del figma)
         Image(
             painter = painterResource(R.drawable.intro),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.71f)
+                .fillMaxHeight(0.72f)
                 .align(Alignment.BottomCenter),
             contentScale = ContentScale.FillBounds
         )
 
-        // 🔸 Bloque blanco superior
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -60,7 +58,6 @@ fun IntroScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🔹 Animación del ícono (rebote lateral)
             val infiniteTransition = rememberInfiniteTransition(label = "arrowBounce")
 
             val offsetX by infiniteTransition.animateValue(
