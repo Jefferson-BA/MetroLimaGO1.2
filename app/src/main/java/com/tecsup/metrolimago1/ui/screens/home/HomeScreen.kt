@@ -20,9 +20,15 @@ import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+<<<<<<< HEAD
 import com.tecsup.metrolimago1.ui.theme.*
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.alpha
+=======
+import com.tecsup.metrolimago1.components.AdvancedSearchBar
+import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.domain.models.Station
+>>>>>>> 495fb37218e9d9970390c772d8111579f9386f98
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,10 +60,17 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 22.dp)
             )
 
-            SearchBar(
+            AdvancedSearchBar(
                 onSearchClick = { query ->
                     navController.navigate(Screen.Estaciones.route)
                 },
+<<<<<<< HEAD
+=======
+                onStationSelect = { station ->
+                    navController.navigate(Screen.EstacionDetail.createRoute(station.id))
+                },
+                cardColor = cardColor,
+>>>>>>> 495fb37218e9d9970390c772d8111579f9386f98
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
