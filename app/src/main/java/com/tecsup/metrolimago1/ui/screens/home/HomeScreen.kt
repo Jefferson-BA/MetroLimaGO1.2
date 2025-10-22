@@ -23,7 +23,9 @@ import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.components.AdvancedSearchBar
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.domain.models.Station
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,9 +58,12 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            SearchBar(
+            AdvancedSearchBar(
                 onSearchClick = { query ->
                     navController.navigate(Screen.Estaciones.route)
+                },
+                onStationSelect = { station ->
+                    navController.navigate(Screen.EstacionDetail.createRoute(station.id))
                 },
                 cardColor = cardColor,
                 textColor = textColor,
