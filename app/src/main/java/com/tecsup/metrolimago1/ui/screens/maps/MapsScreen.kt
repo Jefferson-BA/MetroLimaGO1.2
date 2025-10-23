@@ -1,4 +1,4 @@
-package com.tecsup.metrolimago1.ui.screens.rutas
+package com.tecsup.metrolimago1.ui.screens.maps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +34,7 @@ data class RouteInfo(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanificadorRutaScreen(navController: NavController) {
+fun MapsScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
     // Colores dinámicos según el tema
@@ -62,7 +62,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
             TopAppBar(
                 title = { 
                     Text(
-                        text = "Planificador de Rutas",
+                        text = "Mapa del Metro",
                         color = textColor
                     ) 
                 },
@@ -77,7 +77,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
             )
         },
         bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Rutas.route)
+            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Maps.route)
         }
     ) { paddingValues ->
         Column(
@@ -127,7 +127,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 // Mapa simplificado con fallback
-                SimpleMapView(
+                com.tecsup.metrolimago1.ui.screens.maps.SimpleMapView(
                     selectedOrigin = selectedOrigin,
                     selectedDestination = selectedDestination,
                     showRoute = showRoute,
@@ -295,6 +295,160 @@ fun CompactRoutePanel(
     }
 }
 
+
+
+
+// Función para calcular ruta (simula Directions API)
+fun calculateRoute(origin: Station, destination: Station): RouteInfo {
+    // Simulación de cálculo de distancia y tiempo
+    val distance = "${(1..15).random()} km"
+    val duration = "${(5..45).random()} min"
+    val steps = listOf(
+        "1. Dirígete a ${origin.name}",
+        "2. Toma el Metro hacia ${destination.name}",
+        "3. Baja en ${destination.name}",
+        "4. Has llegado a tu destino"
+    )
+    return RouteInfo(distance, duration, steps)
+}
+
+@Composable
+fun LineFilterSection(
+    selectedLine: String?,
+    onLineSelected: (String?) -> Unit,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Column {
+        Text(
+            text = "Filtrar por Línea",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Botón "Todas"
+            FilterChip(
+                onClick = { onLineSelected(null) },
+                label = { Text("Todas") },
+                selected = selectedLine == null,
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroOrange,
+                    selectedLabelColor = White
+                )
+            )
+            
+            // Botón "Línea 1"
+            FilterChip(
+                onClick = { onLineSelected("Línea 1") },
+                label = { Text("Línea 1") },
+                selected = selectedLine == "Línea 1",
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroOrange,
+                    selectedLabelColor = White
+                )
+            )
+            
+            // Botón "Línea 2"
+            FilterChip(
+                onClick = { onLineSelected("Línea 2") },
+                label = { Text("Línea 2") },
+                selected = selectedLine == "Línea 2",
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroGreen,
+                    selectedLabelColor = White
+                )
+            )
+            
+            // Botón "Línea 3"
+            FilterChip(
+                onClick = { onLineSelected("Línea 3") },
+                label = { Text("Línea 3") },
+                selected = selectedLine == "Línea 3",
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF2196F3),
+                    selectedLabelColor = White
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun RouteInfoCard(
+    routeInfo: RouteInfo,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Distancia",
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
+                    )
+                    Text(
+                        text = routeInfo.distance,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                    )
+                }
+                
+                Column {
+                    Text(
+                        text = "Tiempo",
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
+                    )
+                    Text(
+                        text = routeInfo.duration,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Instrucciones:",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+            )
+            
+            routeInfo.steps.forEach { step ->
+                Text(
+                    text = step,
+                    style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
+                    modifier = Modifier.padding(start = 8.dp, top = 2.dp)
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun CompactStationSelector(
     label: String,
@@ -450,304 +604,4 @@ fun CompactRouteInfo(
             }
         }
     }
-}
-
-@Composable
-fun LineFilterSection(
-    selectedLine: String?,
-    onLineSelected: (String?) -> Unit,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Column {
-        Text(
-            text = "Filtrar por Línea",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Botón "Todas"
-            FilterChip(
-                onClick = { onLineSelected(null) },
-                label = { Text("Todas") },
-                selected = selectedLine == null,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroOrange,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 1"
-            FilterChip(
-                onClick = { onLineSelected("Línea 1") },
-                label = { Text("Línea 1") },
-                selected = selectedLine == "Línea 1",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroOrange,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 2"
-            FilterChip(
-                onClick = { onLineSelected("Línea 2") },
-                label = { Text("Línea 2") },
-                selected = selectedLine == "Línea 2",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroGreen,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 3"
-            FilterChip(
-                onClick = { onLineSelected("Línea 3") },
-                label = { Text("Línea 3") },
-                selected = selectedLine == "Línea 3",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF2196F3),
-                    selectedLabelColor = White
-                )
-            )
-        }
-    }
-}
-
-@Composable
-fun SimpleMapView(
-    selectedOrigin: Station?,
-    selectedDestination: Station?,
-    showRoute: Boolean,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    var showGoogleMap by remember { mutableStateOf(false) }
-    
-    if (showGoogleMap) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(MockStations.LIMA_CENTER, MockStations.LIMA_ZOOM)
-            },
-            properties = MapProperties(
-                isMyLocationEnabled = false,
-                mapType = MapType.NORMAL
-            ),
-            uiSettings = MapUiSettings(
-                zoomControlsEnabled = true,
-                compassEnabled = false,
-                myLocationButtonEnabled = false
-            )
-        ) {
-            // Marcadores de estaciones
-            MockStations.stations.forEach { station ->
-                Marker(
-                    state = MarkerState(position = LatLng(station.latitude, station.longitude)),
-                    title = station.name,
-                    snippet = "${station.line} - ${station.address}"
-                )
-            }
-
-            // Ruta entre estaciones
-            if (showRoute && selectedOrigin != null && selectedDestination != null) {
-                val originPos = LatLng(selectedOrigin.latitude, selectedOrigin.longitude)
-                val destPos = LatLng(selectedDestination.latitude, selectedDestination.longitude)
-                
-                Polyline(
-                    points = listOf(originPos, destPos),
-                    color = MetroOrange,
-                    width = 8f
-                )
-            }
-
-            // Líneas del Metro
-            MetroLinesOverlay()
-        }
-    }
-    
-    if (!showGoogleMap) {
-        // Vista de mapa simplificada
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(secondaryTextColor.copy(alpha = 0.1f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Map,
-                    contentDescription = "Mapa",
-                    tint = MetroOrange,
-                    modifier = Modifier.size(64.dp)
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Text(
-                    text = "Mapa del Metro de Lima",
-                    color = textColor,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Text(
-                    text = "30 estaciones disponibles",
-                    color = secondaryTextColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Botón para activar Google Maps
-                Button(
-                    onClick = { showGoogleMap = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = MetroOrange),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Activar Mapa")
-                }
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Información de estaciones seleccionadas
-                if (selectedOrigin != null || selectedDestination != null) {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = cardColor),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            if (selectedOrigin != null) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.FlightTakeoff,
-                                        contentDescription = "Origen",
-                                        tint = MetroOrange,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Origen: ${selectedOrigin.name}",
-                                        color = textColor,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                            
-                            if (selectedDestination != null) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.FlightLand,
-                                        contentDescription = "Destino",
-                                        tint = MetroGreen,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Destino: ${selectedDestination.name}",
-                                        color = textColor,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                            
-                            if (showRoute && selectedOrigin != null && selectedDestination != null) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Route,
-                                        contentDescription = "Ruta",
-                                        tint = MetroOrange,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Ruta calculada",
-                                        color = MetroOrange,
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MetroLinesOverlay() {
-    // Línea 1 - Naranja
-    val linea1Stations = MockStations.getStationsByLine("Línea 1")
-    if (linea1Stations.isNotEmpty()) {
-        val linea1Points = linea1Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea1Points,
-            color = MetroOrange,
-            width = 6f
-        )
-    }
-
-    // Línea 2 - Verde
-    val linea2Stations = MockStations.getStationsByLine("Línea 2")
-    if (linea2Stations.isNotEmpty()) {
-        val linea2Points = linea2Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea2Points,
-            color = MetroGreen,
-            width = 6f
-        )
-    }
-
-    // Línea 3 - Azul
-    val linea3Stations = MockStations.getStationsByLine("Línea 3")
-    if (linea3Stations.isNotEmpty()) {
-        val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea3Points,
-            color = Color(0xFF2196F3),
-            width = 6f
-        )
-    }
-}
-
-// Función para calcular ruta (simula Directions API)
-fun calculateRoute(origin: Station, destination: Station): RouteInfo {
-    // Simulación de cálculo de distancia y tiempo
-    val distance = "${(1..15).random()} km"
-    val duration = "${(5..45).random()} min"
-    val steps = listOf(
-        "1. Dirígete a ${origin.name}",
-        "2. Toma el Metro hacia ${destination.name}",
-        "3. Baja en ${destination.name}",
-        "4. Has llegado a tu destino"
-    )
-    return RouteInfo(distance, duration, steps)
 }

@@ -14,6 +14,7 @@ import com.tecsup.metrolimago1.ui.screens.rutas.PlanificadorRutaScreen
 import com.tecsup.metrolimago1.ui.screens.chat.ChatScreen
 import com.tecsup.metrolimago1.ui.screens.splash.SplashScreen
 import com.tecsup.metrolimago1.ui.screens.vivo.VivoScreen
+import com.tecsup.metrolimago1.ui.screens.maps.MapsScreen
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -24,6 +25,7 @@ sealed class Screen(val route: String) {
         fun createRoute(estacionId: String) = "estaciones/$estacionId"
     }
     object Rutas : Screen("rutas")
+    object Maps : Screen("maps")
     object Configuracion : Screen("configuracion")
     object Chat : Screen("chat")
     object Vivo : Screen("vivo")
@@ -69,6 +71,10 @@ fun MainNavGraph() {
 
         composable(Screen.Rutas.route) {
             PlanificadorRutaScreen(navController = navController)
+        }
+
+        composable(Screen.Maps.route) {
+            MapsScreen(navController = navController)
         }
 
         composable(Screen.Configuracion.route) {
