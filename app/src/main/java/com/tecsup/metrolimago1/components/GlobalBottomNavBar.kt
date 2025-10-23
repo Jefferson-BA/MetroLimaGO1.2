@@ -13,13 +13,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 30.dp),
         colors = CardDefaults.cardColors(containerColor = CardGray),
         shape = RoundedCornerShape(50.dp)
     ) {
@@ -30,7 +33,6 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Home Icon
             if (currentRoute == Screen.Home.route) {
                 Box(
                     modifier = Modifier
@@ -61,8 +63,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-            // Location Icon
+
             if (currentRoute == Screen.Estaciones.route) {
                 Box(
                     modifier = Modifier
@@ -93,8 +94,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-            // Routes Icon
+
             if (currentRoute == Screen.Rutas.route) {
                 Box(
                     modifier = Modifier
@@ -125,8 +125,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-                    // Signal Icon (En vivo)
+
                     if (currentRoute == Screen.Vivo.route) {
                         Box(
                             modifier = Modifier
@@ -157,8 +156,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                             )
                         }
                     }
-            
-            // Settings Icon
+
             if (currentRoute == Screen.Configuracion.route) {
                 Box(
                     modifier = Modifier
@@ -189,6 +187,26 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GlobalBottomNavBarPreview() {
+    val navController = rememberNavController()
+
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF5F5F5)),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            GlobalBottomNavBar(
+                navController = navController,
+                currentRoute = "home" // Puedes cambiar por "rutas", "vivo", etc. para ver el estado activo
+            )
         }
     }
 }

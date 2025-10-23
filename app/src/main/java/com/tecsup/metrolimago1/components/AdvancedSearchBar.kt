@@ -30,15 +30,14 @@ fun AdvancedSearchBar(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var showSuggestions by remember { mutableStateOf(false) }
-    
-    // Filtrar estaciones basado en la búsqueda
+
     val suggestions = remember(searchQuery) {
         if (searchQuery.length >= 2) {
             MockStations.stations.filter { station ->
                 station.name.contains(searchQuery, ignoreCase = true) ||
                 station.address.contains(searchQuery, ignoreCase = true) ||
                 station.description.contains(searchQuery, ignoreCase = true)
-            }.take(5) // Mostrar máximo 5 sugerencias
+            }.take(5)
         } else {
             emptyList()
         }

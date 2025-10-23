@@ -20,10 +20,9 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         
         viewModelScope.launch {
             while (isActive && isMonitoring) {
-                // Simular alertas aleatorias cada 30-60 segundos
-                val delayTime = (30000..60000).random()
+                val delayTime = (30000..60000).random().toLong()
                 delay(delayTime)
-                
+
                 if (isActive) {
                     simulateRandomAlert()
                 }
