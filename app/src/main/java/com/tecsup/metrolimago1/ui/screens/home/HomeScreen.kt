@@ -2,10 +2,13 @@ package com.tecsup.metrolimago1.ui.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -28,6 +31,8 @@ import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.domain.services.RouteCalculationService
+import com.tecsup.metrolimago1.utils.RouteTestUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,11 +50,12 @@ fun HomeScreen(navController: NavController) {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Home.route)
         },
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+        ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
+                .verticalScroll(rememberScrollState())
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     start = 16.dp,
@@ -105,6 +111,20 @@ fun HomeScreen(navController: NavController) {
                 cardColor = cardColor,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Sección de Pruebas de Rutas
+            RouteTestSection(
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor,
+                onCardClick = {
+                    // Aquí puedes agregar navegación a una pantalla de detalles
+                    // o mostrar un diálogo con más información
+                    println("Card de rutas clickeada!")
+                }
             )
             
             // Espacio para la barra de navegación transparente
@@ -447,4 +467,114 @@ fun RobotImage(modifier: Modifier = Modifier) {
         contentDescription = "Robot IA",
         modifier = modifier.size(130.dp)
     )
+}
+
+@Composable
+fun RouteTestSection(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color,
+    onCardClick: () -> Unit = {}
+) {
+    var showDetails by remember { mutableStateOf(false) }
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { 
+                showDetails = !showDetails
+                onCardClick() 
+            },
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Route,
+                    contentDescription = "Rutas",
+                    tint = MetroOrange,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Pruebas de Cálculo de Rutas",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                )
+            }
+
+            Text(
+                text = "Calcula el tiempo de viaje y muestra las estaciones del recorrido",
+                style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Ejemplo de uso
+            val tiempoEjemplo = RouteCalculationService.calcularTiempoEstimado("Villa El Salvador", "Miraflores")
+            val pasosEjemplo = RouteCalculationService.generarPasosRecorrido("Villa El Salvador", "Miraflores")
+            
+            Text(
+                text = "Ejemplo: Villa El Salvador → Miraflores",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                ),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Tiempo estimado: $tiempoEjemplo minutos",
+                style = MaterialTheme.typography.bodyMedium.copy(color = MetroGreen),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Pasos: ${pasosEjemplo.size} estaciones",
+                style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
+            )
+            
+            // Mostrar detalles expandidos cuando se hace click
+            if (showDetails) {
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = "Detalles del recorrido:",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    ),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                pasosEjemplo.forEachIndexed { index, paso ->
+                    val transferencia = if (paso.esTransferencia) " 🔄" else ""
+                    Text(
+                        text = "${index + 1}. ${paso.estacion} (${paso.linea})$transferencia",
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "💡 Toca la card para ocultar detalles",
+                    style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
+                )
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "💡 Toca la card para ver detalles del recorrido",
+                    style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
+                )
+            }
+        }
+    }
 }
