@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,10 +98,20 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 onOriginSelected = { selectedOrigin = it },
                 onDestinationSelected = { selectedDestination = it },
                 onLineToggle = { line ->
-                    selectedLines = if (selectedLines.contains(line)) {
+                    val newSelectedLines = if (selectedLines.contains(line)) {
                         selectedLines - line
                     } else {
                         selectedLines + line
+                    }
+                    selectedLines = newSelectedLines
+                    
+                    // Limpiar selecciones si las estaciones seleccionadas no están en las líneas filtradas
+                    val filteredStations = getFilteredStations(newSelectedLines)
+                    if (selectedOrigin != null && !filteredStations.contains(selectedOrigin)) {
+                        selectedOrigin = null
+                    }
+                    if (selectedDestination != null && !filteredStations.contains(selectedDestination)) {
+                        selectedDestination = null
                     }
                 },
                 onShowRoute = { 
@@ -131,16 +142,36 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 colors = CardDefaults.cardColors(containerColor = cardColor),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                // Mapa simplificado con fallback
-                SimpleMapView(
-                    selectedOrigin = selectedOrigin,
-                    selectedDestination = selectedDestination,
-                    showRoute = showRoute,
-                    selectedLines = selectedLines,
-                    cardColor = cardColor,
-                    textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
-                )
+                Box {
+                    // Mapa simplificado con fallback
+                    SimpleMapView(
+                        selectedOrigin = selectedOrigin,
+                        selectedDestination = selectedDestination,
+                        showRoute = showRoute,
+                        selectedLines = selectedLines,
+                        cardColor = cardColor,
+                        textColor = textColor,
+                        secondaryTextColor = secondaryTextColor
+                    )
+                    
+                    // Botón para agrandar el mapa
+                    FloatingActionButton(
+                        onClick = { 
+                            // Navegar a pantalla de mapa completo
+                            navController.navigate(Screen.Maps.route)
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp),
+                        containerColor = MetroOrange,
+                        contentColor = White
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Fullscreen,
+                            contentDescription = "Agrandar mapa"
+                        )
+                    }
+                }
             }
         }
     }
@@ -172,35 +203,14 @@ fun CompactRoutePanel(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Título y filtros en una fila
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-        ) {
+            // Título del panel
             Text(
-                    text = "Planifica tu trayecto",
-                    style = MaterialTheme.typography.titleMedium.copy(
+                text = "Planifica tu trayecto",
+                style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 )
             )
-
-                // Botón de IA integrado
-                Button(
-                    onClick = { navController.navigate(Screen.Chat.route) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MetroOrange),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.SmartToy,
-                        contentDescription = "IA",
-                        tint = White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -224,7 +234,7 @@ fun CompactRoutePanel(
                     label = "Origen",
                     selectedStation = selectedOrigin,
                     onStationSelected = onOriginSelected,
-                    stations = MockStations.stations,
+                    stations = getFilteredStations(selectedLines),
                     icon = Icons.Default.FlightTakeoff,
                     cardColor = cardColor,
                     textColor = textColor,
@@ -237,7 +247,7 @@ fun CompactRoutePanel(
                     label = "Destino",
                     selectedStation = selectedDestination,
                     onStationSelected = onDestinationSelected,
-                    stations = MockStations.stations,
+                    stations = getFilteredStations(selectedLines),
                     icon = Icons.Default.FlightLand,
                     cardColor = cardColor,
                     textColor = textColor,
@@ -302,14 +312,27 @@ fun CompactStationSelector(
     var expanded by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            ),
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+            )
+            
+            // Indicador de estaciones disponibles
+            Text(
+                text = "${stations.size} estaciones",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = secondaryTextColor
+                )
+            )
+        }
 
         Card(
             modifier = Modifier
@@ -840,6 +863,19 @@ fun LineFilterButtons(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Más líneas próximamente")
+        }
+    }
+}
+
+// Función para obtener estaciones filtradas por líneas seleccionadas
+fun getFilteredStations(selectedLines: Set<String>): List<Station> {
+    return if (selectedLines.isEmpty()) {
+        // Si no hay líneas seleccionadas, mostrar todas las estaciones
+        MockStations.stations
+    } else {
+        // Filtrar estaciones por las líneas seleccionadas
+        MockStations.stations.filter { station ->
+            selectedLines.contains(station.line)
         }
     }
 }
