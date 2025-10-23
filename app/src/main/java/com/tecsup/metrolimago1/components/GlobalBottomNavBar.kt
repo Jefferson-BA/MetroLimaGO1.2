@@ -16,6 +16,8 @@ import com.tecsup.metrolimago1.ui.theme.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.tecsup.metrolimago1.R
 
 @Composable
 fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
@@ -45,7 +47,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio",
+                        contentDescription = stringResource(R.string.nav_home),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -57,7 +59,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio",
+                        contentDescription = stringResource(R.string.nav_home),
                         tint = LightGray,
                         modifier = Modifier.size(24.dp)
                     )
@@ -76,7 +78,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Ubicación",
+                        contentDescription = stringResource(R.string.nav_stations),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -88,7 +90,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Ubicación",
+                        contentDescription = stringResource(R.string.nav_stations),
                         tint = LightGray,
                         modifier = Modifier.size(24.dp)
                     )

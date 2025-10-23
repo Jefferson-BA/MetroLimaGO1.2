@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +80,7 @@ fun ChatScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Asistente IA",
+                            text = stringResource(R.string.chat_ai_assistant),
                             color = textColor
                         )
                     }
@@ -88,7 +89,7 @@ fun ChatScreen(navController: NavController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = textColor
                         )
                     }
@@ -257,7 +258,7 @@ fun MessageInputBar(
             ) {
                 Icon(
                     Icons.Default.Send,
-                    contentDescription = "Enviar",
+                    contentDescription = stringResource(R.string.chat_send),
                     tint = White,
                     modifier = Modifier.size(20.dp)
                 )

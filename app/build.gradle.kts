@@ -17,6 +17,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Variables de entorno para API Keys (una sola clave para todas las APIs)
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"AIzaSyC41t2X5WxBz78hK6IV8aVAA2nAjJa1XSI\"")
     }
 
     buildTypes {
@@ -37,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -82,4 +86,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    
+    // Para manejar archivos .env
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 }
