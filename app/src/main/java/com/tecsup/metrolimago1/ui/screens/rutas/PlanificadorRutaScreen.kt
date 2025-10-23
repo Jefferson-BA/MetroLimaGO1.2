@@ -1,5 +1,9 @@
 package com.tecsup.metrolimago1.ui.screens.rutas
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,10 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.tecsup.metrolimago1.R
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -39,6 +47,7 @@ data class RouteInfo(
 @Composable
 fun PlanificadorRutaScreen(navController: NavController) {
     val themeState = LocalThemeState.current
+    val context = LocalContext.current
 
     // Colores dinámicos según el tema
     val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
@@ -51,9 +60,60 @@ fun PlanificadorRutaScreen(navController: NavController) {
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
     var showRoute by remember { mutableStateOf(false) }
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
-    
+
     // Estado para filtros de líneas
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
+    
+    // Estado para ubicación del usuario
+    var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var hasLocationPermission by remember { mutableStateOf(false) }
+    var useCurrentLocation by remember { mutableStateOf(true) } // Activado por defecto
+    var showGoogleMap by remember { mutableStateOf(false) }
+    
+    // FusedLocationProviderClient
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    
+    // Launcher para permisos de ubicación
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasLocationPermission = isGranted
+        if (isGranted) {
+            // Obtener ubicación actual
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        userLocation = LatLng(it.latitude, it.longitude)
+                        useCurrentLocation = true
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Manejar error de permisos
+            }
+        }
+    }
+    
+    // Verificar permisos al iniciar y obtener ubicación automáticamente
+    LaunchedEffect(Unit) {
+        hasLocationPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        
+        if (hasLocationPermission) {
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        userLocation = LatLng(it.latitude, it.longitude)
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Manejar error de permisos
+            }
+        } else {
+            // Solicitar permisos automáticamente
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
 
     // Posición de la cámara centrada en Lima
     val limaPosition = remember { MockStations.LIMA_CENTER }
@@ -90,49 +150,49 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 .background(backgroundColor)
                 .padding(paddingValues)
         ) {
-            // Panel de controles compacto
-            CompactRoutePanel(
-                navController = navController,
-                selectedOrigin = selectedOrigin,
-                selectedDestination = selectedDestination,
-                selectedLines = selectedLines,
-                routeInfo = routeInfo,
-                onOriginSelected = { selectedOrigin = it },
-                onDestinationSelected = { selectedDestination = it },
-                onLineToggle = { line ->
-                    val newSelectedLines = if (selectedLines.contains(line)) {
-                        selectedLines - line
-                    } else {
-                        selectedLines + line
-                    }
-                    selectedLines = newSelectedLines
-                    
-                    // Limpiar selecciones si las estaciones seleccionadas no están en las líneas filtradas
-                    val filteredStations = getFilteredStations(newSelectedLines)
-                    if (selectedOrigin != null && !filteredStations.contains(selectedOrigin)) {
-                        selectedOrigin = null
-                    }
-                    if (selectedDestination != null && !filteredStations.contains(selectedDestination)) {
-                        selectedDestination = null
-                    }
-                },
-                onShowRoute = { 
-                    showRoute = true
-                    // Simular cálculo de ruta con Directions API
-                    if (selectedOrigin != null && selectedDestination != null) {
-                        routeInfo = calculateRoute(selectedOrigin!!, selectedDestination!!)
-                    }
-                },
-                onClearRoute = { 
-                    showRoute = false
-                    selectedOrigin = null
-                    selectedDestination = null
-                    routeInfo = null
-                },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                    // Panel de controles compacto
+                    CompactRoutePanel(
+                        navController = navController,
+                        selectedOrigin = selectedOrigin,
+                        selectedDestination = selectedDestination,
+                        selectedLines = selectedLines,
+                        routeInfo = routeInfo,
+                        onOriginSelected = { selectedOrigin = it },
+                        onDestinationSelected = { selectedDestination = it },
+                        onLineToggle = { line ->
+                            val newSelectedLines = if (selectedLines.contains(line)) {
+                                selectedLines - line
+                            } else {
+                                selectedLines + line
+                            }
+                            selectedLines = newSelectedLines
+
+                            // Limpiar selecciones si las estaciones seleccionadas no están en las líneas filtradas
+                            val filteredStations = getFilteredStations(newSelectedLines)
+                            if (selectedOrigin != null && !filteredStations.contains(selectedOrigin)) {
+                                selectedOrigin = null
+                            }
+                            if (selectedDestination != null && !filteredStations.contains(selectedDestination)) {
+                                selectedDestination = null
+                            }
+                        },
+                        onShowRoute = {
+                            showRoute = true
+                            // Simular cálculo de ruta con Directions API
+                            if (selectedOrigin != null && selectedDestination != null) {
+                                routeInfo = calculateRoute(selectedOrigin!!, selectedDestination!!)
+                            }
+                        },
+                        onClearRoute = {
+                            showRoute = false
+                            selectedOrigin = null
+                            selectedDestination = null
+                            routeInfo = null
+                        },
+                        cardColor = cardColor,
+                        textColor = textColor,
+                        secondaryTextColor = secondaryTextColor
+                    )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -145,16 +205,18 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Box {
-                    // Mapa simplificado con fallback
-                    SimpleMapView(
-                        selectedOrigin = selectedOrigin,
-                        selectedDestination = selectedDestination,
-                        showRoute = showRoute,
-                        selectedLines = selectedLines,
-                        cardColor = cardColor,
-                        textColor = textColor,
-                        secondaryTextColor = secondaryTextColor
-                    )
+                            // Mapa simplificado con fallback
+                            SimpleMapView(
+                                selectedOrigin = selectedOrigin,
+                                selectedDestination = selectedDestination,
+                                showRoute = showRoute,
+                                selectedLines = selectedLines,
+                                userLocation = userLocation,
+                                hasLocationPermission = hasLocationPermission,
+                                cardColor = cardColor,
+                                textColor = textColor,
+                                secondaryTextColor = secondaryTextColor
+                            )
                     
                     // Botón para agrandar el mapa
                     FloatingActionButton(
@@ -172,6 +234,39 @@ fun PlanificadorRutaScreen(navController: NavController) {
                             imageVector = Icons.Default.Fullscreen,
                             contentDescription = "Agrandar mapa"
                         )
+                    }
+                    
+                    // Botón pequeño de ubicación (solo visible en mapa agrandado)
+                    if (showGoogleMap) {
+                        FloatingActionButton(
+                            onClick = {
+                                if (hasLocationPermission) {
+                                    try {
+                                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                            location?.let {
+                                                userLocation = LatLng(it.latitude, it.longitude)
+                                                useCurrentLocation = true
+                                            }
+                                        }
+                                    } catch (e: SecurityException) {
+                                        // Manejar error de permisos
+                                    }
+                                } else {
+                                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(16.dp),
+                            containerColor = MetroGreen
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MyLocation,
+                                contentDescription = stringResource(R.string.routes_get_location),
+                                tint = White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -224,9 +319,9 @@ fun CompactRoutePanel(
                 secondaryTextColor = secondaryTextColor
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-            // Selectores de origen y destino en una fila
+                    // Selectores de origen y destino en una fila
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -527,6 +622,8 @@ fun SimpleMapView(
     selectedDestination: Station?,
     showRoute: Boolean,
     selectedLines: Set<String>,
+    userLocation: LatLng?,
+    hasLocationPermission: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -534,45 +631,74 @@ fun SimpleMapView(
     var showGoogleMap by remember { mutableStateOf(false) }
     
     if (showGoogleMap) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(MockStations.LIMA_CENTER, MockStations.LIMA_ZOOM)
-            },
-            properties = MapProperties(
-                isMyLocationEnabled = false,
-                mapType = MapType.NORMAL
-            ),
-            uiSettings = MapUiSettings(
-                zoomControlsEnabled = true,
-                compassEnabled = false,
-                myLocationButtonEnabled = false
-            )
-        ) {
-            // Marcadores de estaciones
-            MockStations.stations.forEach { station ->
-                Marker(
-                    state = MarkerState(position = LatLng(station.latitude, station.longitude)),
-                    title = station.name,
-                    snippet = "${station.line} - ${station.address}"
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = rememberCameraPositionState {
+                    position = if (userLocation != null) {
+                        // Centrar entre usuario y estaciones si hay ruta
+                        if (showRoute && selectedOrigin != null && selectedDestination != null) {
+                            val centerLat = (userLocation.latitude + selectedOrigin.latitude + selectedDestination.latitude) / 3
+                            val centerLng = (userLocation.longitude + selectedOrigin.longitude + selectedDestination.longitude) / 3
+                            CameraPosition.fromLatLngZoom(LatLng(centerLat, centerLng), 12f)
+                        } else {
+                            CameraPosition.fromLatLngZoom(userLocation, 14f)
+                        }
+                    } else {
+                        CameraPosition.fromLatLngZoom(MockStations.LIMA_CENTER, MockStations.LIMA_ZOOM)
+                    }
+                },
+                properties = MapProperties(
+                    isMyLocationEnabled = hasLocationPermission,
+                    mapType = MapType.NORMAL
+                ),
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = true,
+                    compassEnabled = false,
+                    myLocationButtonEnabled = hasLocationPermission
                 )
-            }
+            ) {
+                // Marcador de ubicación del usuario
+                userLocation?.let { userLoc ->
+                    Marker(
+                        state = MarkerState(position = userLoc),
+                        title = stringResource(R.string.routes_your_location),
+                        snippet = stringResource(R.string.routes_current_position)
+                    )
+                }
 
-            // Ruta entre estaciones
-            if (showRoute && selectedOrigin != null && selectedDestination != null) {
-                val originPos = LatLng(selectedOrigin.latitude, selectedOrigin.longitude)
-                val destPos = LatLng(selectedDestination.latitude, selectedDestination.longitude)
-                
-                Polyline(
-                    points = listOf(originPos, destPos),
-                    color = MetroOrange,
-                    width = 8f
-                )
-            }
+                // Marcadores de estaciones
+                MockStations.stations.forEach { station ->
+                    Marker(
+                        state = MarkerState(position = LatLng(station.latitude, station.longitude)),
+                        title = station.name,
+                        snippet = "${station.line} - ${station.address}"
+                    )
+                }
 
-            // Líneas del Metro
-            MetroLinesOverlay(selectedLines = selectedLines)
-        }
+                // Ruta entre estaciones
+                if (showRoute && selectedOrigin != null && selectedDestination != null) {
+                    val originPos = LatLng(selectedOrigin.latitude, selectedOrigin.longitude)
+                    val destPos = LatLng(selectedDestination.latitude, selectedDestination.longitude)
+
+                    Polyline(
+                        points = listOf(originPos, destPos),
+                        color = MetroOrange,
+                        width = 8f
+                    )
+                }
+
+                // Ruta desde ubicación del usuario
+                if (showRoute && userLocation != null && selectedOrigin != null) {
+                    Polyline(
+                        points = listOf(userLocation, LatLng(selectedOrigin.latitude, selectedOrigin.longitude)),
+                        color = MetroGreen,
+                        width = 6f
+                    )
+                }
+
+                // Líneas del Metro
+                MetroLinesOverlay(selectedLines = selectedLines)
+            }
     }
     
     if (!showGoogleMap) {
@@ -894,4 +1020,136 @@ fun calculateRoute(origin: Station, destination: Station): RouteInfo {
         "4. Has llegado a tu destino"
     )
     return RouteInfo(distance, duration, steps)
+}
+
+@Composable
+fun CurrentLocationSection(
+    userLocation: LatLng?,
+    hasLocationPermission: Boolean,
+    useCurrentLocation: Boolean,
+    onGetLocation: () -> Unit,
+    onUseCurrentLocation: (Boolean) -> Unit,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MetroGreen.copy(alpha = 0.1f)),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MyLocation,
+                    contentDescription = stringResource(R.string.routes_your_location),
+                    tint = MetroGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.routes_current_location),
+                    color = textColor,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (userLocation != null) {
+                // Ubicación obtenida
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = stringResource(R.string.routes_location_obtained),
+                        tint = MetroGreen,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.routes_location_obtained),
+                        color = MetroGreen,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Switch para usar ubicación actual
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.routes_use_current_location),
+                        color = textColor,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Switch(
+                        checked = useCurrentLocation,
+                        onCheckedChange = onUseCurrentLocation,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = White,
+                            checkedTrackColor = MetroGreen,
+                            uncheckedThumbColor = secondaryTextColor,
+                            uncheckedTrackColor = secondaryTextColor.copy(alpha = 0.3f)
+                        )
+                    )
+                }
+            } else {
+                // No hay ubicación
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOff,
+                        contentDescription = stringResource(R.string.routes_no_location),
+                        tint = secondaryTextColor,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.routes_no_location),
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Botón para obtener ubicación
+                Button(
+                    onClick = onGetLocation,
+                    colors = ButtonDefaults.buttonColors(containerColor = MetroGreen),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = stringResource(R.string.routes_get_location),
+                        tint = White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.routes_get_location),
+                        color = White,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+    }
 }

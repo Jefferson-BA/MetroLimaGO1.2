@@ -80,6 +80,15 @@
     <string name="routes_coming_soon">Más líneas próximamente</string>
     <string name="routes_expand_map">Agrandar mapa</string>
     
+    <!-- Location and Route -->
+    <string name="routes_your_location">Tu ubicación</string>
+    <string name="routes_current_position">Posición actual</string>
+    <string name="routes_current_location">Ubicación Actual</string>
+    <string name="routes_location_obtained">Ubicación obtenida</string>
+    <string name="routes_use_current_location">Usar mi ubicación actual</string>
+    <string name="routes_no_location">No hay ubicación</string>
+    <string name="routes_get_location">Obtener mi ubicación</string>
+    
     <!-- Live Screen -->
     <string name="live_title">En Vivo</string>
     <string name="live_service_status">Estado del Servicio</string>
