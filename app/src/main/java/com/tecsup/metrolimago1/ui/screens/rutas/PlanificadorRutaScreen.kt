@@ -1,148 +1,398 @@
 package com.tecsup.metrolimago1.ui.screens.rutas
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.domain.models.Station
+import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanificadorRutaScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    val blancoYNegro = themeState.blancoYNegro
-    val darkMode = themeState.isDarkMode
 
-    val backgroundColor = if (blancoYNegro) Color.White else if (darkMode) Color(0xFF121212) else Color(0xFFF5F5F5)
-    val textColor = if (blancoYNegro) Color.Black else if (darkMode) Color.White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (blancoYNegro) Color.DarkGray else if (darkMode) LightGray else Color(0xFF666666)
-    val surfaceColor = if (blancoYNegro) Color(0xFFF0F0F0) else if (darkMode) Color(0xFF1E1E1E) else Color(0xFFFFFFFF)
+    // Colores dinámicos según el tema
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
+    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
+    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
 
-    var origen by remember { mutableStateOf("") }
-    var destino by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf("") }
+    // Estado para las estaciones seleccionadas
+    var selectedOrigin by remember { mutableStateOf<Station?>(null) }
+    var selectedDestination by remember { mutableStateOf<Station?>(null) }
+    var isCalculating by remember { mutableStateOf(false) }
+    var routeResult by remember { mutableStateOf("") }
+
+    // Cargar estaciones desde MockStations
+    val stations = remember { MockStations.stations }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Planificador de Rutas", color = textColor) },
+                title = { 
+                    Text(
+                        text = "Planificador de Rutas",
+                        color = textColor
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver", tint = textColor)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = textColor)
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = surfaceColor,
-                    titleContentColor = textColor,
-                    navigationIconContentColor = textColor
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = cardColor
                 )
             )
         },
-        containerColor = backgroundColor
+        bottomBar = {
+            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Rutas.route)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
                 .padding(paddingValues)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
+            // Título principal
             Text(
-                text = "Planifica tu trayecto 🚉",
-                style = MaterialTheme.typography.titleLarge.copy(
+                text = "Planifica tu trayecto",
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
-                )
+                ),
+                modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Selecciona tu estación de origen y destino",
+                style = MaterialTheme.typography.bodyMedium.copy(color = secondaryTextColor),
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
 
-            OutlinedTextField(
-                value = origen,
-                onValueChange = { origen = it },
-                label = { Text("Estación de origen", color = secondaryTextColor) },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MetroOrange,
-                    unfocusedBorderColor = LightGray,
-                    containerColor = surfaceColor,
-                    cursorColor = MetroOrange,
-                    focusedLabelColor = MetroOrange,
-                    unfocusedLabelColor = secondaryTextColor
-                ),
-                textStyle = LocalTextStyle.current.copy(color = textColor),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp)
+            // Selector de estación de origen
+            StationSelector(
+                label = "Estación de Origen",
+                selectedStation = selectedOrigin,
+                onStationSelected = { selectedOrigin = it },
+                stations = stations,
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor,
+                icon = Icons.Default.FlightTakeoff
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = destino,
-                onValueChange = { destino = it },
-                label = { Text("Estación de destino", color = secondaryTextColor) },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MetroOrange,
-                    unfocusedBorderColor = LightGray,
-                    containerColor = surfaceColor,
-                    cursorColor = MetroOrange,
-                    focusedLabelColor = MetroOrange,
-                    unfocusedLabelColor = secondaryTextColor
-                ),
-                textStyle = LocalTextStyle.current.copy(color = textColor),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp)
+            // Selector de estación de destino
+            StationSelector(
+                label = "Estación de Destino",
+                selectedStation = selectedDestination,
+                onStationSelected = { selectedDestination = it },
+                stations = stations,
+                cardColor = cardColor,
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor,
+                icon = Icons.Default.FlightLand
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Botón Calcular Ruta
             Button(
                 onClick = {
-                    mensaje = if (origen.isNotBlank() && destino.isNotBlank()) {
-                        "Ruta planificada de $origen a $destino"
-                    } else {
-                        "Por favor ingresa ambas estaciones"
+                    if (selectedOrigin != null && selectedDestination != null) {
+                        isCalculating = true
+                        // Simular cálculo de ruta
+                        routeResult = "Ruta calculada de ${selectedOrigin!!.name} a ${selectedDestination!!.name}"
+                        isCalculating = false
                     }
                 },
+                enabled = selectedOrigin != null && selectedDestination != null && !isCalculating,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MetroOrange,
-                    contentColor = Color.White
+                    contentColor = White
                 ),
-                shape = RoundedCornerShape(28.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Calcular Ruta")
+                if (isCalculating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = White,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(
+                    text = if (isCalculating) "Calculando..." else "Calcular Ruta",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            if (mensaje.isNotBlank()) {
-                Text(
-                    text = mensaje,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = textColor)
+            // Mostrar resultado de la ruta
+            if (routeResult.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                RouteResultCard(
+                    result = routeResult,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun PlanificadorRutaScreenPreview() {
-    val navController = rememberNavController()
-    MetroLimaGO1Theme(blancoYNegro = true) {
-        PlanificadorRutaScreen(navController = navController)
+fun StationSelector(
+    label: String,
+    selectedStation: Station?,
+    onStationSelected: (Station) -> Unit,
+    stations: List<Station>,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color,
+    icon: ImageVector
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = MetroOrange,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                )
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded },
+                colors = CardDefaults.cardColors(
+                    containerColor = if (expanded) MetroOrange.copy(alpha = 0.1f) else cardColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = if (expanded) 8.dp else 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Icono de la estación
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = label,
+                        tint = if (selectedStation != null) MetroOrange else secondaryTextColor,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = selectedStation?.name ?: "Selecciona una estación",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = if (selectedStation != null) textColor else secondaryTextColor,
+                                fontWeight = if (selectedStation != null) FontWeight.Bold else FontWeight.Normal
+                            )
+                        )
+                        if (selectedStation != null) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Indicador de línea
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            when (selectedStation.line) {
+                                                "Línea 1" -> MetroOrange
+                                                "Línea 2" -> MetroGreen
+                                                else -> secondaryTextColor
+                                            },
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = selectedStation.line,
+                                    style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Icono de dropdown
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = if (expanded) "Cerrar" else "Abrir",
+                        tint = if (expanded) MetroOrange else secondaryTextColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        cardColor,
+                        RoundedCornerShape(12.dp)
+                    )
+            ) {
+                stations.forEach { station ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Icono de estación
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = "Estación",
+                                    tint = MetroOrange,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                
+                                Spacer(modifier = Modifier.width(12.dp))
+                                
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = station.name,
+                                        color = textColor,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Indicador de línea
+                                        Box(
+                                            modifier = Modifier
+                                                .size(8.dp)
+                                                .background(
+                                                    when (station.line) {
+                                                        "Línea 1" -> MetroOrange
+                                                        "Línea 2" -> MetroGreen
+                                                        else -> secondaryTextColor
+                                                    },
+                                                    RoundedCornerShape(4.dp)
+                                                )
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = station.line,
+                                            color = secondaryTextColor,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                                
+                                // Icono de dirección
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = "Seleccionar",
+                                    tint = secondaryTextColor,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        },
+                        onClick = {
+                            onStationSelected(station)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RouteResultCard(
+    result: String,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = "Ruta calculada",
+                tint = MetroGreen,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Ruta Calculada",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                )
+                Text(
+                    text = result,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = secondaryTextColor)
+                )
+            }
+        }
     }
 }
