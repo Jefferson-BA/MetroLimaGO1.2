@@ -47,9 +47,10 @@ fun PlanificadorRutaScreen(navController: NavController) {
     var selectedOrigin by remember { mutableStateOf<Station?>(null) }
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
     var showRoute by remember { mutableStateOf(false) }
-    var selectedLine by remember { mutableStateOf<String?>(null) }
-    var showNearbyPlaces by remember { mutableStateOf(false) }
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
+    
+    // Estado para filtros de líneas
+    var selectedLines by remember { mutableStateOf(setOf<String>()) }
 
     // Posición de la cámara centrada en Lima
     val limaPosition = remember { MockStations.LIMA_CENTER }
@@ -91,12 +92,17 @@ fun PlanificadorRutaScreen(navController: NavController) {
                 navController = navController,
                 selectedOrigin = selectedOrigin,
                 selectedDestination = selectedDestination,
-                selectedLine = selectedLine,
-                showNearbyPlaces = showNearbyPlaces,
+                selectedLines = selectedLines,
                 routeInfo = routeInfo,
                 onOriginSelected = { selectedOrigin = it },
                 onDestinationSelected = { selectedDestination = it },
-                onLineSelected = { selectedLine = it },
+                onLineToggle = { line ->
+                    selectedLines = if (selectedLines.contains(line)) {
+                        selectedLines - line
+                    } else {
+                        selectedLines + line
+                    }
+                },
                 onShowRoute = { 
                     showRoute = true
                     // Simular cálculo de ruta con Directions API
@@ -104,7 +110,6 @@ fun PlanificadorRutaScreen(navController: NavController) {
                         routeInfo = calculateRoute(selectedOrigin!!, selectedDestination!!)
                     }
                 },
-                onShowNearbyPlaces = { showNearbyPlaces = !showNearbyPlaces },
                 onClearRoute = { 
                     showRoute = false
                     selectedOrigin = null
@@ -131,6 +136,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
                     selectedOrigin = selectedOrigin,
                     selectedDestination = selectedDestination,
                     showRoute = showRoute,
+                    selectedLines = selectedLines,
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor
@@ -145,14 +151,12 @@ fun CompactRoutePanel(
     navController: NavController,
     selectedOrigin: Station?,
     selectedDestination: Station?,
-    selectedLine: String?,
-    showNearbyPlaces: Boolean,
+    selectedLines: Set<String>,
     routeInfo: RouteInfo?,
     onOriginSelected: (Station) -> Unit,
     onDestinationSelected: (Station) -> Unit,
-    onLineSelected: (String?) -> Unit,
+    onLineToggle: (String) -> Unit,
     onShowRoute: () -> Unit,
-    onShowNearbyPlaces: () -> Unit,
     onClearRoute: () -> Unit,
     cardColor: Color,
     textColor: Color,
@@ -173,15 +177,15 @@ fun CompactRoutePanel(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
+        ) {
+            Text(
                     text = "Planifica tu trayecto",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = textColor
-                    )
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
                 )
-                
+            )
+
                 // Botón de IA integrado
                 Button(
                     onClick = { navController.navigate(Screen.Chat.route) },
@@ -200,10 +204,10 @@ fun CompactRoutePanel(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Filtros por línea compactos
-            LineFilterSection(
-                selectedLine = selectedLine,
-                onLineSelected = onLineSelected,
+            // Filtros de líneas
+            LineFilterButtons(
+                selectedLines = selectedLines,
+                onLineToggle = onLineToggle,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -220,7 +224,7 @@ fun CompactRoutePanel(
                     label = "Origen",
                     selectedStation = selectedOrigin,
                     onStationSelected = onOriginSelected,
-                    stations = if (selectedLine != null) MockStations.getStationsByLine(selectedLine) else MockStations.stations,
+                    stations = MockStations.stations,
                     icon = Icons.Default.FlightTakeoff,
                     cardColor = cardColor,
                     textColor = textColor,
@@ -233,7 +237,7 @@ fun CompactRoutePanel(
                     label = "Destino",
                     selectedStation = selectedDestination,
                     onStationSelected = onDestinationSelected,
-                    stations = if (selectedLine != null) MockStations.getStationsByLine(selectedLine) else MockStations.stations,
+                    stations = MockStations.stations,
                     icon = Icons.Default.FlightLand,
                     cardColor = cardColor,
                     textColor = textColor,
@@ -271,18 +275,6 @@ fun CompactRoutePanel(
                     Text("Ver Ruta")
                 }
 
-                OutlinedButton(
-                    onClick = onShowNearbyPlaces,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = if (showNearbyPlaces) MetroOrange else textColor
-                    )
-                ) {
-                    Icon(Icons.Default.Place, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Lugares")
-                }
 
                 OutlinedButton(
                     onClick = onClearRoute,
@@ -362,25 +354,76 @@ fun CompactStationSelector(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    cardColor,
+                    RoundedCornerShape(12.dp)
+                )
         ) {
             stations.forEach { station ->
                 DropdownMenuItem(
                     text = {
-                        Column {
-                            Text(
-                                text = station.name,
-                                color = textColor,
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Icono de estación
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Estación",
+                                tint = MetroOrange,
+                                modifier = Modifier.size(20.dp)
                             )
-                            Text(
-                                text = station.line,
-                                color = secondaryTextColor,
-                                style = MaterialTheme.typography.bodySmall
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
+                            
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = station.name,
+                                    color = textColor,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Indicador de línea
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(
+                                                when (station.line) {
+                                                    "Línea 1" -> MetroOrange
+                                                    "Línea 2" -> MetroGreen
+                                                    "Línea 3" -> Color(0xFF2196F3)
+                                                    else -> secondaryTextColor
+                                                },
+                                                RoundedCornerShape(4.dp)
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = station.line,
+                                        color = secondaryTextColor,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                            
+                            // Icono de dirección
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "Seleccionar",
+                                tint = MetroOrange,
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     },
-                    onClick = {
+                onClick = {
                         onStationSelected(station)
                         expanded = false
                     }
@@ -397,7 +440,7 @@ fun CompactRouteInfo(
     secondaryTextColor: Color
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MetroOrange.copy(alpha = 0.1f)),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -452,79 +495,13 @@ fun CompactRouteInfo(
     }
 }
 
-@Composable
-fun LineFilterSection(
-    selectedLine: String?,
-    onLineSelected: (String?) -> Unit,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Column {
-        Text(
-            text = "Filtrar por Línea",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Botón "Todas"
-            FilterChip(
-                onClick = { onLineSelected(null) },
-                label = { Text("Todas") },
-                selected = selectedLine == null,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroOrange,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 1"
-            FilterChip(
-                onClick = { onLineSelected("Línea 1") },
-                label = { Text("Línea 1") },
-                selected = selectedLine == "Línea 1",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroOrange,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 2"
-            FilterChip(
-                onClick = { onLineSelected("Línea 2") },
-                label = { Text("Línea 2") },
-                selected = selectedLine == "Línea 2",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroGreen,
-                    selectedLabelColor = White
-                )
-            )
-            
-            // Botón "Línea 3"
-            FilterChip(
-                onClick = { onLineSelected("Línea 3") },
-                label = { Text("Línea 3") },
-                selected = selectedLine == "Línea 3",
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF2196F3),
-                    selectedLabelColor = White
-                )
-            )
-        }
-    }
-}
 
 @Composable
 fun SimpleMapView(
     selectedOrigin: Station?,
     selectedDestination: Station?,
     showRoute: Boolean,
+    selectedLines: Set<String>,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -569,7 +546,7 @@ fun SimpleMapView(
             }
 
             // Líneas del Metro
-            MetroLinesOverlay()
+            MetroLinesOverlay(selectedLines = selectedLines)
         }
     }
     
@@ -703,38 +680,167 @@ fun SimpleMapView(
 }
 
 @Composable
-fun MetroLinesOverlay() {
+fun MetroLinesOverlay(selectedLines: Set<String>) {
+    // Si no hay líneas seleccionadas, mostrar todas
+    val linesToShow = if (selectedLines.isEmpty()) {
+        setOf("Línea 1", "Línea 2", "Línea 3")
+    } else {
+        selectedLines
+    }
+
     // Línea 1 - Naranja
-    val linea1Stations = MockStations.getStationsByLine("Línea 1")
-    if (linea1Stations.isNotEmpty()) {
-        val linea1Points = linea1Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea1Points,
-            color = MetroOrange,
-            width = 6f
-        )
+    if (linesToShow.contains("Línea 1")) {
+        val linea1Stations = MockStations.getStationsByLine("Línea 1")
+        if (linea1Stations.isNotEmpty()) {
+            val linea1Points = linea1Stations.map { LatLng(it.latitude, it.longitude) }
+            Polyline(
+                points = linea1Points,
+                color = MetroOrange,
+                width = 6f
+            )
+        }
     }
 
     // Línea 2 - Verde
-    val linea2Stations = MockStations.getStationsByLine("Línea 2")
-    if (linea2Stations.isNotEmpty()) {
-        val linea2Points = linea2Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea2Points,
-            color = MetroGreen,
-            width = 6f
-        )
+    if (linesToShow.contains("Línea 2")) {
+        val linea2Stations = MockStations.getStationsByLine("Línea 2")
+        if (linea2Stations.isNotEmpty()) {
+            val linea2Points = linea2Stations.map { LatLng(it.latitude, it.longitude) }
+            Polyline(
+                points = linea2Points,
+                color = MetroGreen,
+                width = 6f
+            )
+        }
     }
 
     // Línea 3 - Azul
-    val linea3Stations = MockStations.getStationsByLine("Línea 3")
-    if (linea3Stations.isNotEmpty()) {
-        val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
-        Polyline(
-            points = linea3Points,
-            color = Color(0xFF2196F3),
-            width = 6f
+    if (linesToShow.contains("Línea 3")) {
+        val linea3Stations = MockStations.getStationsByLine("Línea 3")
+        if (linea3Stations.isNotEmpty()) {
+            val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
+            Polyline(
+                points = linea3Points,
+                color = Color(0xFF2196F3),
+                width = 6f
+            )
+        }
+    }
+}
+
+@Composable
+fun LineFilterButtons(
+    selectedLines: Set<String>,
+    onLineToggle: (String) -> Unit,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Column {
+        Text(
+            text = "Filtrar Líneas del Metro",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
         )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Botón Línea 1
+            FilterChip(
+                onClick = { onLineToggle("Línea 1") },
+                label = { 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MetroOrange, RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Línea 1")
+                    }
+                },
+                selected = selectedLines.contains("Línea 1"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroOrange,
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                )
+            )
+            
+            // Botón Línea 2
+            FilterChip(
+                onClick = { onLineToggle("Línea 2") },
+                label = { 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MetroGreen, RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Línea 2")
+                    }
+                },
+                selected = selectedLines.contains("Línea 2"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroGreen,
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                )
+            )
+            
+            // Botón Línea 3
+            FilterChip(
+                onClick = { onLineToggle("Línea 3") },
+                label = { 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Línea 3")
+                    }
+                },
+                selected = selectedLines.contains("Línea 3"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF2196F3),
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                )
+            )
+        }
+        
+        // Botón "Próximamente" para futuras líneas
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedButton(
+            onClick = { /* Futuras líneas */ },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = secondaryTextColor
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Construction,
+                contentDescription = "Próximamente",
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Más líneas próximamente")
+        }
     }
 }
 

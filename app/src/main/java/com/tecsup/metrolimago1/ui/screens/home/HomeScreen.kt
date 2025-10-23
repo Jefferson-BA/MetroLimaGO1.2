@@ -89,16 +89,6 @@ fun HomeScreen(navController: NavController) {
                 shape = RoundedCornerShape(28.dp),
                 colors = CardDefaults.elevatedCardColors(containerColor = CardGray)
             ) {
-                MapsSection(navController, textColor, secondaryTextColor)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = CardGray)
-            ) {
                 AISection(navController, textColor, secondaryTextColor)
             }
         }
@@ -367,55 +357,6 @@ fun AISection(
     }
 }
 
-@Composable
-fun MapsSection(
-    navController: NavController,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Mapa del Metro",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MetroOrange
-                )
-            )
-            Text(
-                text = "Explora las estaciones en el mapa interactivo",
-                style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            Button(
-                onClick = { navController.navigate(Screen.Rutas.route) },
-                colors = ButtonDefaults.buttonColors(containerColor = White),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "Ver Mapa",
-                    color = DarkGray,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                )
-            }
-        }
-
-        // Icono del mapa
-        Icon(
-            imageVector = Icons.Default.Map,
-            contentDescription = "Mapa",
-            tint = MetroOrange,
-            modifier = Modifier
-                .size(64.dp)
-                .padding(start = 16.dp)
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
