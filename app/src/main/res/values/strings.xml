@@ -1,3 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MetroLimaGO1</string>
+    <!-- App Name -->
+    <string name="app_name">MetroLima GO</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_stations">Estaciones</string>
+    <string name="nav_routes">Rutas</string>
+    <string name="nav_live">En Vivo</string>
+    <string name="nav_settings">Configuración</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">MetroLima GO</string>
+    <string name="home_search_placeholder">¿A dónde vas?</string>
+    <string name="home_next_arrivals">Próximas Llegadas</string>
+    <string name="home_notifications">Notificaciones</string>
+    <string name="home_ai_chat">Pregúntale a la IA !</string>
+    <string name="home_ai_description">Usar un chat de ayuda o asistente.</string>
+    <string name="home_start_conversation">Iniciar Conversación</string>
+    <string name="home_see_more">Ver más</string>
+    <string name="home_real_time_info">Información en tiempo real</string>
+    
+    <!-- Stations Screen -->
+    <string name="stations_title">Estaciones del Metro</string>
+    <string name="stations_search_placeholder">Buscar estación...</string>
+    <string name="stations_filter_all">Todas</string>
+    <string name="stations_filter_line1">Línea 1</string>
+    <string name="stations_filter_line2">Línea 2</string>
+    <string name="stations_filter_line3">Línea 3</string>
+    <string name="stations_filter_lines">Filtrar Líneas del Metro</string>
+    <string name="stations_showing_lines">Mostrando %d líneas</string>
+    <string name="stations_line">Línea</string>
+    <string name="stations_address">Dirección</string>
+    <string name="stations_description">Descripción</string>
+    <string name="line_1">Línea 1</string>
+    <string name="line_2">Línea 2</string>
+    <string name="line_3">Línea 3</string>
+    
+    <!-- Routes Screen -->
+    <string name="routes_title">Planificador de Rutas</string>
+    <string name="routes_plan_your_trip">Planifica tu trayecto</string>
+    <string name="routes_origin">Origen</string>
+    <string name="routes_destination">Destino</string>
+    <string name="routes_select_station">Seleccionar</string>
+    <string name="routes_calculate_route">Ver Ruta</string>
+    <string name="routes_clear">Limpiar</string>
+    <string name="routes_distance">Distancia</string>
+    <string name="routes_duration">Tiempo</string>
+    <string name="routes_steps">Pasos</string>
+    <string name="routes_filter_lines">Filtrar Líneas del Metro</string>
+    <string name="routes_coming_soon">Más líneas próximamente</string>
+    <string name="routes_expand_map">Agrandar mapa</string>
+    
+    <!-- Live Screen -->
+    <string name="live_title">En Vivo</string>
+    <string name="live_service_status">Estado del Servicio</string>
+    <string name="live_normal_service">Servicio Normal</string>
+    <string name="live_reduced_service">Servicio Reducido</string>
+    <string name="live_suspended">Suspendido</string>
+    <string name="live_schedules">Horarios</string>
+    <string name="live_alerts">Alertas</string>
+    <string name="live_no_alerts">No hay alertas</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_dark_mode">Modo Oscuro</string>
+    <string name="settings_light_mode">Modo Claro</string>
+    <string name="settings_spanish">Español</string>
+    <string name="settings_english">English</string>
+    <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_version">Versión</string>
+    
+    <!-- Chat Screen -->
+    <string name="chat_title">Chat con IA</string>
+    <string name="chat_ai_assistant">Asistente IA</string>
+    <string name="chat_placeholder">Escribe tu mensaje...</string>
+    <string name="chat_send">Enviar</string>
+    <string name="chat_ai_thinking">La IA está pensando...</string>
+    <string name="chat_welcome">¡Hola! Soy tu asistente del Metro de Lima. ¿En qué puedo ayudarte?</string>
+    
+    <!-- Map Screen -->
+    <string name="map_title">Mapa del Metro - Vista Completa</string>
+    <string name="map_full_view_title">Mapa del Metro - Vista Completa</string>
+    <string name="map_activate">Activar Mapa</string>
+    <string name="map_activate_map">Activar Mapa</string>
+    <string name="map_activate_full">Activar Mapa Completo</string>
+    <string name="map_metro_title">Mapa del Metro de Lima</string>
+    <string name="map_metro_description">Vista completa del sistema de Metro</string>
+    <string name="map_filter_lines">Filtrar Líneas</string>
+    <string name="map_map">Mapa</string>
+    <string name="map_enlarge">Agrandar</string>
+    
+    <!-- Common -->
+    <string name="common_back">Volver</string>
+    <string name="common_ok">Aceptar</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_loading">Cargando...</string>
+    <string name="common_error">Error</string>
+    <string name="common_retry">Reintentar</string>
+    
+    <!-- Language Change Alert -->
+    <string name="language_change_title">Cambio de Idioma</string>
+    <string name="language_change_message">Los cambios realizados se aplicarán cuando reinicies la aplicación.</string>
+    <string name="language_change_question">¿Deseas reiniciar ahora o más tarde?</string>
+    <string name="language_restart_now">Reiniciar Ahora</string>
+    <string name="language_restart_later">Reiniciar Más Tarde</string>
+    
+    <!-- Time and Status -->
+    <string name="time_minutes">min</string>
+    <string name="time_hours">h</string>
+    <string name="status_operating">Operando</string>
+    <string name="status_maintenance">Mantenimiento</string>
+    <string name="status_delay">Retraso</string>
 </resources>
