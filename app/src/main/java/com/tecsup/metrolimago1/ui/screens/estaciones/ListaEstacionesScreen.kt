@@ -12,10 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.navigation.Screen
@@ -34,14 +36,14 @@ fun ListaEstacionesScreen(navController: NavController) {
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
     
     var query by remember { mutableStateOf("") }
-    var selectedLine by remember { mutableStateOf("Linea 1") }
+    var selectedLines by remember { mutableStateOf(setOf<String>()) }
     
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Estaciones",
+                        text = stringResource(R.string.stations_title),
                         color = textColor,
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                     )
@@ -75,42 +77,44 @@ fun ListaEstacionesScreen(navController: NavController) {
             
             // Botones de filtro de línea
             LineFilterButtons(
-                selectedLine = selectedLine,
-                onLineSelected = { selectedLine = it },
+                selectedLines = selectedLines,
+                onLineToggle = { line ->
+                    selectedLines = if (selectedLines.contains(line)) {
+                        selectedLines - line
+                    } else {
+                        selectedLines + line
+                    }
+                },
                 cardColor = cardColor,
-                textColor = textColor
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Indicador de línea actual
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(secondaryTextColor, RoundedCornerShape(4.dp))
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = selectedLine,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            // Indicador de líneas seleccionadas
+            if (selectedLines.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.stations_showing_lines, selectedLines.size),
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
             // Lista de estaciones con filtrado mejorado
             val filtered = MockStations.stations.filter { station ->
-                // Filtro por línea
-                val lineMatch = when (selectedLine) {
-                    "Linea 1" -> station.line == "Línea 1"
-                    "Linea 2" -> station.line == "Línea 2"
-                    "Metropolitano" -> station.line == "Línea 3" || station.line == "Línea 4"
-                    else -> true
+                // Filtro por líneas seleccionadas
+                val lineMatch = if (selectedLines.isEmpty()) {
+                    true // Si no hay líneas seleccionadas, mostrar todas
+                } else {
+                    selectedLines.contains(station.line)
                 }
                 
                 // Filtro por búsqueda (nombre, dirección, descripción)
@@ -208,7 +212,7 @@ fun SearchBar(
                 onValueChange = onQueryChange,
                 placeholder = {
                     Text(
-                        text = "Buscar estación...",
+                        text = stringResource(R.string.stations_search_placeholder),
                         color = secondaryTextColor
                     )
                 },
@@ -245,34 +249,97 @@ fun SearchBar(
 
 @Composable
 fun LineFilterButtons(
-    selectedLine: String,
-    onLineSelected: (String) -> Unit,
+    selectedLines: Set<String>,
+    onLineToggle: (String) -> Unit,
     cardColor: Color,
-    textColor: Color
+    textColor: Color,
+    secondaryTextColor: Color
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        val lines = listOf("Linea 1", "Linea 2", "Metropolitano")
-        
-        lines.forEach { line ->
-            val isSelected = selectedLine == line
-            Card(
-                onClick = { onLineSelected(line) },
-                modifier = Modifier.weight(1f),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isSelected) cardColor.copy(alpha = 0.8f) else cardColor
-                ),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Text(
-                    text = line,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+    Column {
+        Text(
+            text = stringResource(R.string.stations_filter_lines),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Botón Línea 1
+            FilterChip(
+                onClick = { onLineToggle("Línea 1") },
+                label = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MetroOrange, RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(R.string.line_1))
+                    }
+                },
+                selected = selectedLines.contains("Línea 1"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroOrange,
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
                 )
-            }
+            )
+
+            // Botón Línea 2
+            FilterChip(
+                onClick = { onLineToggle("Línea 2") },
+                label = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MetroGreen, RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(R.string.line_2))
+                    }
+                },
+                selected = selectedLines.contains("Línea 2"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MetroGreen,
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                )
+            )
+
+            // Botón Línea 3
+            FilterChip(
+                onClick = { onLineToggle("Línea 3") },
+                label = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(R.string.line_3))
+                    }
+                },
+                selected = selectedLines.contains("Línea 3"),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF2196F3),
+                    selectedLabelColor = White,
+                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                )
+            )
         }
     }
 }
