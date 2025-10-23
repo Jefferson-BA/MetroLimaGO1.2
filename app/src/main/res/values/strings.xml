@@ -37,6 +37,20 @@
     <string name="line_2">Línea 2</string>
     <string name="line_3">Línea 3</string>
     
+    <!-- Station Details -->
+    <string name="station_details_title">Detalles de la Estación</string>
+    <string name="station_not_found">Estación no encontrada</string>
+    <string name="station_not_found_description">La estación solicitada no existe o no está disponible</string>
+    <string name="station_location_title">Ubicación de la Estación</string>
+    <string name="station_location">Ubicación</string>
+    <string name="station_address">Dirección</string>
+    <string name="station_id">ID</string>
+    <string name="station_additional_info">Información Adicional</string>
+    <string name="station_coordinates">Coordenadas</string>
+    <string name="station_latitude">Latitud</string>
+    <string name="station_longitude">Longitud</string>
+    <string name="station_description">Descripción</string>
+    
     <!-- Routes Screen -->
     <string name="routes_title">Planificador de Rutas</string>
     <string name="routes_plan_your_trip">Planifica tu trayecto</string>
