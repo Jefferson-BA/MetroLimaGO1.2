@@ -51,6 +51,20 @@
     <string name="station_longitude">Longitud</string>
     <string name="station_description">Descripción</string>
     
+    <!-- Location and Route -->
+    <string name="station_get_location">Obtener mi ubicación</string>
+    <string name="station_show_route">Mostrar ruta</string>
+    <string name="station_your_location">Tu ubicación</string>
+    <string name="station_current_position">Posición actual</string>
+    <string name="station_route_title">Ruta hacia la estación</string>
+    <string name="station_route_distance">Distancia</string>
+    <string name="station_route_duration">Tiempo estimado</string>
+    <string name="station_route_steps">Instrucciones</string>
+    <string name="station_route_step_1">Activa tu ubicación GPS</string>
+    <string name="station_route_step_2">Dirígete hacia %s</string>
+    <string name="station_route_step_3">Sigue las indicaciones del mapa</string>
+    <string name="station_route_step_4">Has llegado a %s</string>
+    
     <!-- Routes Screen -->
     <string name="routes_title">Planificador de Rutas</string>
     <string name="routes_plan_your_trip">Planifica tu trayecto</string>
