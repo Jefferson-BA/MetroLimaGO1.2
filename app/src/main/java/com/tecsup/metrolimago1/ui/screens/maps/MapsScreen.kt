@@ -1,5 +1,9 @@
 package com.tecsup.metrolimago1.ui.screens.maps
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,10 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.tecsup.metrolimago1.R
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -38,6 +46,7 @@ data class RouteInfo(
 @Composable
 fun MapsScreen(navController: NavController) {
     val themeState = LocalThemeState.current
+    val context = LocalContext.current
 
     // Colores dinámicos según el tema
     val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
@@ -48,6 +57,55 @@ fun MapsScreen(navController: NavController) {
     // Estado para filtros de líneas
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
     var showGoogleMap by remember { mutableStateOf(false) }
+    
+    // Estado para ubicación del usuario
+    var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var hasLocationPermission by remember { mutableStateOf(false) }
+    var useCurrentLocation by remember { mutableStateOf(true) } // Activado por defecto
+    
+    // FusedLocationProviderClient
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    
+    // Launcher para permisos de ubicación
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasLocationPermission = isGranted
+        if (isGranted) {
+            // Obtener ubicación actual
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        userLocation = LatLng(it.latitude, it.longitude)
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Manejar error de permisos
+            }
+        }
+    }
+    
+    // Verificar permisos al iniciar y obtener ubicación automáticamente
+    LaunchedEffect(Unit) {
+        hasLocationPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        
+        if (hasLocationPermission) {
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        userLocation = LatLng(it.latitude, it.longitude)
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Manejar error de permisos
+            }
+        } else {
+            // Solicitar permisos automáticamente
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
     var showNearbyPlaces by remember { mutableStateOf(false) }
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
 
@@ -101,18 +159,31 @@ fun MapsScreen(navController: NavController) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(limaPosition, MockStations.LIMA_ZOOM)
+                        position = if (userLocation != null) {
+                            CameraPosition.fromLatLngZoom(userLocation!!, 15f)
+                        } else {
+                            CameraPosition.fromLatLngZoom(limaPosition, MockStations.LIMA_ZOOM)
+                        }
                     },
                     properties = MapProperties(
-                        isMyLocationEnabled = false,
+                        isMyLocationEnabled = hasLocationPermission,
                         mapType = MapType.NORMAL
                     ),
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = true,
                         compassEnabled = true,
-                        myLocationButtonEnabled = false
+                        myLocationButtonEnabled = hasLocationPermission
                     )
                 ) {
+                    // Marcador de ubicación del usuario
+                    userLocation?.let { userLoc ->
+                        Marker(
+                            state = MarkerState(position = userLoc),
+                            title = stringResource(R.string.maps_your_location),
+                            snippet = stringResource(R.string.maps_current_position)
+                        )
+                    }
+
                     // Marcadores de estaciones
                     MockStations.stations.forEach { station ->
                         Marker(
@@ -125,6 +196,34 @@ fun MapsScreen(navController: NavController) {
                     // Líneas del Metro
                     MetroLinesOverlay(selectedLines = selectedLines)
                 }
+                
+                // Botones de control del mapa
+                MapControlButtons(
+                    showGoogleMap = showGoogleMap,
+                    userLocation = userLocation,
+                    hasLocationPermission = hasLocationPermission,
+                    onGetLocation = {
+                        if (hasLocationPermission) {
+                            try {
+                                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                    location?.let {
+                                        userLocation = LatLng(it.latitude, it.longitude)
+                                    }
+                                }
+                            } catch (e: SecurityException) {
+                                // Manejar error de permisos
+                            }
+                        } else {
+                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                    },
+                    onCenterLocation = {
+                        // Centrar en ubicación del usuario
+                        if (userLocation != null) {
+                            // La cámara se centrará automáticamente en userLocation
+                        }
+                    }
+                )
             } else {
                 // Vista de mapa simplificada
                 Box(
@@ -766,6 +865,55 @@ fun CompactRouteInfo(
                         color = textColor
                     )
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun MapControlButtons(
+    showGoogleMap: Boolean,
+    userLocation: LatLng?,
+    hasLocationPermission: Boolean,
+    onGetLocation: () -> Unit,
+    onCenterLocation: () -> Unit
+) {
+    if (showGoogleMap) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Botón para obtener ubicación
+            FloatingActionButton(
+                onClick = onGetLocation,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp),
+                containerColor = MetroGreen
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MyLocation,
+                    contentDescription = stringResource(R.string.maps_get_location),
+                    tint = White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            
+            // Botón para centrar en ubicación actual
+            if (userLocation != null) {
+                FloatingActionButton(
+                    onClick = onCenterLocation,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp),
+                    containerColor = MetroOrange
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.GpsFixed,
+                        contentDescription = stringResource(R.string.maps_center_location),
+                        tint = White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }

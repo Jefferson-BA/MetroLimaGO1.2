@@ -89,6 +89,12 @@
     <string name="routes_no_location">No hay ubicación</string>
     <string name="routes_get_location">Obtener mi ubicación</string>
     
+    <!-- Maps Screen -->
+    <string name="maps_your_location">Tu ubicación</string>
+    <string name="maps_current_position">Posición actual</string>
+    <string name="maps_get_location">Obtener ubicación</string>
+    <string name="maps_center_location">Centrar en mi ubicación</string>
+    
     <!-- Live Screen -->
     <string name="live_title">En Vivo</string>
     <string name="live_service_status">Estado del Servicio</string>
