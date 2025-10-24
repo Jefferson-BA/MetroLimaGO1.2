@@ -33,9 +33,9 @@ fun ChatScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
     // Colores dinámicos según el tema
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     // Estado del chat
     var messageText by remember { mutableStateOf("") }

@@ -1,6 +1,7 @@
 package com.tecsup.metrolimago1.ui.screens.configuracion
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,10 +41,10 @@ fun ConfiguracionScreen(navController: NavController) {
     var pendingLanguage by remember { mutableStateOf<String?>(null) }
 
     // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else LightBackground
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     Scaffold(
         bottomBar = {
@@ -82,6 +83,7 @@ fun ConfiguracionScreen(navController: NavController) {
             LanguageSection(
                 selectedLanguage = selectedLanguage,
                 onLanguageClick = { showLanguageDialog = true },
+                isDarkMode = themeState.isDarkMode,
                 cardColor = cardColor,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
@@ -164,7 +166,8 @@ fun AppearanceSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(28.dp),
+            border = if (!isDarkMode) BorderStroke(1.dp, LightBorderStrong) else null
         ) {
             Row(
                 modifier = Modifier
@@ -175,7 +178,7 @@ fun AppearanceSection(
                 Icon(
                     imageVector = Icons.Default.DarkMode,
                     contentDescription = "Modo Oscuro",
-                    tint = textColor,
+                    tint = if (isDarkMode) textColor else LightIconSettings,
                     modifier = Modifier.size(24.dp)
                 )
 
@@ -214,6 +217,7 @@ fun AppearanceSection(
 fun LanguageSection(
     selectedLanguage: String,
     onLanguageChange: (String) -> Unit,
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -231,7 +235,8 @@ fun LanguageSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(28.dp),
+            border = if (!isDarkMode) BorderStroke(1.dp, LightBorderStrong) else null
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -242,7 +247,7 @@ fun LanguageSection(
                     Icon(
                         imageVector = Icons.Default.Language,
                         contentDescription = "Idioma",
-                        tint = textColor,
+                        tint = if (isDarkMode) textColor else LightIconLanguage,
                         modifier = Modifier.size(24.dp)
                     )
 
@@ -418,6 +423,7 @@ fun AboutSection(
 fun LanguageSection(
     selectedLanguage: String,
     onLanguageClick: () -> Unit,
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color

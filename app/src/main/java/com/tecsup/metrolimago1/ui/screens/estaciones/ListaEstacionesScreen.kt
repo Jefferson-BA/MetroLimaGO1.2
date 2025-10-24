@@ -30,10 +30,10 @@ fun ListaEstacionesScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
     // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else LightBackground
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     var query by remember { mutableStateOf("") }
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
@@ -167,6 +167,7 @@ fun ListaEstacionesScreen(navController: NavController) {
                         StationCard(
                             station = station,
                             onClick = { navController.navigate(Screen.EstacionDetail.createRoute(station.id)) },
+                            isDarkMode = themeState.isDarkMode,
                             cardColor = cardColor,
                             textColor = textColor,
                             secondaryTextColor = secondaryTextColor
@@ -348,6 +349,7 @@ fun LineFilterButtons(
 fun StationCard(
     station: com.tecsup.metrolimago1.domain.models.Station,
     onClick: () -> Unit,
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -368,7 +370,7 @@ fun StationCard(
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Ubicación",
-                tint = secondaryTextColor,
+                tint = if (isDarkMode) MetroOrange else LightIconLocation,
                 modifier = Modifier.size(24.dp)
             )
 

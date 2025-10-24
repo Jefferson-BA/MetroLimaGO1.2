@@ -12,8 +12,8 @@ fun GradientBackground(
     isDarkMode: Boolean,
     content: @Composable () -> Unit
 ) {
-    // Usar colores sólidos como en el planificador de rutas
-    val backgroundColor = if (isDarkMode) DarkGray else Color(0xFFF5F5F5)
+    // Usar colores sólidos mejorados
+    val backgroundColor = if (isDarkMode) DarkGray else LightBackground
 
     Box(
         modifier = Modifier

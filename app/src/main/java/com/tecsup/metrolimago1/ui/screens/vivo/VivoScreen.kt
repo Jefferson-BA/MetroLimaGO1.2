@@ -8,7 +8,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,9 +30,9 @@ import com.tecsup.metrolimago1.ui.theme.*
 fun VivoScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     GradientBackground(isDarkMode = themeState.isDarkMode) {
         Scaffold(
@@ -69,6 +72,7 @@ fun VivoScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ServiceStatusCard(
+                    isDarkMode = themeState.isDarkMode,
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor
@@ -94,6 +98,7 @@ fun VivoScreen(navController: NavController) {
 
 @Composable
 fun ServiceStatusCard(
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -111,7 +116,7 @@ fun ServiceStatusCard(
                 Icon(
                     imageVector = Icons.Default.Wifi,
                     contentDescription = "Estado",
-                    tint = textColor,
+                    tint = if (isDarkMode) textColor else LightIconWifi,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))

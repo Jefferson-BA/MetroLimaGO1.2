@@ -49,14 +49,14 @@ fun MapsScreen(navController: NavController) {
     val context = LocalContext.current
 
     // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else LightBackground
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     // Estado para filtros de líneas
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
-    var showGoogleMap by remember { mutableStateOf(false) }
+    var showGoogleMap by remember { mutableStateOf(true) }
     
     // Estado para ubicación del usuario
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -167,7 +167,8 @@ fun MapsScreen(navController: NavController) {
                     },
                     properties = MapProperties(
                         isMyLocationEnabled = hasLocationPermission,
-                        mapType = MapType.NORMAL
+                        mapType = MapType.NORMAL,
+                        isTrafficEnabled = false
                     ),
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = true,

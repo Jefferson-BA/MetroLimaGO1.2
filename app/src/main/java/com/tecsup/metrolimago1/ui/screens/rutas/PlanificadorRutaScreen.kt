@@ -50,10 +50,10 @@ fun PlanificadorRutaScreen(navController: NavController) {
     val context = LocalContext.current
 
     // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val backgroundColor = if (themeState.isDarkMode) DarkGray else LightBackground
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     // Estado para las estaciones seleccionadas
     var selectedOrigin by remember { mutableStateOf<Station?>(null) }
@@ -189,6 +189,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
                             selectedDestination = null
                             routeInfo = null
                         },
+                        isDarkMode = themeState.isDarkMode,
                         cardColor = cardColor,
                         textColor = textColor,
                         secondaryTextColor = secondaryTextColor
@@ -286,6 +287,7 @@ fun CompactRoutePanel(
     onLineToggle: (String) -> Unit,
     onShowRoute: () -> Unit,
     onClearRoute: () -> Unit,
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -377,7 +379,7 @@ fun CompactRoutePanel(
                     colors = ButtonDefaults.buttonColors(containerColor = MetroOrange),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(Icons.Default.Route, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Route, contentDescription = null, tint = if (isDarkMode) MetroOrange else LightIconRoute, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Ver Ruta")
                 }
@@ -628,7 +630,7 @@ fun SimpleMapView(
     textColor: Color,
     secondaryTextColor: Color
 ) {
-    var showGoogleMap by remember { mutableStateOf(false) }
+    var showGoogleMap by remember { mutableStateOf(true) }
     
     if (showGoogleMap) {
             GoogleMap(

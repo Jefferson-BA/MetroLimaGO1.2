@@ -37,9 +37,9 @@ import com.tecsup.metrolimago1.ui.theme.*
 fun HomeScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
-    val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
-    val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
-    val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
+    val cardColor = if (themeState.isDarkMode) CardGray else LightCard
+    val textColor = if (themeState.isDarkMode) White else LightTextPrimary
+    val secondaryTextColor = if (themeState.isDarkMode) LightGray else LightTextSecondary
 
     GradientBackground(isDarkMode = themeState.isDarkMode) {
         Scaffold(
@@ -83,6 +83,7 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 NextArrivalsSection(
+                    isDarkMode = themeState.isDarkMode,
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor
@@ -193,6 +194,7 @@ fun SearchBar(
 
 @Composable
 fun NextArrivalsSection(
+    isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
@@ -212,7 +214,7 @@ fun NextArrivalsSection(
                 Icon(
                     imageVector = Icons.Default.Schedule,
                     contentDescription = "Reloj",
-                    tint = MetroOrange,
+                    tint = if (isDarkMode) MetroOrange else LightIconTime,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))

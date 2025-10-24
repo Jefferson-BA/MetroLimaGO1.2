@@ -45,7 +45,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
 
     val station = MockStations.findById(estacionId)
-    var showGoogleMap by remember { mutableStateOf(false) }
+    var showGoogleMap by remember { mutableStateOf(true) }
 
     // Estado para ubicación del usuario
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -164,7 +164,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = cardColor
                 )
             )
         },
@@ -242,7 +242,8 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                                 },
                                 properties = MapProperties(
                                     isMyLocationEnabled = hasLocationPermission,
-                                    mapType = MapType.NORMAL
+                                    mapType = MapType.NORMAL,
+                                    isTrafficEnabled = false
                                 ),
                                 uiSettings = MapUiSettings(
                                     zoomControlsEnabled = true,

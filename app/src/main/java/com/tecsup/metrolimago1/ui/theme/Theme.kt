@@ -25,14 +25,14 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = MetroOrange,
-    secondary = LightGray,
+    secondary = LightTextSecondary,
     tertiary = MetroGreen,
-    background = Color(0xFFF5F5F5),
-    surface = Color(0xFFFFFFFF),
-    onBackground = Color(0xFF1C1C1C),
-    onSurface = Color(0xFF1C1C1C),
+    background = LightBackground,
+    surface = LightCard,
+    onBackground = LightTextPrimary,
+    onSurface = LightTextPrimary,
     onPrimary = White,
-    onSecondary = Color(0xFF1C1C1C),
+    onSecondary = LightTextPrimary,
     onTertiary = White
 )
 
