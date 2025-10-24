@@ -344,7 +344,8 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                         routeInfo = routeInfo!!,
                         cardColor = cardColor,
                         textColor = textColor,
-                        secondaryTextColor = secondaryTextColor
+                        secondaryTextColor = secondaryTextColor,
+                        context = context
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -597,7 +598,8 @@ fun RouteInfoCard(
     routeInfo: RouteInfo,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier

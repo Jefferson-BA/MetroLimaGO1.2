@@ -18,6 +18,7 @@ import com.google.maps.android.compose.*
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.utils.TranslationUtils
 
 @Composable
 fun SimpleMapView(
@@ -26,7 +27,8 @@ fun SimpleMapView(
     showRoute: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     var showGoogleMap by remember { mutableStateOf(false) }
     
@@ -119,7 +121,7 @@ fun SimpleMapView(
                 ) {
                     Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Activar Mapa")
+                    Text(TranslationUtils.getText(context, "activate_map"))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))

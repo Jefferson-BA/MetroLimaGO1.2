@@ -1,94 +1,160 @@
-# 🚇 MetroLima GO
+# MetroLima GO
 
-**Aplicación móvil para planificar viajes en el Metro de Lima y rutas integradas**
+Aplicación móvil para la planificación de viajes en el Metro de Lima, desarrollada en Android con Jetpack Compose.
 
-## 📱 Descripción
+## 🎯 Objetivo
 
-MetroLima GO es una aplicación Android nativa desarrollada en **Kotlin** con **Jetpack Compose** que permite a ciudadanos y visitantes de Lima planificar sus viajes de manera rápida y visual en el Metro de Lima, incluyendo alimentadores, corredores y transporte complementario.
+Brindar a los ciudadanos y visitantes una forma rápida y visual de planificar sus viajes en el Metro de Lima y rutas integradas (alimentadores, corredores y transporte complementario).
 
-## ✨ Características Principales
+## 🚀 Características Principales
 
-- 🗺️ **Consulta de Estaciones**: Lista completa de estaciones del Metro con detalles
-- 🚉 **Planificador de Rutas**: Calcula la mejor ruta entre origen y destino
-- ⏱️ **Tiempo Estimado**: Visualiza la duración aproximada del viaje
-- 🌐 **Información en Tiempo Real**: Alertas y horarios actualizados
-- 🌙 **Modo Oscuro**: Interfaz adaptable a preferencias del usuario
-- 🌍 **Multiidioma**: Soporte para Español e Inglés
+### 📱 Módulos Implementados
 
-## 🛠️ Stack Tecnológico
+- **🏠 Home**: Pantalla principal con acceso a todas las funcionalidades
+- **🚇 Estaciones**: Lista y detalles de estaciones del Metro de Lima
+- **🗺️ Rutas**: Planificador de rutas con origen y destino
+- **📍 Mapas**: Visualización de mapas con Google Maps
+- **⚡ En Vivo**: Estado del servicio en tiempo real
+- **💬 Chat**: Asistente IA con respuestas predefinidas
+- **⚙️ Configuración**: Temas, idiomas y información de la app
 
-### Lenguaje
-- **Kotlin** 1.9+
+### 🎨 Diseño y UX
 
-### UI
-- **Jetpack Compose** - UI moderna y declarativa
-- **Material Design 3** - Componentes y estilos
+- **Material 3**: Diseño moderno con Material Design 3
+- **Temas**: Modo claro y oscuro
+- **Idiomas**: Soporte para español e inglés
+- **Navegación**: Bottom Navigation con 5 secciones principales
+- **Colores**: Esquema de colores característico del Metro de Lima (naranja)
 
-### Persistencia Local
-- **Room Database** - Base de datos SQLite
+## 🛠️ Tecnologías Utilizadas
 
-### Networking
-- **Retrofit** - Cliente HTTP
-- **Gson** - Serialización JSON
+- **Android**: Kotlin + Jetpack Compose
+- **Navegación**: Navigation Compose
+- **Base de Datos**: Room (SQLite)
+- **Mapas**: Google Maps Compose
+- **Red**: Retrofit + OkHttp
+- **Corrutinas**: Kotlin Coroutines
+- **UI**: Material 3 Components
+- **Localización**: Sistema de traducciones personalizado
 
-### Asincronía
-- **Kotlin Coroutines** - Programación asíncrona
-- **Flow** - Streams reactivos
+## 📁 Estructura del Proyecto
 
-### Navegación
-- **Navigation Compose** - Navegación entre pantallas
-
-## 🚀 Requisitos Previos
-
-- **Android Studio** Hedgehog (2023.1.1) o superior
-- **JDK** 17 o superior
-- **Gradle** 8.0+
-- **Android SDK** mínimo: API 24 (Android 7.0)
-- **Android SDK** objetivo: API 34 (Android 14)
-
-## ⚙️ Instalación y Configuración
-
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/Jefferson-BA/MetroLimmaGO.git
-cd metrolima-go
+```
+app/src/main/java/com/tecsup/metrolimago1/
+├── data/
+│   ├── local/          # Room Database
+│   └── remote/         # API Services
+├── domain/
+│   └── models/         # Data Models
+├── ui/
+│   ├── screens/        # Pantallas principales
+│   ├── components/     # Componentes reutilizables
+│   └── theme/          # Temas y colores
+├── navigation/         # Navegación entre pantallas
+└── utils/             # Utilidades (traducciones, locales)
 ```
 
-### 2. Ejecutar la aplicación
-- Conecta un dispositivo Android o inicia un emulador
-- Haz clic en el botón "Run" (▶️) o presiona `Shift + F10`
+## 🎯 Funcionalidades por Módulo
 
-## 👥 Equipo de Desarrollo
+### 🏠 Home Screen
+- Acceso rápido a todas las funcionalidades
+- Búsqueda de estaciones
+- Próximas llegadas
+- Notificaciones del servicio
 
-### Integrantes
-- **Jeff** - Setup del Proyecto y Configuración Base
-- **Jhon** - Diseño UI/UX y Recursos Visuales
-- **Alexis** - Navegación y Desarrollo de Pantallas
+### 🚇 Estaciones
+- Lista completa de estaciones
+- Búsqueda por nombre o línea
+- Detalles individuales con mapas
+- Información de horarios y servicios
 
-### Docente
-**Juan León S.** - TECSUP
+### 🗺️ Planificador de Rutas
+- Selección de origen y destino
+- Cálculo de tiempo estimado
+- Visualización de pasos del recorrido
+- Integración con mapas
 
-## 📅 Planificación del Proyecto
+### 📍 Mapas
+- Google Maps integrado
+- Marcadores de estaciones
+- Rutas visuales
+- Filtros por líneas
 
-| Día | Actividades | Estado |
-|-----|-------------|--------|
-| **Día 1** | Setup, estructura, navegación básica | ✅ En progreso |
-| **Día 2** | Diseño UI con Compose |  Pendiente |
-| **Día 3** | Base de datos local (Room) |  Pendiente |
-| **Día 4** | Consumo de API (Retrofit) |  Pendiente |
-| **Día 5** | Planificador de rutas |  Pendiente |
-| **Día 6** | Ajustes y mejoras visuales |  Pendiente |
-| **Día 7** | Pruebas y despliegue |  Pendiente |
+### ⚡ Estado en Vivo
+- Estado operacional del servicio
+- Alertas y notificaciones
+- Horarios actualizados
+- Información de mantenimiento
 
-## 📖 Recursos y Referencias
+### 💬 Chat IA
+- Asistente con respuestas predefinidas
+- Preguntas frecuentes
+- Soporte en español e inglés
+- Información del Metro de Lima
 
-- [Documentación oficial de Jetpack Compose](https://developer.android.com/jetpack/compose)
-- [Guía de arquitectura Android](https://developer.android.com/topic/architecture)
-- [Material Design 3](https://m3.material.io/)
-- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+### ⚙️ Configuración
+- Cambio de tema (claro/oscuro)
+- Selección de idioma
+- Información de la aplicación
+- Datos del desarrollador
+
+## 🎨 Sistema de Temas
+
+### Colores Característicos
+- **Naranja Metro**: Color principal del Metro de Lima
+- **Verde Línea 1**: Identificación visual
+- **Azul Línea 2**: Identificación visual
+- **Amarillo Línea 3**: Identificación visual
+
+### Modo Oscuro/Claro
+- Adaptación automática del sistema
+- Colores optimizados para cada modo
+- Iconos y textos con contraste adecuado
+
+## 🌐 Sistema de Localización
+
+- **Español**: Idioma por defecto
+- **Inglés**: Traducción completa
+- **Persistencia**: Guardado de preferencias
+- **Cambio dinámico**: Sin reinicio de aplicación
+
+## 📱 Pantallas Principales
+
+1. **Splash Screen**: Pantalla de carga con logo
+2. **Home**: Dashboard principal
+3. **Estaciones**: Lista y búsqueda
+4. **Detalle Estación**: Información completa
+5. **Planificador**: Selección de rutas
+6. **Mapas**: Visualización geográfica
+7. **En Vivo**: Estado del servicio
+8. **Chat**: Asistente IA
+9. **Configuración**: Ajustes de la app
+
+## 🚀 Instalación y Uso
+
+1. Clonar el repositorio
+2. Abrir en Android Studio
+3. Sincronizar dependencias
+4. Ejecutar en dispositivo o emulador
+5. Configurar API Key de Google Maps (opcional)
+
+## 📋 Requisitos
+
+- Android Studio Arctic Fox o superior
+- Android SDK 24+
+- Kotlin 1.8+
+- Google Maps API Key (para funcionalidad completa)
+
+## 👥 Desarrollo
+
+**Docente**: Juan León S.  
+**Proyecto**: MetroLima GO  
+**Tecnología**: Android + Jetpack Compose  
+
+## 📄 Licencia
+
+Proyecto académico desarrollado para fines educativos.
 
 ---
 
-**MetroLima GO** - v1.0.0  
-Perú 🇵🇪  
-© 2025 TECSUP
+*MetroLima GO - Tu compañero ideal para navegar por el sistema de Metro de Lima*

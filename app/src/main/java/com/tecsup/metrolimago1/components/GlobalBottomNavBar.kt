@@ -17,6 +17,9 @@ import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.utils.TranslationUtils
+import com.tecsup.metrolimago1.utils.LocaleUtils
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
@@ -26,6 +29,7 @@ import com.tecsup.metrolimago1.ui.theme.ThemeState
 @Composable
 fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
     val themeState = LocalThemeState.current
+    val context = LocalContext.current
 
     val transparentBackground = if (themeState.isDarkMode)
         Color.Black.copy(alpha = 0.3f)
@@ -74,7 +78,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio",
+                        contentDescription = TranslationUtils.getText(context, "home"),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -86,7 +90,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio",
+                        contentDescription = TranslationUtils.getText(context, "home"),
                         tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -105,7 +109,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Ubicación",
+                        contentDescription = TranslationUtils.getText(context, "stations"),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -117,7 +121,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Ubicación",
+                        contentDescription = TranslationUtils.getText(context, "stations"),
                         tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -136,7 +140,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Route,
-                        contentDescription = "Rutas",
+                        contentDescription = TranslationUtils.getText(context, "routes"),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -148,7 +152,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Route,
-                        contentDescription = "Rutas",
+                        contentDescription = TranslationUtils.getText(context, "routes"),
                         tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -167,7 +171,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Wifi,
-                                contentDescription = "En vivo",
+                                contentDescription = TranslationUtils.getText(context, "live"),
                                 tint = White,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -179,7 +183,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Wifi,
-                                contentDescription = "En vivo",
+                                contentDescription = TranslationUtils.getText(context, "live"),
                                 tint = inactiveIconColor,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -198,7 +202,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Configuración",
+                        contentDescription = TranslationUtils.getText(context, "settings"),
                         tint = White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -210,7 +214,7 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Configuración",
+                        contentDescription = TranslationUtils.getText(context, "settings"),
                         tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )

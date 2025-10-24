@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,11 +32,14 @@ import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.domain.services.RouteCalculationService
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.utils.TranslationUtils
+import com.tecsup.metrolimago1.utils.LocaleUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     val themeState = LocalThemeState.current
+    val context = LocalContext.current
 
     val cardColor = if (themeState.isDarkMode) CardGray else LightCard
     val textColor = if (themeState.isDarkMode) White else LightTextPrimary
@@ -77,7 +81,8 @@ fun HomeScreen(navController: NavController) {
                     onSearchClick = { _ -> navController.navigate(Screen.Estaciones.route) },
                     cardColor = cardColor,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    context = context
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -86,7 +91,8 @@ fun HomeScreen(navController: NavController) {
                     isDarkMode = themeState.isDarkMode,
                     cardColor = cardColor,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    context = context
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -94,7 +100,8 @@ fun HomeScreen(navController: NavController) {
                 NotificationsSection(
                     cardColor = cardColor,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    context = context
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +135,8 @@ fun SearchBar(
     onSearchClick: (String) -> Unit,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -147,7 +155,7 @@ fun SearchBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Buscar",
+                contentDescription = TranslationUtils.getText(context, "search"),
                 tint = secondaryTextColor,
                 modifier = Modifier.size(24.dp)
             )
@@ -182,7 +190,7 @@ fun SearchBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Buscar",
+                        contentDescription = TranslationUtils.getText(context, "search"),
                         tint = MetroOrange,
                         modifier = Modifier.size(20.dp)
                     )
@@ -197,7 +205,8 @@ fun NextArrivalsSection(
     isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -213,7 +222,7 @@ fun NextArrivalsSection(
             ) {
                 Icon(
                     imageVector = Icons.Default.Schedule,
-                    contentDescription = "Reloj",
+                    contentDescription = TranslationUtils.getText(context, "clock"),
                     tint = if (isDarkMode) MetroOrange else LightIconTime,
                     modifier = Modifier.size(20.dp)
                 )
@@ -324,7 +333,8 @@ fun ArrivalItem(
 fun NotificationsSection(
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -340,7 +350,7 @@ fun NotificationsSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Notificaciones",
+                    text = TranslationUtils.getText(context, "notifications"),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MetroOrange

@@ -34,6 +34,8 @@ import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.utils.TranslationUtils
+import com.tecsup.metrolimago1.utils.LocaleUtils
 
 // Clase para información de rutas
 data class RouteInfo(
@@ -272,7 +274,7 @@ fun MapsScreen(navController: NavController) {
                         ) {
                             Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Activar Mapa Completo")
+                            Text(TranslationUtils.getText(context, "activate_map"))
                         }
                     }
                 }
@@ -372,7 +374,8 @@ fun CompactRoutePanel(
     onClearRoute: () -> Unit,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier
@@ -421,7 +424,8 @@ fun CompactRoutePanel(
                 selectedLine = selectedLine,
                 onLineSelected = onLineSelected,
                 textColor = textColor,
-                secondaryTextColor = secondaryTextColor
+                secondaryTextColor = secondaryTextColor,
+                context = context
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -465,7 +469,8 @@ fun CompactRoutePanel(
                 CompactRouteInfo(
                     routeInfo = routeInfo,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    context = context
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -484,7 +489,7 @@ fun CompactRoutePanel(
                 ) {
                     Icon(Icons.Default.Route, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Ver Ruta")
+                    Text(TranslationUtils.getText(context, "see_route"))
                 }
 
                 OutlinedButton(
@@ -497,7 +502,7 @@ fun CompactRoutePanel(
                 ) {
                     Icon(Icons.Default.Place, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Lugares")
+                    Text(TranslationUtils.getText(context, "places"))
                 }
 
                 OutlinedButton(
@@ -582,7 +587,8 @@ fun LineFilterSection(
     selectedLine: String?,
     onLineSelected: (String?) -> Unit,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Column {
         Text(
@@ -601,7 +607,7 @@ fun LineFilterSection(
             // Botón "Todas"
             FilterChip(
                 onClick = { onLineSelected(null) },
-                label = { Text("Todas") },
+                label = { Text(TranslationUtils.getText(context, "all")) },
                 selected = selectedLine == null,
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = MetroOrange,
@@ -650,7 +656,8 @@ fun RouteInfoCard(
     routeInfo: RouteInfo,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -666,7 +673,7 @@ fun RouteInfoCard(
             ) {
                 Column {
                     Text(
-                        text = "Distancia",
+                        text = TranslationUtils.getText(context, "distance"),
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                     Text(
@@ -680,7 +687,7 @@ fun RouteInfoCard(
                 
                 Column {
                     Text(
-                        text = "Tiempo",
+                        text = TranslationUtils.getText(context, "time"),
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                     Text(
@@ -813,7 +820,8 @@ fun CompactStationSelector(
 fun CompactRouteInfo(
     routeInfo: RouteInfo,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -856,7 +864,7 @@ fun CompactRouteInfo(
             
             Column {
                 Text(
-                    text = "Pasos",
+                        text = TranslationUtils.getText(context, "steps"),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(

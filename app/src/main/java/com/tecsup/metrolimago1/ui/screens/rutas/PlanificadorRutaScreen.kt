@@ -35,6 +35,8 @@ import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.utils.TranslationUtils
+import com.tecsup.metrolimago1.utils.LocaleUtils
 
 // Clase para información de rutas
 data class RouteInfo(
@@ -192,7 +194,8 @@ fun PlanificadorRutaScreen(navController: NavController) {
                         isDarkMode = themeState.isDarkMode,
                         cardColor = cardColor,
                         textColor = textColor,
-                        secondaryTextColor = secondaryTextColor
+                        secondaryTextColor = secondaryTextColor,
+                        context = context
                     )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -216,7 +219,8 @@ fun PlanificadorRutaScreen(navController: NavController) {
                                 hasLocationPermission = hasLocationPermission,
                                 cardColor = cardColor,
                                 textColor = textColor,
-                                secondaryTextColor = secondaryTextColor
+                                secondaryTextColor = secondaryTextColor,
+                                context = context
                             )
                     
                     // Botón para agrandar el mapa
@@ -290,7 +294,8 @@ fun CompactRoutePanel(
     isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
         modifier = Modifier
@@ -362,7 +367,8 @@ fun CompactRoutePanel(
                 CompactRouteInfo(
                     routeInfo = routeInfo,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    context = context
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -381,7 +387,7 @@ fun CompactRoutePanel(
                 ) {
                     Icon(Icons.Default.Route, contentDescription = null, tint = if (isDarkMode) MetroOrange else LightIconRoute, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Ver Ruta")
+                    Text(TranslationUtils.getText(context, "see_route"))
                 }
 
 
@@ -559,7 +565,8 @@ fun CompactStationSelector(
 fun CompactRouteInfo(
     routeInfo: RouteInfo,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -574,7 +581,7 @@ fun CompactRouteInfo(
         ) {
             Column {
                 Text(
-                    text = "Distancia",
+                        text = TranslationUtils.getText(context, "distance"),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -588,7 +595,7 @@ fun CompactRouteInfo(
             
             Column {
                 Text(
-                    text = "Tiempo",
+                        text = TranslationUtils.getText(context, "time"),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -602,7 +609,7 @@ fun CompactRouteInfo(
             
             Column {
                 Text(
-                    text = "Pasos",
+                        text = TranslationUtils.getText(context, "steps"),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -628,7 +635,8 @@ fun SimpleMapView(
     hasLocationPermission: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     var showGoogleMap by remember { mutableStateOf(true) }
     
@@ -750,7 +758,7 @@ fun SimpleMapView(
                 ) {
                     Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Activar Mapa")
+                    Text(TranslationUtils.getText(context, "activate_map"))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))

@@ -22,8 +22,10 @@ import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
-import com.tecsup.metrolimago1.utils.LocalizationManager
+import com.tecsup.metrolimago1.utils.TranslationUtils
+import com.tecsup.metrolimago1.utils.LocaleUtils
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,10 +34,8 @@ fun ConfiguracionScreen(navController: NavController) {
     val themeState = LocalThemeState.current
     val context = LocalContext.current
 
-    // Estado para idioma
-    var selectedLanguage by remember {
-        mutableStateOf(LocalizationManager.getSavedLanguage(context))
-    }
+    // Estado para idioma - siempre en español por defecto
+    var selectedLanguage by remember { mutableStateOf("es") }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showLanguageChangeAlert by remember { mutableStateOf(false) }
     var pendingLanguage by remember { mutableStateOf<String?>(null) }
@@ -60,7 +60,7 @@ fun ConfiguracionScreen(navController: NavController) {
         ) {
             // Título principal
             Text(
-                text = stringResource(R.string.settings_title),
+                text = TranslationUtils.getText(context, "settings"),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -74,7 +74,8 @@ fun ConfiguracionScreen(navController: NavController) {
                 onDarkModeToggle = { themeState.updateDarkMode(it) },
                 cardColor = cardColor,
                 textColor = textColor,
-                secondaryTextColor = secondaryTextColor
+                secondaryTextColor = secondaryTextColor,
+                context = context
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -82,11 +83,19 @@ fun ConfiguracionScreen(navController: NavController) {
             // Sección Idioma
             LanguageSection(
                 selectedLanguage = selectedLanguage,
-                onLanguageClick = { showLanguageDialog = true },
+                onLanguageChange = { language ->
+                    selectedLanguage = language
+                    // Guardar preferencia de idioma
+                    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("selected_language", language).apply()
+                    // Aplicar cambio de idioma
+                    TranslationUtils.changeLanguage(context, language)
+                },
                 isDarkMode = themeState.isDarkMode,
                 cardColor = cardColor,
                 textColor = textColor,
-                secondaryTextColor = secondaryTextColor
+                secondaryTextColor = secondaryTextColor,
+                context = context
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -95,7 +104,8 @@ fun ConfiguracionScreen(navController: NavController) {
             AboutSection(
                 cardColor = cardColor,
                 textColor = textColor,
-                secondaryTextColor = secondaryTextColor
+                secondaryTextColor = secondaryTextColor,
+                context = context
             )
         }
     }
@@ -106,7 +116,7 @@ fun ConfiguracionScreen(navController: NavController) {
             currentLanguage = selectedLanguage,
             onLanguageSelected = { language ->
                 selectedLanguage = language
-                LocalizationManager.saveLanguage(context, language)
+                // Guardar idioma seleccionado
                 showLanguageDialog = false
 
                 // Mostrar alert de cambio de idioma
@@ -116,7 +126,8 @@ fun ConfiguracionScreen(navController: NavController) {
             onDismiss = { showLanguageDialog = false },
             cardColor = cardColor,
             textColor = textColor,
-            secondaryTextColor = secondaryTextColor
+            secondaryTextColor = secondaryTextColor,
+            context = context
         )
     }
 
@@ -130,6 +141,7 @@ fun ConfiguracionScreen(navController: NavController) {
                 if (context is Activity) {
                     val intent = Intent(context, context.javaClass)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    intent.putExtra("language_changed", true)
                     context.startActivity(intent)
                     context.finish()
                 }
@@ -140,7 +152,8 @@ fun ConfiguracionScreen(navController: NavController) {
             },
             cardColor = cardColor,
             textColor = textColor,
-            secondaryTextColor = secondaryTextColor
+            secondaryTextColor = secondaryTextColor,
+            context = context
         )
     }
 }
@@ -151,11 +164,12 @@ fun AppearanceSection(
     onDarkModeToggle: (Boolean) -> Unit,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Column {
         Text(
-            text = "Apariencia",
+            text = TranslationUtils.getText(context, "appearance"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -177,7 +191,7 @@ fun AppearanceSection(
             ) {
                 Icon(
                     imageVector = Icons.Default.DarkMode,
-                    contentDescription = "Modo Oscuro",
+                    contentDescription = TranslationUtils.getText(context, "dark_mode"),
                     tint = if (isDarkMode) textColor else LightIconSettings,
                     modifier = Modifier.size(24.dp)
                 )
@@ -186,14 +200,14 @@ fun AppearanceSection(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Modo Oscuro",
+                        text = TranslationUtils.getText(context, "dark_mode"),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = textColor
                         )
                     )
                     Text(
-                        text = "Cambia el tema de la aplicación",
+                        text = TranslationUtils.getText(context, "change_theme"),
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
@@ -220,11 +234,12 @@ fun LanguageSection(
     isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Column {
         Text(
-            text = "Idioma",
+            text = TranslationUtils.getText(context, "language"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -246,7 +261,7 @@ fun LanguageSection(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Language,
-                        contentDescription = "Idioma",
+                        contentDescription = TranslationUtils.getText(context, "language"),
                         tint = if (isDarkMode) textColor else LightIconLanguage,
                         modifier = Modifier.size(24.dp)
                     )
@@ -255,14 +270,14 @@ fun LanguageSection(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Idioma",
+                            text = TranslationUtils.getText(context, "language"),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = textColor
                             )
                         )
                         Text(
-                            text = "Selecciona tu idioma preferido",
+                            text = TranslationUtils.getText(context, "select_language"),
                             style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                         )
                     }
@@ -275,7 +290,9 @@ fun LanguageSection(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onLanguageChange("es") },
+                        onClick = { 
+                            onLanguageChange("es")
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedLanguage == "es") MetroOrange else secondaryTextColor
                         ),
@@ -283,13 +300,15 @@ fun LanguageSection(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Es Español",
+                            text = TranslationUtils.getText(context, "spanish"),
                             color = if (selectedLanguage == "es") White else textColor
                         )
                     }
 
                     Button(
-                        onClick = { onLanguageChange("en") },
+                        onClick = { 
+                            onLanguageChange("en")
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedLanguage == "en") MetroOrange else secondaryTextColor
                         ),
@@ -297,7 +316,7 @@ fun LanguageSection(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Us Inglés",
+                            text = TranslationUtils.getText(context, "english"),
                             color = if (selectedLanguage == "en") White else textColor
                         )
                     }
@@ -311,11 +330,12 @@ fun LanguageSection(
 fun AboutSection(
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Column {
         Text(
-            text = "Acerca de",
+            text = TranslationUtils.getText(context, "about"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -332,7 +352,7 @@ fun AboutSection(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "MetroLima GO",
+                    text = TranslationUtils.getText(context, "app_name"),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -346,7 +366,7 @@ fun AboutSection(
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
-                        text = "Version 1.0.0",
+                        text = "${TranslationUtils.getText(context, "version")} 1.0.0",
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -355,7 +375,7 @@ fun AboutSection(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.",
+                    text = TranslationUtils.getText(context, "app_description"),
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
                 )
 
@@ -369,13 +389,13 @@ fun AboutSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Email,
-                        contentDescription = "Contacto",
+                        contentDescription = TranslationUtils.getText(context, "contact"),
                         tint = textColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Contacto",
+                        text = TranslationUtils.getText(context, "contact"),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = textColor
@@ -395,13 +415,13 @@ fun AboutSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Security,
-                        contentDescription = "Desarrollador",
+                        contentDescription = TranslationUtils.getText(context, "developer"),
                         tint = textColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Desarrollador",
+                        text = TranslationUtils.getText(context, "developer"),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = textColor
@@ -410,7 +430,7 @@ fun AboutSection(
                 }
 
                 Text(
-                    text = "MetroLima Development Team",
+                    text = TranslationUtils.getText(context, "development_team"),
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
@@ -426,11 +446,12 @@ fun LanguageSection(
     isDarkMode: Boolean,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     Column {
         Text(
-            text = stringResource(R.string.settings_language),
+            text = TranslationUtils.getText(context, "language"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -453,7 +474,7 @@ fun LanguageSection(
             ) {
                 Icon(
                     imageVector = Icons.Default.Language,
-                    contentDescription = stringResource(R.string.settings_language),
+                    contentDescription = TranslationUtils.getText(context, "language"),
                     tint = textColor,
                     modifier = Modifier.size(24.dp)
                 )
@@ -462,21 +483,21 @@ fun LanguageSection(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = stringResource(R.string.settings_language),
+                        text = TranslationUtils.getText(context, "language"),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = textColor
                         )
                     )
                     Text(
-                        text = LocalizationManager.getLanguageDisplayName(selectedLanguage),
+                        text = if (selectedLanguage == "es") TranslationUtils.getText(context, "spanish") else TranslationUtils.getText(context, "english"),
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
 
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
-                    contentDescription = stringResource(R.string.common_back),
+                    contentDescription = TranslationUtils.getText(context, "back"),
                     tint = secondaryTextColor,
                     modifier = Modifier.size(20.dp)
                 )
@@ -492,19 +513,20 @@ fun LanguageSelectionDialog(
     onDismiss: () -> Unit,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.settings_language),
+                text = TranslationUtils.getText(context, "language"),
                 color = textColor
             )
         },
         text = {
             Column {
-                LocalizationManager.getAvailableLanguages().forEach { (code, name) ->
+                listOf("es" to TranslationUtils.getText(context, "spanish"), "en" to TranslationUtils.getText(context, "english")).forEach { (code, name) ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -528,7 +550,7 @@ fun LanguageSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_ok))
+                Text(TranslationUtils.getText(context, "ok"))
             }
         },
         containerColor = cardColor
@@ -541,7 +563,8 @@ fun LanguageChangeAlert(
     onRestartLater: () -> Unit,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    context: android.content.Context
 ) {
     AlertDialog(
         onDismissRequest = onRestartLater,
@@ -551,13 +574,13 @@ fun LanguageChangeAlert(
             ) {
                 Icon(
                     imageVector = Icons.Default.Language,
-                    contentDescription = "Idioma",
+                    contentDescription = TranslationUtils.getText(context, "language"),
                     tint = MetroOrange,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.settings_language),
+                    text = TranslationUtils.getText(context, "language"),
                     color = textColor,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold
@@ -568,13 +591,13 @@ fun LanguageChangeAlert(
         text = {
             Column {
                 Text(
-                    text = stringResource(R.string.language_change_message),
+                    text = TranslationUtils.getText(context, "language_change_message"),
                     color = textColor,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.language_change_question),
+                    text = TranslationUtils.getText(context, "language_change_question"),
                     color = secondaryTextColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -587,7 +610,7 @@ fun LanguageChangeAlert(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.language_restart_now),
+                    text = TranslationUtils.getText(context, "language_restart_now"),
                     color = White,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold
@@ -604,7 +627,7 @@ fun LanguageChangeAlert(
                 )
             ) {
                 Text(
-                    text = stringResource(R.string.language_restart_later),
+                    text = TranslationUtils.getText(context, "language_restart_later"),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
