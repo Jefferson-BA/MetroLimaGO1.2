@@ -13,3 +13,19 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Archivos de configuración sensibles
+.env
+*.env
+app/.env
+app/local.properties
+
+# API Keys y datos sensibles
+**/secrets.properties
+**/api_keys.properties
+**/config.properties
+
+# Archivos de configuración de desarrollo
+**/debug.keystore
+**/release.keystore
+**/keystore.properties

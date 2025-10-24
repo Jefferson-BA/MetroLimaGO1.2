@@ -25,8 +25,14 @@ import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
 import com.tecsup.metrolimago1.ui.theme.ThemeState
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 import com.tecsup.metrolimago1.viewmodels.NotificationViewModel
+import com.tecsup.metrolimago1.utils.LocalizationManager
+import android.content.Context
 
 class MainActivity : ComponentActivity() {
+    
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocalizationManager.applySavedLanguage(newBase))
+    }
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()

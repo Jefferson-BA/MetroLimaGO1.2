@@ -1,20 +1,67 @@
 package com.tecsup.metrolimago1.data.local
 
+import com.google.android.gms.maps.model.LatLng
 import com.tecsup.metrolimago1.domain.models.Station
 
 object MockStations {
+    // Coordenadas reales del Metro de Lima
     val stations = listOf(
-        Station("LIM-01", "Central", "Línea 1", "Av. Central 100", -12.0464, -77.0428, "Estación central del sistema"),
-        Station("LIM-02", "San Borja", "Línea 1", "Av. San Borja 45", -12.0800, -76.9800, "Cerca al parque central"),
-        Station("LIM-03", "Miraflores", "Línea 2", "C. Larco 200", -12.1214, -77.0297, "Zona turística"),
-        Station("LIM-04", "Barranco", "Línea 2", "P. de la reserva 12", -12.1440, -77.0200, "Barranco cultural"),
-        Station("LIM-05", "San Isidro", "Línea 1", "C. Las Flores 56", -12.0850, -77.0370, "Distrito financiero"),
-        Station("LIM-06", "La Molina", "Línea 4", "Av. La Molina 300", -12.0500, -76.9500, "Zona residencial"),
-        Station("LIM-07", "San Miguel", "Línea 3", "Av. La Marina 77", -12.0600, -77.1100, "Acceso a puerto"),
-        Station("LIM-08", "Comas", "Línea 4", "Av. Universitaria 9", -11.9800, -77.0700, "Norte de la ciudad"),
-        Station("LIM-09", "Ate", "Línea 1", "Av. Faucett 140", -12.0450, -77.0200, "Zona industrial"),
-        Station("LIM-10", "Pueblo Libre", "Línea 3", "Jr. Ucayali 23", -12.0950, -77.0600, "Barrio tradicional")
+        // Línea 1 - Villa El Salvador a San Juan de Lurigancho
+        Station("LIM-01", "Villa El Salvador", "Línea 1", "Av. Villa El Salvador", -12.1939, -76.9399, "Terminal sur de la Línea 1"),
+        Station("LIM-02", "María Auxiliadora", "Línea 1", "Av. María Auxiliadora", -12.1639, -76.9703, "Conexión con buses"),
+        Station("LIM-03", "La Cultura", "Línea 1", "Av. La Cultura", -12.0865, -76.9779, "Cerca al parque"),
+        Station("LIM-04", "San Borja Sur", "Línea 1", "Av. San Borja Sur", -12.1003, -76.9961, "Distrito San Borja"),
+        Station("LIM-05", "Angamos", "Línea 1", "Av. Angamos", -12.1214, -77.0297, "Conexión con Línea 2"),
+        Station("LIM-06", "San Borja Norte", "Línea 1", "Av. San Borja Norte", -12.0800, -76.9800, "Centro de San Borja"),
+        Station("LIM-07", "La Victoria", "Línea 1", "Av. La Victoria", -12.0600, -77.0200, "Distrito comercial"),
+        Station("LIM-08", "Gamarra", "Línea 1", "Av. Gamarra", -12.0450, -77.0200, "Centro comercial"),
+        Station("LIM-09", "El Agustino", "Línea 1", "Av. El Agustino", -12.0200, -77.0000, "Zona residencial"),
+        Station("LIM-10", "San Juan de Lurigancho", "Línea 1", "Av. San Juan de Lurigancho", -11.9800, -77.0700, "Terminal norte"),
+        
+        // Línea 2 - Ate Vitarte a Callao
+        Station("LIM-11", "Ate Vitarte", "Línea 2", "Av. Ate Vitarte", -12.0450, -76.9500, "Terminal este"),
+        Station("LIM-12", "Santa Anita", "Línea 2", "Av. Santa Anita", -12.0500, -76.9600, "Distrito Santa Anita"),
+        Station("LIM-13", "La Molina", "Línea 2", "Av. La Molina", -12.0500, -76.9500, "Zona residencial"),
+        Station("LIM-14", "San Luis", "Línea 2", "Av. San Luis", -12.0600, -76.9700, "Distrito San Luis"),
+        Station("LIM-15", "San Isidro", "Línea 2", "Av. San Isidro", -12.0850, -77.0370, "Distrito financiero"),
+        Station("LIM-16", "Miraflores", "Línea 2", "Av. Miraflores", -12.1214, -77.0297, "Zona turística"),
+        Station("LIM-17", "Barranco", "Línea 2", "Av. Barranco", -12.1440, -77.0200, "Barranco cultural"),
+        Station("LIM-18", "Chorrillos", "Línea 2", "Av. Chorrillos", -12.1600, -77.0100, "Distrito Chorrillos"),
+        Station("LIM-19", "San Miguel", "Línea 2", "Av. San Miguel", -12.0600, -77.1100, "Acceso al puerto"),
+        Station("LIM-20", "Callao", "Línea 2", "Av. Callao", -12.0500, -77.1300, "Terminal oeste"),
+        
+        // Línea 3 - Comas a Chorrillos
+        Station("LIM-21", "Comas", "Línea 3", "Av. Comas", -11.9800, -77.0700, "Norte de Lima"),
+        Station("LIM-22", "Independencia", "Línea 3", "Av. Independencia", -12.0000, -77.0500, "Distrito Independencia"),
+        Station("LIM-23", "Rímac", "Línea 3", "Av. Rímac", -12.0200, -77.0300, "Distrito Rímac"),
+        Station("LIM-24", "Cercado de Lima", "Línea 3", "Av. Cercado", -12.0464, -77.0428, "Centro histórico"),
+        Station("LIM-25", "La Victoria", "Línea 3", "Av. La Victoria", -12.0600, -77.0200, "Distrito comercial"),
+        Station("LIM-26", "Lince", "Línea 3", "Av. Lince", -12.0800, -77.0300, "Distrito Lince"),
+        Station("LIM-27", "Jesús María", "Línea 3", "Av. Jesús María", -12.0900, -77.0400, "Distrito Jesús María"),
+        Station("LIM-28", "Magdalena", "Línea 3", "Av. Magdalena", -12.1000, -77.0500, "Distrito Magdalena"),
+        Station("LIM-29", "Pueblo Libre", "Línea 3", "Av. Pueblo Libre", -12.0950, -77.0600, "Barrio tradicional"),
+        Station("LIM-30", "Chorrillos", "Línea 3", "Av. Chorrillos", -12.1600, -77.0100, "Terminal sur")
     )
+
+    // Coordenadas de Lima para centrar el mapa
+    val LIMA_CENTER = LatLng(-12.0464, -77.0428)
+    val LIMA_ZOOM = 12f
+
+    // Función para obtener estaciones por línea
+    fun getStationsByLine(line: String): List<Station> {
+        return stations.filter { it.line == line }
+    }
+
+    // Función para obtener coordenadas de una estación
+    fun getStationLatLng(stationId: String): LatLng? {
+        val station = stations.find { it.id == stationId }
+        return station?.let { LatLng(it.latitude, it.longitude) }
+    }
+
+    // Función para obtener todas las coordenadas de una línea
+    fun getLineCoordinates(line: String): List<LatLng> {
+        return getStationsByLine(line).map { LatLng(it.latitude, it.longitude) }
+    }
 
     fun findById(id: String?): Station? = stations.find { it.id == id }
 }

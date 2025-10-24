@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,7 @@ fun HomeScreen(navController: NavController) {
                 .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
             Text(
-                text = "MetroLima GO",
+                text = stringResource(R.string.home_title),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -107,12 +108,12 @@ fun SearchBar(
         value = searchQuery,
         shape = RoundedCornerShape(28.dp),
         onValueChange = { searchQuery = it },
-        placeholder = {
-            Text(
-                text = "¿A dónde vas?",
-                color = secondaryTextColor
-            )
-        },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.home_search_placeholder),
+                        color = secondaryTextColor
+                    )
+                },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -155,18 +156,18 @@ fun NextArrivalsSection(textColor: Color, secondaryTextColor: Color) {
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Próximas Llegadas",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
-                )
-            )
+                    Text(
+                        text = stringResource(R.string.home_next_arrivals),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                    )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Información en tiempo real",
+            text = stringResource(R.string.home_real_time_info),
             style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
         )
 
@@ -246,15 +247,15 @@ fun NotificationsSection(textColor: Color, secondaryTextColor: Color) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+                    Text(
+                        text = stringResource(R.string.home_notifications),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MetroOrange
+                        )
+                    )
             Text(
-                text = "Notificaciones",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MetroOrange
-                )
-            )
-            Text(
-                text = "Ver más",
+                text = stringResource(R.string.home_see_more),
                 style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
             )
         }
@@ -310,14 +311,14 @@ fun AISection(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Pregúntale a la IA",
+                text = stringResource(R.string.home_ai_chat),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MetroOrange
                 )
             )
             Text(
-                text = "Usa el chat de ayuda inteligente.",
+                text = stringResource(R.string.home_ai_description),
                 style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -331,7 +332,7 @@ fun AISection(
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Iniciar conversación")
+                Text(text = stringResource(R.string.home_start_conversation))
             }
         }
 
@@ -356,6 +357,7 @@ fun AISection(
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
