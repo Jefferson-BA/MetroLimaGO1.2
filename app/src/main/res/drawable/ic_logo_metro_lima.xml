@@ -3,16 +3,17 @@
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
+
   <!-- Círculo de fondo -->
   <path
       android:fillColor="#FFFFFF"
       android:pathData="M24,4C13.5,4 5,12.5 5,23s8.5,19 19,19s19,-8.5 19,-19S34.5,4 24,4z"/>
-  
+
   <!-- Tren del Metro -->
   <path
       android:fillColor="#FF8C00"
       android:pathData="M12,18h24c1.1,0 2,0.9 2,2v8c0,1.1 -0.9,2 -2,2H12c-1.1,0 -2,-0.9 -2,-2v-8C10,18.9 10.9,18 12,18z"/>
-  
+
   <!-- Ventanas del tren -->
   <path
       android:fillColor="#FFFFFF"
@@ -26,19 +27,15 @@
   <path
       android:fillColor="#FFFFFF"
       android:pathData="M32,20h4v4h-4V20z"/>
-  
-  <!-- Ruedas -->
-  <circle
+
+  <!-- Ruedas (CORREGIDO) - Converted to <path> elements -->
+  <path
       android:fillColor="#333333"
-      android:cx="16"
-      android:cy="30"
-      android:r="2"/>
-  <circle
+      android:pathData="M16,28 a2,2 0 1,0 0,4 a2,2 0 1,0 0,-4"/>
+  <path
       android:fillColor="#333333"
-      android:cx="32"
-      android:cy="30"
-      android:r="2"/>
-  
+      android:pathData="M32,28 a2,2 0 1,0 0,4 a2,2 0 1,0 0,-4"/>
+
   <!-- Rieles -->
   <path
       android:fillColor="#666666"

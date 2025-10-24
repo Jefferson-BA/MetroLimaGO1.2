@@ -15,7 +15,6 @@ import com.tecsup.metrolimago1.data.local.MockStations
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.padding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

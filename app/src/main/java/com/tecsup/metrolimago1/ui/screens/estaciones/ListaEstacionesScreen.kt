@@ -13,172 +13,175 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.ui.theme.GradientBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaEstacionesScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    
-    // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
+
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
-    
+
     var query by remember { mutableStateOf("") }
     var selectedLine by remember { mutableStateOf("Linea 1") }
-    
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Estaciones",
-                        color = textColor,
-                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor
-                )
-            )
-        },
-        bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Estaciones.route)
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 0.dp // Sin padding inferior para permitir contenido detrás de la barra
-                )
-                .padding(vertical = 8.dp)
-        ) {
-            // Barra de búsqueda
-            SearchBar(
-                query = query,
-                onQueryChange = { query = it },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Botones de filtro de línea
-            LineFilterButtons(
-                selectedLine = selectedLine,
-                onLineSelected = { selectedLine = it },
-                cardColor = cardColor,
-                textColor = textColor
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Indicador de línea actual
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(secondaryTextColor, RoundedCornerShape(4.dp))
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = selectedLine,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Lista de estaciones con filtrado mejorado
-            val filtered = MockStations.stations.filter { station ->
-                // Filtro por línea
-                val lineMatch = when (selectedLine) {
-                    "Linea 1" -> station.line == "Línea 1"
-                    "Linea 2" -> station.line == "Línea 2"
-                    "Metropolitano" -> station.line == "Línea 3" || station.line == "Línea 4"
-                    else -> true
-                }
-                
-                // Filtro por búsqueda (nombre, dirección, descripción)
-                val searchMatch = if (query.isBlank()) {
-                    true
-                } else {
-                    station.name.contains(query, ignoreCase = true) ||
-                    station.address.contains(query, ignoreCase = true) ||
-                    station.description.contains(query, ignoreCase = true) ||
-                    station.id.contains(query, ignoreCase = true)
-                }
-                
-                lineMatch && searchMatch
-            }
-            
-            if (filtered.isEmpty()) {
-                // Mensaje cuando no hay resultados
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.SearchOff,
-                        contentDescription = "Sin resultados",
-                        tint = secondaryTextColor,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = if (query.isNotEmpty()) "No se encontraron estaciones" else "No hay estaciones en esta línea",
-                        color = textColor,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    if (query.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+
+    // 🔹 Fondo gradiente dinámico
+    GradientBackground(isDarkMode = themeState.isDarkMode) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
                         Text(
-                            text = "Intenta con otros términos de búsqueda",
-                            color = secondaryTextColor,
-                            style = MaterialTheme.typography.bodyMedium
+                            text = "Estaciones",
+                            color = textColor,
+                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                         )
-                    }
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent // permite ver el gradiente
+                    )
+                )
+            },
+            bottomBar = {
+                GlobalBottomNavBar(
+                    navController = navController,
+                    currentRoute = Screen.Estaciones.route
+                )
+            },
+            containerColor = Color.Transparent, // importante para el fondo
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 0.dp
+                    )
+                    .padding(vertical = 8.dp)
+            ) {
+                SearchBar(
+                    query = query,
+                    onQueryChange = { query = it },
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LineFilterButtons(
+                    selectedLine = selectedLine,
+                    onLineSelected = { selectedLine = it },
+                    cardColor = cardColor,
+                    textColor = textColor
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 ) {
-                    items(filtered) { station ->
-                        StationCard(
-                            station = station,
-                            onClick = { navController.navigate(Screen.EstacionDetail.createRoute(station.id)) },
-                            cardColor = cardColor,
-                            textColor = textColor,
-                            secondaryTextColor = secondaryTextColor
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(secondaryTextColor, RoundedCornerShape(4.dp))
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = selectedLine,
+                        color = textColor,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val filtered = MockStations.stations.filter { station ->
+                    val lineMatch = when (selectedLine) {
+                        "Linea 1" -> station.line == "Línea 1"
+                        "Linea 2" -> station.line == "Línea 2"
+                        "Metropolitano" -> station.line == "Línea 3" || station.line == "Línea 4"
+                        else -> true
+                    }
+
+                    val searchMatch = if (query.isBlank()) {
+                        true
+                    } else {
+                        station.name.contains(query, ignoreCase = true) ||
+                                station.address.contains(query, ignoreCase = true) ||
+                                station.description.contains(query, ignoreCase = true) ||
+                                station.id.contains(query, ignoreCase = true)
+                    }
+
+                    lineMatch && searchMatch
+                }
+
+                if (filtered.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SearchOff,
+                            contentDescription = "Sin resultados",
+                            tint = secondaryTextColor,
+                            modifier = Modifier.size(48.dp)
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = if (query.isNotEmpty()) "No se encontraron estaciones" else "No hay estaciones en esta línea",
+                            color = textColor,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        if (query.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Intenta con otros términos de búsqueda",
+                                color = secondaryTextColor,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(filtered) { station ->
+                            StationCard(
+                                station = station,
+                                onClick = {
+                                    navController.navigate(
+                                        Screen.EstacionDetail.createRoute(station.id)
+                                    )
+                                },
+                                cardColor = cardColor,
+                                textColor = textColor,
+                                secondaryTextColor = secondaryTextColor
+                            )
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(80.dp))
             }
-            
-            // Espacio para la barra de navegación transparente
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -194,7 +197,7 @@ fun SearchBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(58.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -211,7 +214,7 @@ fun SearchBar(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
@@ -233,8 +236,7 @@ fun SearchBar(
                 textStyle = MaterialTheme.typography.bodyMedium,
                 singleLine = true
             )
-            
-            // Botón de limpiar búsqueda
+
             if (query.isNotEmpty()) {
                 IconButton(
                     onClick = { onQueryChange("") },
@@ -264,7 +266,7 @@ fun LineFilterButtons(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val lines = listOf("Linea 1", "Linea 2", "Metropolitano")
-        
+
         lines.forEach { line ->
             val isSelected = selectedLine == line
             Card(
@@ -279,7 +281,7 @@ fun LineFilterButtons(
                     text = line,
                     color = textColor,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
                 )
             }
         }
@@ -288,7 +290,7 @@ fun LineFilterButtons(
 
 @Composable
 fun StationCard(
-    station: com.tecsup.metrolimago1.domain.models.Station,
+    station: Station,
     onClick: () -> Unit,
     cardColor: Color,
     textColor: Color,
@@ -298,7 +300,7 @@ fun StationCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
@@ -306,17 +308,15 @@ fun StationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icono de ubicación
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Ubicación",
                 tint = secondaryTextColor,
                 modifier = Modifier.size(24.dp)
             )
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
-            // Información de la estación
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = station.name,
@@ -340,8 +340,7 @@ fun StationCard(
                     )
                 }
             }
-            
-            // Indicador de tiempo
+
             Card(
                 colors = CardDefaults.cardColors(containerColor = MetroGreen),
                 shape = RoundedCornerShape(8.dp)
@@ -353,6 +352,32 @@ fun StationCard(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "💡 ListaEstacionesScreen - Claro")
+@Composable
+fun ListaEstacionesScreenPreviewLight() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(false) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ListaEstacionesScreen(navController)
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "🌙 ListaEstacionesScreen - Oscuro")
+@Composable
+fun ListaEstacionesScreenPreviewDark() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(true) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ListaEstacionesScreen(navController)
         }
     }
 }

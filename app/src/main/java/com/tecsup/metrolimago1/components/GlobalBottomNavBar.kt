@@ -17,34 +17,36 @@ import androidx.navigation.NavController
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
+import com.tecsup.metrolimago1.ui.theme.ThemeState
 
 @Composable
 fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
     val themeState = LocalThemeState.current
-    
-    // Colores transparentes según el tema
-    val transparentBackground = if (themeState.isDarkMode) 
-        Color.Black.copy(alpha = 0.3f) 
-    else 
-        Color.White.copy(alpha = 0.4f) // Más opaco en modo claro
-    
-    // Borde para mejor visibilidad
-    val borderColor = if (themeState.isDarkMode) 
+
+    val transparentBackground = if (themeState.isDarkMode)
+        Color.Black.copy(alpha = 0.3f)
+    else
+        Color.White.copy(alpha = 0.4f)
+
+    val borderColor = if (themeState.isDarkMode)
         Color.White.copy(alpha = 0.2f)
-    else 
-        Color.Black.copy(alpha = 0.15f) // Borde sutil en modo claro
-    
-    // Colores para iconos inactivos con mejor contraste
-    val inactiveIconColor = if (themeState.isDarkMode) 
+    else
+        Color.Black.copy(alpha = 0.15f)
+
+    val inactiveIconColor = if (themeState.isDarkMode)
         Color.White.copy(alpha = 0.7f)
-    else 
+    else
         Color.Black.copy(alpha = 0.7f)
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .blur(radius = 0.dp), // Sin blur para mantener nitidez
+            .padding(horizontal = 16.dp, vertical = 22.dp)
+            .blur(radius = 0.dp),
         colors = CardDefaults.cardColors(containerColor = transparentBackground),
         shape = RoundedCornerShape(50.dp),
         border = BorderStroke(
@@ -65,8 +67,8 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            MetroOrange,
-                            RoundedCornerShape(24.dp)
+                            MetroBrightOrange,
+                            RoundedCornerShape(22.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -90,15 +92,14 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-            // Location Icon
+
             if (currentRoute == Screen.Estaciones.route) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
                             MetroOrange,
-                            RoundedCornerShape(24.dp)
+                            RoundedCornerShape(20.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -122,15 +123,14 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-            // Routes Icon
+
             if (currentRoute == Screen.Rutas.route) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
                             MetroOrange,
-                            RoundedCornerShape(24.dp)
+                            RoundedCornerShape(22.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -154,15 +154,14 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                     )
                 }
             }
-            
-                    // Signal Icon (En vivo)
+
                     if (currentRoute == Screen.Vivo.route) {
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
                                 .background(
                                     MetroOrange,
-                                    RoundedCornerShape(24.dp)
+                                    RoundedCornerShape(22.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -186,15 +185,14 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                             )
                         }
                     }
-            
-            // Settings Icon
+
             if (currentRoute == Screen.Configuracion.route) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            MetroOrange,
-                            RoundedCornerShape(24.dp)
+                            MetroBrightOrange,
+                            RoundedCornerShape(22.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -216,6 +214,80 @@ fun GlobalBottomNavBar(navController: NavController, currentRoute: String) {
                         tint = inactiveIconColor,
                         modifier = Modifier.size(24.dp)
                     )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Modo Claro - Pantalla completa")
+@Composable
+fun PreviewGlobalBottomNavBar_LightFull() {
+    val fakeNavController = rememberNavController()
+    val themeState = ThemeState().apply { updateDarkMode(false) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = MaterialTheme.colorScheme.background,
+                bottomBar = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                    ) {
+                        GlobalBottomNavBar(
+                            navController = fakeNavController,
+                            currentRoute = Screen.Home.route
+                        )
+                    }
+                }
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(MaterialTheme.colorScheme.background),
+                    contentAlignment = Alignment.Center
+                ) {
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Modo Oscuro - Pantalla completa", backgroundColor = 0xFF000000)
+@Composable
+fun PreviewGlobalBottomNavBar_DarkFull() {
+    val fakeNavController = rememberNavController()
+    val themeState = ThemeState().apply { updateDarkMode(true) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = MaterialTheme.colorScheme.background,
+                bottomBar = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                    ) {
+                        GlobalBottomNavBar(
+                            navController = fakeNavController,
+                            currentRoute = Screen.Configuracion.route
+                        )
+                    }
+                }
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(MaterialTheme.colorScheme.background),
+                    contentAlignment = Alignment.Center
+                ) {
                 }
             }
         }

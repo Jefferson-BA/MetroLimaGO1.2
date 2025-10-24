@@ -9,8 +9,10 @@ val DarkGray = Color(0xFF1E1E1E) // Fondo principal oscuro
 val CardGray = Color(0xFF2D2D2D) // Fondo de tarjetas
 val LightGray = Color(0xFFB0B0B0) // Texto secundario
 val White = Color(0xFFFFFFFF) // Texto principal
+val MetroBrightOrange = Color(0xFFFA7612)
+val Black = Color(0xFF000000)
 
-// Colores del tema oscuro
+
 val Purple80 = MetroOrange
 val PurpleGrey80 = LightGray
 val Pink80 = MetroGreen

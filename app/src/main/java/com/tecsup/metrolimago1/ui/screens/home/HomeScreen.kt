@@ -1,134 +1,123 @@
 package com.tecsup.metrolimago1.ui.screens.home
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.R
+import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.domain.services.RouteCalculationService
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
-import com.tecsup.metrolimago1.components.GlobalBottomNavBar
-import com.tecsup.metrolimago1.ui.theme.LocalThemeState
-import com.tecsup.metrolimago1.domain.services.RouteCalculationService
-import com.tecsup.metrolimago1.utils.RouteTestUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
-    // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
 
-    Scaffold(
-        bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Home.route)
-        },
-        modifier = Modifier.fillMaxSize()
-        ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 0.dp // Sin padding inferior para permitir contenido detrás de la barra
+    GradientBackground(isDarkMode = themeState.isDarkMode) {
+        Scaffold(
+            bottomBar = {
+                GlobalBottomNavBar(
+                    navController = navController,
+                    currentRoute = Screen.Home.route
                 )
-                .padding(vertical = 24.dp)
-        ) {
-            // Título principal
-            Text(
-                text = "MetroLima GO",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
-                ),
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+            },
+            containerColor = Color.Transparent, // importante para que se vea el gradiente
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 0.dp
+                    )
+                    .padding(vertical = 24.dp)
+            ) {
+                Text(
+                    text = "MetroLima GO",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    ),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
 
-            // Barra de búsqueda
-            SearchBar(
-                onSearchClick = { query ->
-                    // Navegar a estaciones con la consulta de búsqueda
-                    navController.navigate(Screen.Estaciones.route)
-                },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                SearchBar(
+                    onSearchClick = { _ -> navController.navigate(Screen.Estaciones.route) },
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Sección Próximas Llegadas
-            NextArrivalsSection(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                NextArrivalsSection(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección Notificaciones
-            NotificationsSection(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                NotificationsSection(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección IA
-            AISection(
-                navController = navController,
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Sección de Pruebas de Rutas
-            RouteTestSection(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor,
-                onCardClick = {
-                    // Aquí puedes agregar navegación a una pantalla de detalles
-                    // o mostrar un diálogo con más información
-                    println("Card de rutas clickeada!")
-                }
-            )
-            
-            // Espacio para la barra de navegación transparente
-            Spacer(modifier = Modifier.height(80.dp))
+                AISection(
+                    navController = navController,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                RouteTestSection(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    onCardClick = {
+                        println("Card de rutas clickeada!")
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(80.dp))
+            }
         }
     }
 }
@@ -147,7 +136,7 @@ fun SearchBar(
             .fillMaxWidth()
             .height(56.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(25.dp)
     ) {
         Row(
             modifier = Modifier
@@ -185,12 +174,9 @@ fun SearchBar(
                 singleLine = true
             )
 
-            // Botón de búsqueda
             if (searchQuery.isNotEmpty()) {
                 IconButton(
-                    onClick = {
-                        onSearchClick(searchQuery)
-                    },
+                    onClick = { onSearchClick(searchQuery) },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
@@ -214,7 +200,7 @@ fun NextArrivalsSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(25.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -245,7 +231,6 @@ fun NextArrivalsSection(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Lista de llegadas
             ArrivalItem(
                 stationName = "Villa El Salvador",
                 direction = "hacia San Martin",
@@ -278,7 +263,7 @@ fun ArrivalItem(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = if (textColor == White) DarkGray else Color(0xFFF0F0F0)),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(15.dp)
     ) {
         Row(
             modifier = Modifier
@@ -286,7 +271,6 @@ fun ArrivalItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Línea naranja vertical
             Box(
                 modifier = Modifier
                     .width(4.dp)
@@ -319,10 +303,9 @@ fun ArrivalItem(
                 }
             }
 
-            // Indicador de tiempo
             Card(
                 colors = CardDefaults.cardColors(containerColor = MetroGreen),
-                shape = RoundedCornerShape(6.dp)
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = time,
@@ -344,7 +327,7 @@ fun NotificationsSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(25.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -420,7 +403,7 @@ fun AISection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(25.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -439,20 +422,33 @@ fun AISection(
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
+                val infiniteTransition = rememberInfiniteTransition(label = "ledGlow")
+
+                val glowAlpha by infiniteTransition.animateFloat(
+                    initialValue = 0.6f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "glowAnim"
+                )
+
+                val glowingColor = MetroBrightOrange.copy(alpha = glowAlpha)
+
                 Button(
                     onClick = { navController.navigate(Screen.Chat.route) },
-                    colors = ButtonDefaults.buttonColors(containerColor = White),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = glowingColor),
+                    shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(
                         text = "Iniciar Conversación",
-                        color = DarkGray,
+                        color = White,
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
             }
 
-            // Imagen del robot personalizado
             RobotImage(
                 modifier = Modifier.padding(start = 16.dp)
             )
@@ -477,16 +473,16 @@ fun RouteTestSection(
     onCardClick: () -> Unit = {}
 ) {
     var showDetails by remember { mutableStateOf(false) }
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { 
+            .clickable {
                 showDetails = !showDetails
-                onCardClick() 
+                onCardClick()
             },
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(25.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -517,10 +513,9 @@ fun RouteTestSection(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Ejemplo de uso
             val tiempoEjemplo = RouteCalculationService.calcularTiempoEstimado("Villa El Salvador", "Miraflores")
             val pasosEjemplo = RouteCalculationService.generarPasosRecorrido("Villa El Salvador", "Miraflores")
-            
+
             Text(
                 text = "Ejemplo: Villa El Salvador → Miraflores",
                 style = MaterialTheme.typography.titleSmall.copy(
@@ -529,22 +524,21 @@ fun RouteTestSection(
                 ),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            
+
             Text(
                 text = "Tiempo estimado: $tiempoEjemplo minutos",
                 style = MaterialTheme.typography.bodyMedium.copy(color = MetroGreen),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            
+
             Text(
                 text = "Pasos: ${pasosEjemplo.size} estaciones",
                 style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
             )
-            
-            // Mostrar detalles expandidos cuando se hace click
+
             if (showDetails) {
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Text(
                     text = "Detalles del recorrido:",
                     style = MaterialTheme.typography.titleSmall.copy(
@@ -553,28 +547,64 @@ fun RouteTestSection(
                     ),
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 pasosEjemplo.forEachIndexed { index, paso ->
-                    val transferencia = if (paso.esTransferencia) " 🔄" else ""
+                    val transferencia = if (paso.esTransferencia) " " else ""
                     Text(
                         text = "${index + 1}. ${paso.estacion} (${paso.linea})$transferencia",
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "💡 Toca la card para ocultar detalles",
+                    text = "Toca la card para ocultar detalles",
                     style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
                 )
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "💡 Toca la card para ver detalles del recorrido",
+                    text = "Toca la card para ver detalles del recorrido",
                     style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
                 )
             }
         }
     }
+}
+
+@Composable
+fun HomeScreenPreview(isDarkMode: Boolean) {
+    val themeState = ThemeState().apply {
+        updateDarkMode(isDarkMode)
+    }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            GradientBackground(isDarkMode = themeState.isDarkMode) {
+                HomeScreen(navController = rememberNavController())
+            }
+        }
+    }
+}
+
+@Preview(
+    name = "Modo Claro ☀️",
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun PreviewHomeLight() {
+    HomeScreenPreview(isDarkMode = false)
+}
+
+@Preview(
+    name = "Modo Oscuro 🌙",
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun PreviewHomeDark() {
+    HomeScreenPreview(isDarkMode = true)
 }
