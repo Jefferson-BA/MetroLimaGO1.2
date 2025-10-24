@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
 import com.tecsup.metrolimago1.ui.theme.ThemeState
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
