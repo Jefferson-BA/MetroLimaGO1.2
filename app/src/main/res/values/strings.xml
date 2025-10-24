@@ -20,6 +20,14 @@
     <string name="home_start_conversation">Iniciar Conversación</string>
     <string name="home_see_more">Ver más</string>
     <string name="home_real_time_info">Información en tiempo real</string>
+    <string name="home_route_tests">Pruebas de Cálculo de Rutas</string>
+    <string name="home_route_tests_description">Calcula el tiempo de viaje y muestra las estaciones del recorrido</string>
+    <string name="home_route_example">Ejemplo: Villa El Salvador → Miraflores</string>
+    <string name="home_route_estimated_time">Tiempo estimado: %d minutos</string>
+    <string name="home_route_steps">Pasos: %d estaciones</string>
+    <string name="home_route_details">Detalles del recorrido:</string>
+    <string name="home_route_hide_details">Toca la card para ocultar detalles</string>
+    <string name="home_route_show_details">Toca la card para ver detalles del recorrido</string>
     
     <!-- Stations Screen -->
     <string name="stations_title">Estaciones del Metro</string>
@@ -104,6 +112,26 @@
     <string name="live_schedules">Horarios</string>
     <string name="live_alerts">Alertas</string>
     <string name="live_no_alerts">No hay alertas</string>
+    <string name="live_real_time_status">Estado en tiempo real de las líneas</string>
+    <string name="live_operating_hours">Horario de Operación</string>
+    <string name="live_alerts_notices">Alertas y Avisos</string>
+    <string name="live_scheduled_maintenance">Mantenimiento Programado</string>
+    <string name="live_maintenance_description_1">El domingo 20 de octubre habrá mantenimiento en la estación Grau de 6:00 AM a 8:00 AM</string>
+    <string name="live_maintenance_description_2">El domingo 20 de octubre habrá mantenimiento</string>
+    <string name="live_maintenance_date">19 de octubre de 2025</string>
+    <string name="live_weekdays">Lunes - Viernes</string>
+    <string name="live_weekdays_description">Días laborales</string>
+    <string name="live_saturday">Sábados</string>
+    <string name="live_saturday_description">Fin de semana</string>
+    <string name="live_sunday_holidays">Domingos y Feriados</string>
+    <string name="live_sunday_holidays_description">Horario reducido</string>
+    <string name="live_weekdays_hours">5:30 AM - 10:00 PM</string>
+    <string name="live_saturday_hours">6:00 AM - 10:00 PM</string>
+    <string name="live_sunday_hours">5:30 AM - 09:00 PM</string>
+    <string name="live_normal_service_description">Todas las líneas operando con normalidad</string>
+    <string name="live_maintenance_line1">Línea 1: Horario reducido el domingo 20 de octubre</string>
+    <string name="map_metro_title">Mapa del Metro de Lima</string>
+    <string name="map_metro_description">30 estaciones disponibles</string>
     
     <!-- Settings Screen -->
     <string name="settings_title">Configuración</string>
@@ -116,6 +144,13 @@
     <string name="settings_notifications">Notificaciones</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_version">Versión</string>
+    <string name="settings_theme_description">Cambia el tema de la aplicación</string>
+    <string name="settings_language_description">Selecciona tu idioma preferido</string>
+    <string name="settings_app_description">MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.</string>
+    <string name="settings_contact">Contacto</string>
+    <string name="settings_developer">Desarrollador</string>
+    <string name="settings_contact_email">soporte@metrolimago.pe</string>
+    <string name="settings_developer_team">MetroLima Development Team</string>
     
     <!-- Chat Screen -->
     <string name="chat_title">Chat con IA</string>
@@ -128,11 +163,8 @@
     <!-- Map Screen -->
     <string name="map_title">Mapa del Metro - Vista Completa</string>
     <string name="map_full_view_title">Mapa del Metro - Vista Completa</string>
-    <string name="map_activate">Activar Mapa</string>
     <string name="map_activate_map">Activar Mapa</string>
     <string name="map_activate_full">Activar Mapa Completo</string>
-    <string name="map_metro_title">Mapa del Metro de Lima</string>
-    <string name="map_metro_description">Vista completa del sistema de Metro</string>
     <string name="map_filter_lines">Filtrar Líneas</string>
     <string name="map_map">Mapa</string>
     <string name="map_enlarge">Agrandar</string>
@@ -145,6 +177,12 @@
     <string name="common_loading">Cargando...</string>
     <string name="common_error">Error</string>
     <string name="common_retry">Reintentar</string>
+    <string name="common_search">Buscar</string>
+    <string name="common_clock">Reloj</string>
+    <string name="common_no_results">No se encontraron resultados</string>
+    <string name="common_no_stations_found">No se encontraron estaciones</string>
+    <string name="common_no_stations_line">No hay estaciones en esta línea</string>
+    <string name="common_try_other_terms">Intenta con otros términos de búsqueda</string>
     
     <!-- Language Change Alert -->
     <string name="language_change_title">Cambio de Idioma</string>

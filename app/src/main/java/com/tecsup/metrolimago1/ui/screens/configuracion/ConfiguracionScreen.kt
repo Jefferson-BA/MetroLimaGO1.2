@@ -1,5 +1,6 @@
 package com.tecsup.metrolimago1.ui.screens.configuracion
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,21 +10,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.GradientBackground
 import com.tecsup.metrolimago1.ui.theme.*
+import com.tecsup.metrolimago1.utils.LocalizationManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfiguracionScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    var selectedLanguage by remember { mutableStateOf("es") }
+    val context = LocalContext.current
+    var selectedLanguage by remember { mutableStateOf(LocalizationManager.getSavedLanguage(context)) }
 
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
@@ -52,7 +58,7 @@ fun ConfiguracionScreen(navController: NavController) {
                     .padding(vertical = 24.dp)
             ) {
                 Text(
-                    text = "Configuración",
+                    text = stringResource(R.string.settings_title),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -72,7 +78,12 @@ fun ConfiguracionScreen(navController: NavController) {
 
                 LanguageSection(
                     selectedLanguage = selectedLanguage,
-                    onLanguageChange = { selectedLanguage = it },
+                    onLanguageChange = { 
+                        selectedLanguage = it
+                        LocalizationManager.saveLanguage(context, it)
+                        // Reiniciar la actividad para aplicar el cambio
+                        (context as Activity).recreate()
+                    },
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor
@@ -102,7 +113,7 @@ fun AppearanceSection(
 ) {
     Column {
         Text(
-            text = "Apariencia",
+            text = stringResource(R.string.settings_theme),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -123,7 +134,7 @@ fun AppearanceSection(
             ) {
                 Icon(
                     imageVector = Icons.Default.DarkMode,
-                    contentDescription = "Modo Oscuro",
+                    contentDescription = stringResource(R.string.settings_dark_mode),
                     tint = textColor,
                     modifier = Modifier.size(24.dp)
                 )
@@ -132,14 +143,14 @@ fun AppearanceSection(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Modo Oscuro",
+                        text = stringResource(R.string.settings_dark_mode),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = textColor
                         )
                     )
                     Text(
-                        text = "Cambia el tema de la aplicación",
+                        text = stringResource(R.string.settings_theme_description),
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                     )
                 }
@@ -169,7 +180,7 @@ fun LanguageSection(
 ) {
     Column {
         Text(
-            text = "Idioma",
+            text = stringResource(R.string.settings_language),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -188,7 +199,7 @@ fun LanguageSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Language,
-                        contentDescription = "Idioma",
+                        contentDescription = stringResource(R.string.settings_language),
                         tint = textColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -197,14 +208,14 @@ fun LanguageSection(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Idioma",
+                            text = stringResource(R.string.settings_language),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = textColor
                             )
                         )
                         Text(
-                            text = "Selecciona tu idioma preferido",
+                            text = stringResource(R.string.settings_language_description),
                             style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                         )
                     }
@@ -225,7 +236,7 @@ fun LanguageSection(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Es Español",
+                            text = stringResource(R.string.settings_spanish),
                             color = if (selectedLanguage == "es") White else textColor
                         )
                     }
@@ -239,7 +250,7 @@ fun LanguageSection(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Us Inglés",
+                            text = stringResource(R.string.settings_english),
                             color = if (selectedLanguage == "en") White else textColor
                         )
                     }
@@ -257,7 +268,7 @@ fun AboutSection(
 ) {
     Column {
         Text(
-            text = "Acerca de",
+            text = stringResource(R.string.settings_about),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -272,7 +283,7 @@ fun AboutSection(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "MetroLima GO",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -286,7 +297,7 @@ fun AboutSection(
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
-                        text = "Versión 1.0.0",
+                        text = stringResource(R.string.settings_version) + " 1.0.0",
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -295,7 +306,7 @@ fun AboutSection(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "MetroLima GO es tu compañero ideal para navegar por el sistema de Metro de Lima. Planifica tus viajes, consulta horarios y encuentra la mejor ruta.",
+                    text = stringResource(R.string.settings_app_description),
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
                 )
 
@@ -304,13 +315,13 @@ fun AboutSection(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Email, contentDescription = "Contacto", tint = textColor, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Email, contentDescription = stringResource(R.string.settings_contact), tint = textColor, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Contacto", color = textColor, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.settings_contact), color = textColor, fontWeight = FontWeight.Bold)
                 }
 
                 Text(
-                    text = "soporte@metrolimago.pe",
+                    text = stringResource(R.string.settings_contact_email),
                     color = textColor,
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
@@ -318,13 +329,13 @@ fun AboutSection(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Security, contentDescription = "Desarrollador", tint = textColor, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Security, contentDescription = stringResource(R.string.settings_developer), tint = textColor, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Desarrollador", color = textColor, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.settings_developer), color = textColor, fontWeight = FontWeight.Bold)
                 }
 
                 Text(
-                    text = "MetroLima Development Team",
+                    text = stringResource(R.string.settings_developer_team),
                     color = textColor,
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
@@ -332,6 +343,7 @@ fun AboutSection(
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true, name = "💡 ConfiguracionScreen - Modo Claro")
 @Composable

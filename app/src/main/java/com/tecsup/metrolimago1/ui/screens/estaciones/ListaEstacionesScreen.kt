@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
+import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 import com.tecsup.metrolimago1.ui.theme.GradientBackground
@@ -44,7 +46,7 @@ fun ListaEstacionesScreen(navController: NavController) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Estaciones",
+                            text = stringResource(R.string.stations_title),
                             color = textColor,
                             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                         )
@@ -154,7 +156,7 @@ fun ListaEstacionesScreen(navController: NavController) {
                         if (query.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Intenta con otros términos de búsqueda",
+                                text = stringResource(R.string.common_try_other_terms),
                                 color = secondaryTextColor,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -220,7 +222,7 @@ fun SearchBar(
                 onValueChange = onQueryChange,
                 placeholder = {
                     Text(
-                        text = "Buscar estación...",
+                        text = stringResource(R.string.stations_search_placeholder),
                         color = secondaryTextColor
                     )
                 },

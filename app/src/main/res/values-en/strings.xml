@@ -20,6 +20,14 @@
     <string name="home_start_conversation">Start Conversation</string>
     <string name="home_see_more">See more</string>
     <string name="home_real_time_info">Real-time information</string>
+    <string name="home_route_tests">Route Calculation Tests</string>
+    <string name="home_route_tests_description">Calculate travel time and show stations in the route</string>
+    <string name="home_route_example">Example: Villa El Salvador → Miraflores</string>
+    <string name="home_route_estimated_time">Estimated time: %d minutes</string>
+    <string name="home_route_steps">Steps: %d stations</string>
+    <string name="home_route_details">Route details:</string>
+    <string name="home_route_hide_details">Tap the card to hide details</string>
+    <string name="home_route_show_details">Tap the card to see route details</string>
     
     <!-- Stations Screen -->
     <string name="stations_title">Metro Stations</string>
@@ -104,6 +112,26 @@
     <string name="live_schedules">Schedules</string>
     <string name="live_alerts">Alerts</string>
     <string name="live_no_alerts">No alerts</string>
+    <string name="live_real_time_status">Real-time status of the lines</string>
+    <string name="live_operating_hours">Operating Hours</string>
+    <string name="live_alerts_notices">Alerts and Notices</string>
+    <string name="live_scheduled_maintenance">Scheduled Maintenance</string>
+    <string name="live_maintenance_description_1">On Sunday, October 20, there will be maintenance at Grau station from 6:00 AM to 8:00 AM</string>
+    <string name="live_maintenance_description_2">On Sunday, October 20, there will be maintenance</string>
+    <string name="live_maintenance_date">October 19, 2025</string>
+    <string name="live_weekdays">Monday - Friday</string>
+    <string name="live_weekdays_description">Workdays</string>
+    <string name="live_saturday">Saturdays</string>
+    <string name="live_saturday_description">Weekend</string>
+    <string name="live_sunday_holidays">Sundays and Holidays</string>
+    <string name="live_sunday_holidays_description">Reduced hours</string>
+    <string name="live_weekdays_hours">5:30 AM - 10:00 PM</string>
+    <string name="live_saturday_hours">6:00 AM - 10:00 PM</string>
+    <string name="live_sunday_hours">5:30 AM - 09:00 PM</string>
+    <string name="live_normal_service_description">All lines operating normally</string>
+    <string name="live_maintenance_line1">Line 1: Reduced schedule on Sunday, October 20</string>
+    <string name="map_metro_title">Lima Metro Map</string>
+    <string name="map_metro_description">30 stations available</string>
     
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -116,6 +144,13 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version</string>
+    <string name="settings_theme_description">Change the application theme</string>
+    <string name="settings_language_description">Select your preferred language</string>
+    <string name="settings_app_description">MetroLima GO is your ideal companion for navigating Lima\'s Metro system. Plan your trips, check schedules and find the best route.</string>
+    <string name="settings_contact">Contact</string>
+    <string name="settings_developer">Developer</string>
+    <string name="settings_contact_email">support@metrolimago.pe</string>
+    <string name="settings_developer_team">MetroLima Development Team</string>
     
     <!-- Chat Screen -->
     <string name="chat_title">AI Chat</string>
@@ -128,11 +163,8 @@
     <!-- Map Screen -->
     <string name="map_title">Metro Map - Full View</string>
     <string name="map_full_view_title">Metro Map - Full View</string>
-    <string name="map_activate">Activate Map</string>
     <string name="map_activate_map">Activate Map</string>
     <string name="map_activate_full">Activate Full Map</string>
-    <string name="map_metro_title">Lima Metro Map</string>
-    <string name="map_metro_description">Complete view of the Metro system</string>
     <string name="map_filter_lines">Filter Lines</string>
     <string name="map_map">Map</string>
     <string name="map_enlarge">Enlarge</string>
@@ -145,6 +177,12 @@
     <string name="common_loading">Loading...</string>
     <string name="common_error">Error</string>
     <string name="common_retry">Retry</string>
+    <string name="common_search">Search</string>
+    <string name="common_clock">Clock</string>
+    <string name="common_no_results">No results found</string>
+    <string name="common_no_stations_found">No stations found</string>
+    <string name="common_no_stations_line">No stations in this line</string>
+    <string name="common_try_other_terms">Try other search terms</string>
     
     <!-- Language Change Alert -->
     <string name="language_change_title">Language Change</string>

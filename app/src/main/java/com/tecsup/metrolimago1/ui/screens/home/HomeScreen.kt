@@ -20,7 +20,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,7 +67,7 @@ fun HomeScreen(navController: NavController) {
                     .padding(vertical = 24.dp)
             ) {
                 Text(
-                    text = "MetroLima GO",
+                    text = stringResource(R.string.home_title),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -157,7 +159,7 @@ fun SearchBar(
                 onValueChange = { searchQuery = it },
                 placeholder = {
                     Text(
-                        text = "¿A dónde vas?",
+                        text = stringResource(R.string.home_search_placeholder),
                         color = secondaryTextColor
                     )
                 },
@@ -217,7 +219,7 @@ fun NextArrivalsSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Próximas Llegadas",
+                    text = stringResource(R.string.home_next_arrivals),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -226,7 +228,7 @@ fun NextArrivalsSection(
             }
 
             Text(
-                text = "Información en tiempo real",
+                text = stringResource(R.string.home_real_time_info),
                 style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -338,14 +340,14 @@ fun NotificationsSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Notificaciones",
+                    text = stringResource(R.string.home_notifications),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MetroOrange
                     )
                 )
                 Text(
-                    text = "Ver más",
+                    text = stringResource(R.string.home_see_more),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
             }
@@ -353,8 +355,8 @@ fun NotificationsSection(
             Spacer(modifier = Modifier.height(12.dp))
 
             NotificationItem(
-                title = "Servicio Normal",
-                description = "Todas las líneas operando con normalidad",
+                title = stringResource(R.string.live_normal_service),
+                description = stringResource(R.string.live_normal_service_description),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -362,8 +364,8 @@ fun NotificationsSection(
             Spacer(modifier = Modifier.height(8.dp))
 
             NotificationItem(
-                title = "Mantenimiento Programado",
-                description = "Línea 1: Horario reducido el domingo 20 de octubre",
+                title = stringResource(R.string.live_scheduled_maintenance),
+                description = stringResource(R.string.live_maintenance_line1),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -411,14 +413,14 @@ fun AISection(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Pregúntale a la IA !",
+                    text = stringResource(R.string.home_ai_chat),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MetroOrange
                     )
                 )
                 Text(
-                    text = "Usar un chat de ayuda o asistente.",
+                    text = stringResource(R.string.home_ai_description),
                     style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -442,7 +444,7 @@ fun AISection(
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(
-                        text = "Iniciar Conversación",
+                        text = stringResource(R.string.home_start_conversation),
                         color = White,
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
@@ -499,7 +501,7 @@ fun RouteTestSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Pruebas de Cálculo de Rutas",
+                    text = stringResource(R.string.home_route_tests),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -508,7 +510,7 @@ fun RouteTestSection(
             }
 
             Text(
-                text = "Calcula el tiempo de viaje y muestra las estaciones del recorrido",
+                text = stringResource(R.string.home_route_tests_description),
                 style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -517,7 +519,7 @@ fun RouteTestSection(
             val pasosEjemplo = RouteCalculationService.generarPasosRecorrido("Villa El Salvador", "Miraflores")
 
             Text(
-                text = "Ejemplo: Villa El Salvador → Miraflores",
+                text = stringResource(R.string.home_route_example),
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -526,13 +528,13 @@ fun RouteTestSection(
             )
 
             Text(
-                text = "Tiempo estimado: $tiempoEjemplo minutos",
+                text = stringResource(R.string.home_route_estimated_time, tiempoEjemplo),
                 style = MaterialTheme.typography.bodyMedium.copy(color = MetroGreen),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
-                text = "Pasos: ${pasosEjemplo.size} estaciones",
+                text = stringResource(R.string.home_route_steps, pasosEjemplo.size),
                 style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
             )
 
@@ -540,7 +542,7 @@ fun RouteTestSection(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Detalles del recorrido:",
+                    text = stringResource(R.string.home_route_details),
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -559,13 +561,13 @@ fun RouteTestSection(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Toca la card para ocultar detalles",
+                    text = stringResource(R.string.home_route_hide_details),
                     style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
                 )
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Toca la card para ver detalles del recorrido",
+                    text = stringResource(R.string.home_route_show_details),
                     style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
                 )
             }

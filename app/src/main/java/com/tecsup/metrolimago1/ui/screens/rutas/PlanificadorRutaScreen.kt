@@ -302,7 +302,7 @@ fun CompactRoutePanel(
         ) {
             // Título del panel
             Text(
-                text = "Planifica tu trayecto",
+                text = stringResource(R.string.routes_plan_your_trip),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -328,7 +328,7 @@ fun CompactRoutePanel(
             ) {
                 // Selector de origen
                 CompactStationSelector(
-                    label = "Origen",
+                    label = stringResource(R.string.routes_origin),
                     selectedStation = selectedOrigin,
                     onStationSelected = onOriginSelected,
                     stations = getFilteredStations(selectedLines),
@@ -341,7 +341,7 @@ fun CompactRoutePanel(
 
                 // Selector de destino
                 CompactStationSelector(
-                    label = "Destino",
+                    label = stringResource(R.string.routes_destination),
                     selectedStation = selectedDestination,
                     onStationSelected = onDestinationSelected,
                     stations = getFilteredStations(selectedLines),
@@ -379,7 +379,7 @@ fun CompactRoutePanel(
                 ) {
                     Icon(Icons.Default.Route, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Ver Ruta")
+                    Text(stringResource(R.string.routes_calculate_route))
                 }
 
 
@@ -454,7 +454,7 @@ fun CompactStationSelector(
                 Spacer(modifier = Modifier.width(8.dp))
                 
                 Text(
-                    text = selectedStation?.name ?: "Seleccionar",
+                    text = selectedStation?.name ?: stringResource(R.string.routes_select_station),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = if (selectedStation != null) textColor else secondaryTextColor,
                         fontWeight = if (selectedStation != null) FontWeight.Bold else FontWeight.Normal
@@ -572,7 +572,7 @@ fun CompactRouteInfo(
         ) {
             Column {
                 Text(
-                    text = "Distancia",
+                    text = stringResource(R.string.routes_distance),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -586,7 +586,7 @@ fun CompactRouteInfo(
             
             Column {
                 Text(
-                    text = "Tiempo",
+                    text = stringResource(R.string.routes_duration),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -600,7 +600,7 @@ fun CompactRouteInfo(
             
             Column {
                 Text(
-                    text = "Pasos",
+                    text = stringResource(R.string.routes_steps),
                     style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
                 )
                 Text(
@@ -748,7 +748,7 @@ fun SimpleMapView(
                 ) {
                     Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Activar Mapa")
+                    Text(stringResource(R.string.map_activate_map))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -888,7 +888,7 @@ fun LineFilterButtons(
 ) {
     Column {
         Text(
-            text = "Filtrar Líneas del Metro",
+            text = stringResource(R.string.routes_filter_lines),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -990,7 +990,7 @@ fun LineFilterButtons(
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Más líneas próximamente")
+            Text(stringResource(R.string.routes_coming_soon))
         }
     }
 }

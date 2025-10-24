@@ -12,12 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
@@ -37,7 +39,7 @@ fun VivoScreen(navController: NavController) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = "En vivo",
+                            text = stringResource(R.string.live_title),
                             color = textColor,
                             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                         )
@@ -116,14 +118,14 @@ fun ServiceStatusCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Estado del Servicio",
+                    text = stringResource(R.string.live_service_status),
                     color = textColor,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
 
             Text(
-                text = "Estado en tiempo real de las líneas",
+                text = stringResource(R.string.live_real_time_status),
                 color = secondaryTextColor,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -224,16 +226,16 @@ fun OperatingHoursCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Horario de Operación",
+                    text = stringResource(R.string.live_operating_hours),
                     color = textColor,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
 
             OperatingHoursItem(
-                dayType = "Lunes - Viernes",
-                description = "Días laborales",
-                hours = "5:30 AM - 10:00 PM",
+                dayType = stringResource(R.string.live_weekdays),
+                description = stringResource(R.string.live_weekdays_description),
+                hours = stringResource(R.string.live_weekdays_hours),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -241,9 +243,9 @@ fun OperatingHoursCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             OperatingHoursItem(
-                dayType = "Sábados",
-                description = "Fin de semana",
-                hours = "6:00 AM - 10:00 PM",
+                dayType = stringResource(R.string.live_saturday),
+                description = stringResource(R.string.live_saturday_description),
+                hours = stringResource(R.string.live_saturday_hours),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -251,9 +253,9 @@ fun OperatingHoursCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             OperatingHoursItem(
-                dayType = "Domingos y Feriados",
-                description = "Horario reducido",
-                hours = "5:30 AM - 09:00 PM",
+                dayType = stringResource(R.string.live_sunday_holidays),
+                description = stringResource(R.string.live_sunday_holidays_description),
+                hours = stringResource(R.string.live_sunday_hours),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -318,16 +320,16 @@ fun AlertsCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Alertas y Avisos",
+                    text = stringResource(R.string.live_alerts_notices),
                     color = textColor,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
 
             AlertItem(
-                title = "Mantenimiento Programado",
-                description = "El domingo 20 de octubre habrá mantenimiento en la estación Grau de 6:00 AM a 8:00 AM",
-                date = "19 de octubre de 2025",
+                title = stringResource(R.string.live_scheduled_maintenance),
+                description = stringResource(R.string.live_maintenance_description_1),
+                date = stringResource(R.string.live_maintenance_date),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
@@ -335,9 +337,9 @@ fun AlertsCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             AlertItem(
-                title = "Mantenimiento Programado",
-                description = "El domingo 20 de octubre habrá mantenimiento",
-                date = "19 de octubre de 2025",
+                title = stringResource(R.string.live_scheduled_maintenance),
+                description = stringResource(R.string.live_maintenance_description_2),
+                date = stringResource(R.string.live_maintenance_date),
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )

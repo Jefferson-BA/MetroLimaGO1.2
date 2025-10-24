@@ -246,7 +246,7 @@ fun MapsScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Mapa del Metro de Lima",
+                            text = stringResource(R.string.map_metro_title),
                             color = textColor,
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
@@ -256,7 +256,7 @@ fun MapsScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Vista completa del sistema de Metro",
+                            text = stringResource(R.string.map_metro_description),
                             color = secondaryTextColor,
                             style = MaterialTheme.typography.bodyLarge
                         )
