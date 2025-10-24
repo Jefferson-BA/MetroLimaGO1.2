@@ -53,11 +53,17 @@ fun MetroLimaGO1Theme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme.copy(
+    val adjustedScheme = if (darkTheme) {
+        colorScheme.copy(
             surface = Color.White.copy(alpha = 0.08f),
             background = Color(0xFF0E0E0E)
-        ),
+        )
+    } else {
+        colorScheme
+    }
+
+    MaterialTheme(
+        colorScheme = adjustedScheme,
         typography = Typography,
         shapes = Shapes,
         content = content

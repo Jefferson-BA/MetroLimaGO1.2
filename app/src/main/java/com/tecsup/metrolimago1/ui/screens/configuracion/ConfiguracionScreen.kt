@@ -1,7 +1,5 @@
 package com.tecsup.metrolimago1.ui.screens.configuracion
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,135 +9,86 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.tecsup.metrolimago1.R
+import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
+import com.tecsup.metrolimago1.ui.theme.GradientBackground
 import com.tecsup.metrolimago1.ui.theme.*
-import com.tecsup.metrolimago1.ui.theme.LocalThemeState
-import com.tecsup.metrolimago1.utils.LocalizationManager
-import android.app.Activity
-import android.content.Intent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfiguracionScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    val context = LocalContext.current
-    
-    // Estado para idioma
-    var selectedLanguage by remember { 
-        mutableStateOf(LocalizationManager.getSavedLanguage(context))
-    }
-    var showLanguageDialog by remember { mutableStateOf(false) }
-    var showLanguageChangeAlert by remember { mutableStateOf(false) }
-    var pendingLanguage by remember { mutableStateOf<String?>(null) }
+    var selectedLanguage by remember { mutableStateOf("es") }
 
-    // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
 
     Scaffold(
         bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Configuracion.route)
-        }
+            GlobalBottomNavBar(
+                navController = navController,
+                currentRoute = Screen.Configuracion.route
+            )
+        },
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 24.dp)
-        ) {
-            // Título principal
-            Text(
-                text = stringResource(R.string.settings_title),
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
-                ),
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+        GradientBackground(isDarkMode = themeState.isDarkMode) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 0.dp
+                    )
+                    .padding(vertical = 24.dp)
+            ) {
+                Text(
+                    text = "Configuración",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    ),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
 
-            // Sección Apariencia
-            AppearanceSection(
-                isDarkMode = themeState.isDarkMode,
-                onDarkModeToggle = { themeState.updateDarkMode(it) },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                AppearanceSection(
+                    isDarkMode = themeState.isDarkMode,
+                    onDarkModeToggle = { themeState.updateDarkMode(it) },
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección Idioma
-            LanguageSection(
-                selectedLanguage = selectedLanguage,
-                onLanguageClick = { showLanguageDialog = true },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                LanguageSection(
+                    selectedLanguage = selectedLanguage,
+                    onLanguageChange = { selectedLanguage = it },
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección Acerca de
-            AboutSection(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                AboutSection(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                Spacer(modifier = Modifier.height(80.dp))
+            }
         }
-    }
-    
-    // Diálogo de selección de idioma
-    if (showLanguageDialog) {
-        LanguageSelectionDialog(
-            currentLanguage = selectedLanguage,
-            onLanguageSelected = { language ->
-                selectedLanguage = language
-                LocalizationManager.saveLanguage(context, language)
-                showLanguageDialog = false
-                
-                // Mostrar alert de cambio de idioma
-                pendingLanguage = language
-                showLanguageChangeAlert = true
-            },
-            onDismiss = { showLanguageDialog = false },
-            cardColor = cardColor,
-            textColor = textColor,
-            secondaryTextColor = secondaryTextColor
-        )
-    }
-    
-    // Card Alert de cambio de idioma
-    if (showLanguageChangeAlert) {
-        LanguageChangeAlert(
-            onRestartNow = {
-                showLanguageChangeAlert = false
-                pendingLanguage = null
-                // Reiniciar la actividad para aplicar el cambio de idioma
-                if (context is Activity) {
-                    val intent = Intent(context, context.javaClass)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    context.startActivity(intent)
-                    context.finish()
-                }
-            },
-            onRestartLater = {
-                showLanguageChangeAlert = false
-                pendingLanguage = null
-            },
-            cardColor = cardColor,
-            textColor = textColor,
-            secondaryTextColor = secondaryTextColor
-        )
     }
 }
 
@@ -164,7 +113,7 @@ fun AppearanceSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(25.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -200,7 +149,7 @@ fun AppearanceSection(
                     onCheckedChange = onDarkModeToggle,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = White,
-                        checkedTrackColor = MetroOrange,
+                        checkedTrackColor = Black,
                         uncheckedThumbColor = secondaryTextColor,
                         uncheckedTrackColor = if (isDarkMode) DarkGray else Color(0xFFE0E0E0)
                     )
@@ -231,14 +180,12 @@ fun LanguageSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(25.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Language,
                         contentDescription = "Idioma",
@@ -274,7 +221,7 @@ fun LanguageSection(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedLanguage == "es") MetroOrange else secondaryTextColor
                         ),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
@@ -288,7 +235,7 @@ fun LanguageSection(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedLanguage == "en") MetroOrange else secondaryTextColor
                         ),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(14.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
@@ -321,11 +268,9 @@ fun AboutSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(25.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "MetroLima GO",
                     style = MaterialTheme.typography.titleLarge.copy(
@@ -341,7 +286,7 @@ fun AboutSection(
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
-                        text = "Version 1.0.0",
+                        text = "Versión 1.0.0",
                         style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -355,58 +300,32 @@ fun AboutSection(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Divider(color = secondaryTextColor, thickness = 1.dp)
-
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Contacto
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "Contacto",
-                        tint = textColor,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(Icons.Default.Email, contentDescription = "Contacto", tint = textColor, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Contacto",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                    )
+                    Text("Contacto", color = textColor, fontWeight = FontWeight.Bold)
                 }
 
                 Text(
                     text = "soporte@metrolimago.pe",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+                    color = textColor,
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Desarrollador
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Security,
-                        contentDescription = "Desarrollador",
-                        tint = textColor,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Icon(Icons.Default.Security, contentDescription = "Desarrollador", tint = textColor, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Desarrollador",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                    )
+                    Text("Desarrollador", color = textColor, fontWeight = FontWeight.Bold)
                 }
 
                 Text(
                     text = "MetroLima Development Team",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+                    color = textColor,
                     modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                 )
             }
@@ -414,195 +333,28 @@ fun AboutSection(
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true, name = "💡 ConfiguracionScreen - Modo Claro")
 @Composable
-fun LanguageSection(
-    selectedLanguage: String,
-    onLanguageClick: () -> Unit,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Column {
-        Text(
-            text = stringResource(R.string.settings_language),
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = textColor
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+fun ConfiguracionScreenPreviewLight() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(false) }
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onLanguageClick() },
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Language,
-                    contentDescription = stringResource(R.string.settings_language),
-                    tint = textColor,
-                    modifier = Modifier.size(24.dp)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.settings_language),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                    )
-                    Text(
-                        text = LocalizationManager.getLanguageDisplayName(selectedLanguage),
-                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryTextColor)
-                    )
-                }
-
-                Icon(
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = stringResource(R.string.common_back),
-                    tint = secondaryTextColor,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ConfiguracionScreen(navController = navController)
         }
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true, name = "🌙 ConfiguracionScreen - Modo Oscuro")
 @Composable
-fun LanguageSelectionDialog(
-    currentLanguage: String,
-    onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.settings_language),
-                color = textColor
-            )
-        },
-        text = {
-            Column {
-                LocalizationManager.getAvailableLanguages().forEach { (code, name) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onLanguageSelected(code) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = currentLanguage == code,
-                            onClick = { onLanguageSelected(code) }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = name,
-                            color = textColor,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_ok))
-            }
-        },
-        containerColor = cardColor
-    )
-}
+fun ConfiguracionScreenPreviewDark() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(true) }
 
-@Composable
-fun LanguageChangeAlert(
-    onRestartNow: () -> Unit,
-    onRestartLater: () -> Unit,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    AlertDialog(
-        onDismissRequest = onRestartLater,
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Language,
-                    contentDescription = "Idioma",
-                    tint = MetroOrange,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.settings_language),
-                    color = textColor,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        },
-        text = {
-            Column {
-                Text(
-                    text = stringResource(R.string.language_change_message),
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.language_change_question),
-                    color = secondaryTextColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onRestartNow,
-                colors = ButtonDefaults.buttonColors(containerColor = MetroOrange),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.language_restart_now),
-                    color = White,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onRestartLater,
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = textColor
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.language_restart_later),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        },
-        containerColor = cardColor
-    )
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ConfiguracionScreen(navController = navController)
+        }
+    }
 }

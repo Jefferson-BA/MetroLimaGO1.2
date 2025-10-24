@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,33 +14,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.metrolimago1.R
-import com.tecsup.metrolimago1.components.GlobalBottomNavBar
-import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
+import com.tecsup.metrolimago1.ui.theme.ThemeState
+import androidx.compose.runtime.CompositionLocalProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(navController: NavController) {
     val themeState = LocalThemeState.current
-    
+
     // Colores dinámicos según el tema
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
-    
+
     // Estado del chat
     var messageText by remember { mutableStateOf("") }
     var messages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var isLoading by remember { mutableStateOf(false) }
-    
+
     // Mensaje de bienvenida inicial
     LaunchedEffect(Unit) {
         if (messages.isEmpty()) {
@@ -55,6 +54,7 @@ fun ChatScreen(navController: NavController) {
         }
     }
 
+    // Simular respuesta IA
     LaunchedEffect(isLoading) {
         if (isLoading) {
             kotlinx.coroutines.delay(1500)
@@ -67,97 +67,101 @@ fun ChatScreen(navController: NavController) {
             isLoading = false
         }
     }
-    
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ia),
-                            contentDescription = "Robot IA",
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.chat_ai_assistant),
-                            color = textColor
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.common_back),
-                            tint = textColor
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = cardColor
-                )
-            )
-        },
-        bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Chat.route)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .padding(paddingValues)
-        ) {
-            // Lista de mensajes
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(messages) { message ->
-                    ChatMessageBubble(
-                        message = message,
-                        textColor = textColor,
-                        cardColor = cardColor,
-                        secondaryTextColor = secondaryTextColor
+
+    GradientBackground(isDarkMode = themeState.isDarkMode) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ia),
+                                contentDescription = "Robot IA",
+                                modifier = Modifier.size(50.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Asistente IA",
+                                color = textColor
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = "Volver",
+                                tint = textColor
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = cardColor
                     )
-                }
-                
-                if (isLoading) {
-                    item {
-                        TypingIndicator(
+                )
+            },
+            bottomBar = {},
+            containerColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 0.dp,
+                        end = 0.dp,
+                        bottom = 0.dp
+                    )
+            ) {
+                // Lista de mensajes
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    reverseLayout = false
+                ) {
+                    items(messages) { message ->
+                        ChatMessageBubble(
+                            message = message,
+                            textColor = textColor,
                             cardColor = cardColor,
-                            textColor = secondaryTextColor
+                            secondaryTextColor = secondaryTextColor
                         )
+                    }
+
+                    if (isLoading) {
+                        item {
+                            TypingIndicator(
+                                cardColor = cardColor,
+                                textColor = secondaryTextColor
+                            )
+                        }
                     }
                 }
+
+                // Barra de entrada de mensaje
+                MessageInputBar(
+                    messageText = messageText,
+                    onMessageTextChange = { messageText = it },
+                    onSendMessage = {
+                        if (messageText.isNotBlank()) {
+                            val userMessage = ChatMessage(
+                                text = messageText,
+                                isUser = true,
+                                timestamp = System.currentTimeMillis()
+                            )
+                            messages = messages + userMessage
+                            isLoading = true
+                            messageText = ""
+                        }
+                    },
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
             }
-            
-            // Barra de entrada de mensaje
-            MessageInputBar(
-                messageText = messageText,
-                onMessageTextChange = { messageText = it },
-                onSendMessage = {
-                    if (messageText.isNotBlank()) {
-                        // Agregar mensaje del usuario
-                        val userMessage = ChatMessage(
-                            text = messageText,
-                            isUser = true,
-                            timestamp = System.currentTimeMillis()
-                        )
-                        messages = messages + userMessage
-                        
-                        // Simular respuesta de IA
-                        isLoading = true
-                        messageText = ""
-                    }
-                },
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
         }
     }
 }
@@ -216,9 +220,10 @@ fun MessageInputBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 35.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(28.dp)
+        shape = RoundedCornerShape(38.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Row(
             modifier = Modifier
@@ -235,7 +240,10 @@ fun MessageInputBar(
                         color = secondaryTextColor
                     )
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .offset(x = (-5).dp),
+                shape = RoundedCornerShape(28.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = textColor,
                     unfocusedTextColor = textColor,
@@ -244,13 +252,13 @@ fun MessageInputBar(
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium
             )
-            
+
             Spacer(modifier = Modifier.width(8.dp))
-            
+
             IconButton(
                 onClick = { onSendMessage() },
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(44.dp)
                     .background(
                         MetroOrange,
                         RoundedCornerShape(28.dp)
@@ -258,7 +266,7 @@ fun MessageInputBar(
             ) {
                 Icon(
                     Icons.Default.Send,
-                    contentDescription = stringResource(R.string.chat_send),
+                    contentDescription = "Enviar",
                     tint = White,
                     modifier = Modifier.size(20.dp)
                 )
@@ -273,7 +281,7 @@ fun TypingIndicator(
     textColor: Color
 ) {
     Card(
-        modifier = Modifier.widthIn(max = 100.dp),
+        modifier = Modifier.widthIn(max = 120.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(28.dp)
     ) {
@@ -305,4 +313,30 @@ data class ChatMessage(
 fun formatTime(timestamp: Long): String {
     val time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
     return time.format(java.util.Date(timestamp))
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "💡 ChatScreen - Modo Claro")
+@Composable
+fun ChatScreenPreviewLight() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(false) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ChatScreen(navController = navController)
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "🌙 ChatScreen - Modo Oscuro")
+@Composable
+fun ChatScreenPreviewDark() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(true) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            ChatScreen(navController = navController)
+        }
+    }
 }

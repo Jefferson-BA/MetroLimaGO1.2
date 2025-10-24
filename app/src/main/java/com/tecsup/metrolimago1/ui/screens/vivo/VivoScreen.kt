@@ -7,74 +7,87 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.tecsup.metrolimago1.R
+import androidx.navigation.compose.rememberNavController
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
-import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VivoScreen(navController: NavController) {
     val themeState = LocalThemeState.current
 
-    val backgroundColor = if (themeState.isDarkMode) DarkGray else Color(0xFFF5F5F5)
     val cardColor = if (themeState.isDarkMode) CardGray else Color(0xFFFFFFFF)
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
-    
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.live_title),
-                        color = textColor,
-                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+
+    GradientBackground(isDarkMode = themeState.isDarkMode) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "En vivo",
+                            color = textColor,
+                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor
                 )
-            )
-        },
-        bottomBar = {
-            GlobalBottomNavBar(navController = navController, currentRoute = Screen.Vivo.route)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundColor)
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            ServiceStatusCard(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+            },
+            bottomBar = {
+                GlobalBottomNavBar(
+                    navController = navController,
+                    currentRoute = Screen.Vivo.route
+                )
+            },
+            containerColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 0.dp
+                    )
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ServiceStatusCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            OperatingHoursCard(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                OperatingHoursCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
 
-            AlertsCard(
-                cardColor = cardColor,
-                textColor = textColor,
-                secondaryTextColor = secondaryTextColor
-            )
+                AlertsCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                Spacer(modifier = Modifier.height(80.dp))
+            }
         }
     }
 }
@@ -88,11 +101,9 @@ fun ServiceStatusCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(28.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -110,7 +121,7 @@ fun ServiceStatusCard(
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
-            
+
             Text(
                 text = "Estado en tiempo real de las líneas",
                 color = secondaryTextColor,
@@ -119,17 +130,17 @@ fun ServiceStatusCard(
             )
 
             ServiceLineItem(
-                lineName = "Linea 1",
+                lineName = "Línea 1",
                 status = "Servicio operando con normalidad",
                 isOperating = true,
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
             ServiceLineItem(
-                lineName = "Linea 2",
+                lineName = "Línea 2",
                 status = "En construcción - Apertura estimada 2026",
                 isOperating = false,
                 textColor = textColor,
@@ -157,7 +168,7 @@ fun ServiceLineItem(
             tint = if (isOperating) MetroGreen else Color(0xFFE53E3E),
             modifier = Modifier.size(20.dp)
         )
-        
+
         Spacer(modifier = Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
@@ -200,9 +211,7 @@ fun OperatingHoursCard(
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(28.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -228,7 +237,7 @@ fun OperatingHoursCard(
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
             OperatingHoursItem(
@@ -238,7 +247,7 @@ fun OperatingHoursCard(
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
             OperatingHoursItem(
@@ -276,7 +285,7 @@ fun OperatingHoursItem(
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        
+
         Text(
             text = hours,
             color = textColor,
@@ -296,9 +305,7 @@ fun AlertsCard(
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(28.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -324,7 +331,7 @@ fun AlertsCard(
                 textColor = textColor,
                 secondaryTextColor = secondaryTextColor
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
             AlertItem(
@@ -364,5 +371,31 @@ fun AlertItem(
             color = secondaryTextColor,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)
         )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "💡 VivoScreen - Modo Claro")
+@Composable
+fun VivoScreenPreviewLight() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(false) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            VivoScreen(navController = navController)
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "🌙 VivoScreen - Modo Oscuro")
+@Composable
+fun VivoScreenPreviewDark() {
+    val navController = rememberNavController()
+    val themeState = remember { ThemeState() }.apply { updateDarkMode(true) }
+
+    CompositionLocalProvider(LocalThemeState provides themeState) {
+        MetroLimaGO1Theme(darkTheme = themeState.isDarkMode) {
+            VivoScreen(navController = navController)
+        }
     }
 }
