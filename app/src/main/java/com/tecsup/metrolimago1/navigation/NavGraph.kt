@@ -26,6 +26,10 @@ sealed class Screen(val route: String) {
     }
     object Rutas : Screen("rutas")
     object Maps : Screen("maps")
+    object Favoritos : Screen("favoritos")
+    object LineDetail : Screen("lines/{lineId}") {
+        fun createRoute(lineId: String) = "lines/$lineId"
+    }
     object Configuracion : Screen("configuracion")
     object Chat : Screen("chat")
     object Vivo : Screen("vivo")
@@ -75,6 +79,18 @@ fun MainNavGraph() {
 
         composable(Screen.Maps.route) {
             MapsScreen(navController = navController)
+        }
+
+        composable(Screen.Favoritos.route) {
+            com.tecsup.metrolimago1.ui.screens.estaciones.FavoriteStationsScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.LineDetail.route,
+            arguments = listOf(navArgument("lineId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lineId = backStackEntry.arguments?.getString("lineId")
+            com.tecsup.metrolimago1.ui.screens.lines.LineDetailScreen(navController = navController, lineId = lineId)
         }
 
         composable(Screen.Configuracion.route) {

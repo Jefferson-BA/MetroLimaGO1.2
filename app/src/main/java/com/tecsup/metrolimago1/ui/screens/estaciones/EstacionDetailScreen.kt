@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,9 +33,13 @@ import com.google.maps.android.compose.*
 import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.data.local.FavoriteStation
+import com.tecsup.metrolimago1.data.local.database.AppDatabase
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +55,11 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
 
     val station = MockStations.findById(estacionId)
     var showGoogleMap by remember { mutableStateOf(true) }
+
+    // Estado para favoritos
+    val database = remember { AppDatabase.getDatabase(context) }
+    var isFavorite by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Estado para ubicación del usuario
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -75,6 +86,14 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
             } catch (e: SecurityException) {
                 // Manejar error de permisos
             }
+        }
+    }
+
+    // Verificar si la estación es favorita
+    LaunchedEffect(station?.id) {
+        station?.let { st ->
+            val favorite = database.favoriteStationDao().getById(st.id).first()
+            isFavorite = favorite != null
         }
     }
 
@@ -116,6 +135,38 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     }
                 },
                 actions = {
+                    // Botón de favoritos
+                    IconButton(
+                        onClick = {
+                            station?.let { st ->
+                                coroutineScope.launch {
+                                    if (isFavorite) {
+                                        database.favoriteStationDao().delete(st.id)
+                                        isFavorite = false
+                                    } else {
+                                        database.favoriteStationDao().insert(
+                                            FavoriteStation(
+                                                id = st.id,
+                                                name = st.name,
+                                                line = st.line,
+                                                address = st.address,
+                                                latitude = st.latitude,
+                                                longitude = st.longitude
+                                            )
+                                        )
+                                        isFavorite = true
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                            tint = if (isFavorite) Color(0xFFFF6B6B) else textColor
+                        )
+                    }
+
                     // Botón para obtener ubicación
                     IconButton(
                         onClick = {
@@ -332,12 +383,13 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     }
                 }
 
-                // Detalles de la estación
+                // Detalles de la estación (combinado: info + estado + línea)
                 StationDetailsCard(
                     station = station,
                     cardColor = cardColor,
                     textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
+                    secondaryTextColor = secondaryTextColor,
+                    navController = navController
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -353,28 +405,8 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-
-                // Información adicional
-                StationInfoCard(
-                    station = station,
-                    cardColor = cardColor,
-                    textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
-                )
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Horarios y Estado
-                StationScheduleAndStatusCard(
-                    station = station,
-                    cardColor = cardColor,
-                    textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Servicios Cercanos
+                // Servicios Cercanos (si existen)
                 if (station.nearbyServices.isNotEmpty()) {
                     NearbyServicesCard(
                         services = station.nearbyServices,
@@ -401,7 +433,8 @@ fun StationDetailsCard(
     station: com.tecsup.metrolimago1.domain.models.Station,
     cardColor: Color,
     textColor: Color,
-    secondaryTextColor: Color
+    secondaryTextColor: Color,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
@@ -435,9 +468,19 @@ fun StationDetailsCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Información de la línea
+            // Información de la línea (clickeable)
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { 
+                    // Navegar a detalle de línea
+                    val lineId = when (station.line) {
+                        "Línea 1" -> "LINEA_1"
+                        "Línea 2" -> "LINEA_2"
+                        "Línea 3" -> "LINEA_3"
+                        else -> "LINEA_1"
+                    }
+                    navController.navigate(Screen.LineDetail.createRoute(lineId))
+                }
             ) {
                 Box(
                     modifier = Modifier
@@ -459,6 +502,13 @@ fun StationDetailsCard(
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     )
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "Ver línea",
+                    tint = secondaryTextColor,
+                    modifier = Modifier.size(16.dp)
                 )
             }
 
@@ -482,124 +532,87 @@ fun StationDetailsCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // ID de la estación
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Tag,
-                    contentDescription = stringResource(R.string.station_id),
-                    tint = secondaryTextColor,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = station.id,
-                    color = secondaryTextColor,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StationInfoCard(
-    station: com.tecsup.metrolimago1.domain.models.Station,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.station_additional_info),
-                color = textColor,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.2f))
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Coordenadas
+            // Estado y Horarios (combinados)
             Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.GpsFixed,
-                    contentDescription = stringResource(R.string.station_coordinates),
-                    tint = secondaryTextColor,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = stringResource(R.string.station_latitude),
-                        color = secondaryTextColor,
-                        style = MaterialTheme.typography.bodySmall
+                // Estado
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = when (station.status) {
+                            com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> Icons.Default.CheckCircle
+                            com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Icons.Default.Warning
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Icons.Default.Construction
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Icons.Default.Close
+                        },
+                        contentDescription = "Estado",
+                        tint = when (station.status) {
+                            com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> MetroGreen
+                            com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Color(0xFFFFA726)
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Color(0xFF2196F3)
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Color(0xFFE53E3E)
+                        },
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "${station.latitude}",
+                        text = when (station.status) {
+                            com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> "Operativa"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> "Mantenimiento"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> "Construcción"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> "Cerrada"
+                        },
                         color = textColor,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Medium
-                        )
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = stringResource(R.string.station_longitude),
-                        color = secondaryTextColor,
-                        style = MaterialTheme.typography.bodySmall
+
+                // Horarios
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = "Horarios",
+                        tint = secondaryTextColor,
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "${station.longitude}",
+                        text = "${station.openingTime} - ${station.closingTime}",
                         color = textColor,
-                        style = MaterialTheme.typography.bodyMedium.copy(
+                        style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium
                         )
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Descripción
+            // Descripción (si existe)
             if (station.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.2f))
+                Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     verticalAlignment = Alignment.Top
                 ) {
                     Icon(
                         imageVector = Icons.Default.Info,
-                        contentDescription = stringResource(R.string.station_description),
+                        contentDescription = "Descripción",
                         tint = secondaryTextColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.station_description),
-                            color = secondaryTextColor,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            text = station.description,
-                            color = textColor,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    Text(
+                        text = station.description,
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
@@ -732,108 +745,6 @@ fun RouteInfoCard(
                         text = step,
                         color = secondaryTextColor,
                         style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }
-    }
-}
-
-// Nuevo componente para Horarios y Estado
-@Composable
-fun StationScheduleAndStatusCard(
-    station: com.tecsup.metrolimago1.domain.models.Station,
-    cardColor: Color,
-    textColor: Color,
-    secondaryTextColor: Color
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Horarios y Estado",
-                color = textColor,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Horarios
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Schedule,
-                    contentDescription = "Horarios",
-                    tint = secondaryTextColor,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "Horario de funcionamiento",
-                        color = secondaryTextColor,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = "${station.openingTime} - ${station.closingTime}",
-                        color = textColor,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Estado
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = when (station.status) {
-                        com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> Icons.Default.CheckCircle
-                        com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Icons.Default.Warning
-                        com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Icons.Default.Construction
-                        com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Icons.Default.Close
-                    },
-                    contentDescription = "Estado",
-                    tint = when (station.status) {
-                        com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> MetroGreen
-                        com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Color(0xFFFFA726)
-                        com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Color(0xFF2196F3)
-                        com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Color(0xFFE53E3E)
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "Estado",
-                        color = secondaryTextColor,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = when (station.status) {
-                            com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> "Operativa"
-                            com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> "En Mantenimiento"
-                            com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> "En Construcción"
-                            com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> "Cerrada"
-                        },
-                        color = textColor,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Medium
-                        )
                     )
                 }
             }

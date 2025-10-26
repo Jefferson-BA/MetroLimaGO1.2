@@ -87,6 +87,16 @@ fun HomeScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Botón de estaciones favoritas
+                FavoriteStationsCard(
+                    navController = navController,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 NextArrivalsSection(
                     isDarkMode = themeState.isDarkMode,
                     cardColor = cardColor,
@@ -581,6 +591,61 @@ fun RouteTestSection(
                     style = MaterialTheme.typography.bodySmall.copy(color = MetroOrange)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun FavoriteStationsCard(
+    navController: NavController,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { navController.navigate(Screen.Favoritos.route) },
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(25.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favoritos",
+                tint = Color(0xFFFF6B6B),
+                modifier = Modifier.size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Estaciones Favoritas",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                )
+                Text(
+                    text = "Ver tus estaciones guardadas",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = secondaryTextColor
+                    )
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Ver favoritos",
+                tint = MetroOrange,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
