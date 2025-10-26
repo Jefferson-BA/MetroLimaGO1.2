@@ -14,4 +14,10 @@ interface FavoriteStationDao {
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(station: FavoriteStation)
+    
+    @Query("DELETE FROM favorite_stations WHERE id = :stationId")
+    suspend fun delete(stationId: String)
+    
+    @Query("SELECT * FROM favorite_stations WHERE id = :stationId LIMIT 1")
+    fun getById(stationId: String): Flow<FavoriteStation?>
 }

@@ -33,7 +33,7 @@ fun IntroScreen(navController: NavController) {
             .background(Color(0xFF0E0E0E))
     ) {
         Image(
-            painter = painterResource(R.drawable.intro),
+            painter = painterResource(R.drawable.fondo2),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()

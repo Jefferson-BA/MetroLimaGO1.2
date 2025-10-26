@@ -6,7 +6,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -14,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -211,6 +214,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColor)
+                    .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
             ) {
                 // Mapa de Google Maps
@@ -353,6 +357,36 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 // Información adicional
                 StationInfoCard(
                     station = station,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Horarios y Estado
+                StationScheduleAndStatusCard(
+                    station = station,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Servicios Cercanos
+                if (station.nearbyServices.isNotEmpty()) {
+                    NearbyServicesCard(
+                        services = station.nearbyServices,
+                        cardColor = cardColor,
+                        textColor = textColor,
+                        secondaryTextColor = secondaryTextColor
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                
+                // Información de Tarifas
+                FareInfoCard(
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor
@@ -700,6 +734,304 @@ fun RouteInfoCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
+            }
+        }
+    }
+}
+
+// Nuevo componente para Horarios y Estado
+@Composable
+fun StationScheduleAndStatusCard(
+    station: com.tecsup.metrolimago1.domain.models.Station,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Horarios y Estado",
+                color = textColor,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Horarios
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = "Horarios",
+                    tint = secondaryTextColor,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Horario de funcionamiento",
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        text = "${station.openingTime} - ${station.closingTime}",
+                        color = textColor,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Estado
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = when (station.status) {
+                        com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> Icons.Default.CheckCircle
+                        com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Icons.Default.Warning
+                        com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Icons.Default.Construction
+                        com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Icons.Default.Close
+                    },
+                    contentDescription = "Estado",
+                    tint = when (station.status) {
+                        com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> MetroGreen
+                        com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> Color(0xFFFFA726)
+                        com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> Color(0xFF2196F3)
+                        com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> Color(0xFFE53E3E)
+                    },
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Estado",
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        text = when (station.status) {
+                            com.tecsup.metrolimago1.domain.models.StationStatus.OPERATIONAL -> "Operativa"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.MAINTENANCE -> "En Mantenimiento"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CONSTRUCTION -> "En Construcción"
+                            com.tecsup.metrolimago1.domain.models.StationStatus.CLOSED -> "Cerrada"
+                        },
+                        color = textColor,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Nuevo componente para Servicios Cercanos
+@Composable
+fun NearbyServicesCard(
+    services: List<com.tecsup.metrolimago1.domain.models.NearbyService>,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Servicios Cercanos",
+                color = textColor,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            services.forEach { service ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = getServiceIcon(service.type),
+                        contentDescription = service.name,
+                        tint = MetroOrange,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = service.name,
+                            color = textColor,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                        Text(
+                            text = service.address,
+                            color = secondaryTextColor,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Text(
+                        text = service.distance,
+                        color = MetroOrange,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Función para obtener el icono según el tipo de servicio
+@Composable
+fun getServiceIcon(type: com.tecsup.metrolimago1.domain.models.ServiceType): ImageVector {
+    return when (type) {
+        com.tecsup.metrolimago1.domain.models.ServiceType.RESTAURANT -> Icons.Default.Restaurant
+        com.tecsup.metrolimago1.domain.models.ServiceType.BANK -> Icons.Default.AccountBalance
+        com.tecsup.metrolimago1.domain.models.ServiceType.PHARMACY -> Icons.Default.LocalPharmacy
+        com.tecsup.metrolimago1.domain.models.ServiceType.HOSPITAL -> Icons.Default.LocalHospital
+        com.tecsup.metrolimago1.domain.models.ServiceType.UNIVERSITY -> Icons.Default.School
+        com.tecsup.metrolimago1.domain.models.ServiceType.MALL -> Icons.Default.ShoppingCart
+        com.tecsup.metrolimago1.domain.models.ServiceType.PARK -> Icons.Default.Park
+        com.tecsup.metrolimago1.domain.models.ServiceType.ATM -> Icons.Default.CreditCard
+    }
+}
+
+// Nuevo componente para Información de Tarifas
+@Composable
+fun FareInfoCard(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Información de Tarifas",
+                color = textColor,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Precio Adulto
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Adulto",
+                        tint = secondaryTextColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Adulto",
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Text(
+                    text = "S/ 2.50",
+                    color = MetroOrange,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Precio Estudiante
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.School,
+                        contentDescription = "Estudiante",
+                        tint = secondaryTextColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Estudiante (con carné)",
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Text(
+                    text = "S/ 1.25",
+                    color = MetroOrange,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.2f))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Métodos de pago
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Payment,
+                    contentDescription = "Pago",
+                    tint = MetroGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Métodos: Efectivo, Tarjeta de Crédito/Débito, Tarjeta Lima",
+                    color = textColor,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
