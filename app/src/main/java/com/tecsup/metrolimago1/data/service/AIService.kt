@@ -1,29 +1,26 @@
 package com.tecsup.metrolimago1.data.service
 
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
 import kotlinx.coroutines.delay
 
 /**
  * Servicio de IA para MetroLima GO
- * 
- * AQUÍ DEBES INTEGRAR TU API DE IA:
- * 
- * 1. Agrega tu token/API key en las constantes
- * 2. Implementa la función sendMessage() con tu API
- * 3. Maneja los errores apropiadamente
- * 
- * Ejemplos de APIs que puedes usar:
- * - OpenAI GPT
- * - Google Gemini
- * - Claude AI
- * - Azure OpenAI
- * - O cualquier otra API de IA
+ * Usa OpenAI GPT-3.5-turbo con Retrofit
  */
 
 class AIService {
     
-    // TODO: Reemplaza con tu token/API key real
-    private val API_KEY = "TU_API_KEY_AQUI"
-    private val API_URL = "https://api.tu-servicio-ia.com/v1/chat/completions"
+    // API Key de OpenAI
+    private val API_KEY = "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"
+    
+    // URL base de OpenAI API
+    private val BASE_URL = "https://api.openai.com/v1/"
     
     /**
      * Envía un mensaje a la IA y obtiene la respuesta
@@ -31,81 +28,121 @@ class AIService {
      * @param message El mensaje del usuario
      * @return La respuesta de la IA
      */
+    // Instancia singleton de Retrofit
+    private val retrofit: Retrofit by lazy {
+        // Interceptor para agregar headers
+        val authInterceptor = Interceptor { chain ->
+            val originalRequest = chain.request()
+            val newRequest = originalRequest.newBuilder()
+                .addHeader("Authorization", "Bearer $API_KEY")
+                .addHeader("Content-Type", "application/json")
+                .build()
+            chain.proceed(newRequest)
+        }
+        
+        // Logging interceptor para debug
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        
+        // OkHttpClient con interceptores
+        val client = OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .build()
+        
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+    
+    private val apiService: AIApiService by lazy {
+        retrofit.create(AIApiService::class.java)
+    }
+    
     suspend fun sendMessage(message: String): String {
-        return try {
-            // TODO: Implementa aquí la llamada a tu API de IA
-            // Ejemplo de implementación:
-            
-            /*
-            val client = HttpClient {
-                install(ContentNegotiation) {
-                    json()
+        val maxRetries = 3
+        var lastException: Exception? = null
+        
+        for (attempt in 1..maxRetries) {
+            try {
+                val request = ChatRequest(
+                    model = "gpt-3.5-turbo",
+                    messages = listOf(
+                        Message("system", "Eres un asistente de MetroLima GO. Ayuda a los usuarios con información sobre el metro de Lima."),
+                        Message("user", message)
+                    ),
+                    max_tokens = 500,
+                    temperature = 0.7
+                )
+                
+                val response = apiService.sendMessage(request)
+                return response.choices.firstOrNull()?.message?.content 
+                    ?: "Lo siento, no pude procesar tu mensaje."
+                
+            } catch (e: Exception) {
+                lastException = e
+                
+                // Si es error 429 (Rate limit), esperar antes de reintentar
+                if (e.message?.contains("429") == true || e.message?.contains("rate limit", ignoreCase = true) == true) {
+                    if (attempt < maxRetries) {
+                        val waitTime = attempt * 2L // 2, 4, 6 segundos
+                        delay(waitTime * 1000)
+                        continue // Reintentar
+                    } else {
+                        return "El servicio está muy ocupado en este momento. Por favor intenta de nuevo en unos minutos."
+                    }
+                }
+                
+                // Si no es error de rate limit, lanzar excepción
+                if (attempt == maxRetries) {
+                    break
                 }
             }
-            
-            val requestBody = mapOf(
-                "model" to "gpt-3.5-turbo", // o tu modelo preferido
-                "messages" to listOf(
-                    mapOf("role" to "system", "content" to "Eres un asistente de MetroLima GO. Ayuda a los usuarios con información sobre el metro de Lima."),
-                    mapOf("role" to "user", "content" to message)
-                ),
-                "max_tokens" to 500,
-                "temperature" to 0.7
-            )
-            
-            val response = client.post(API_URL) {
-                headers {
-                    append("Authorization", "Bearer $API_KEY")
-                    append("Content-Type", "application/json")
-                }
-                setBody(requestBody)
-            }
-            
-            val responseBody = response.body<Map<String, Any>>()
-            responseBody["choices"]?.let { choices ->
-                if (choices is List<*> && choices.isNotEmpty()) {
-                    val firstChoice = choices[0] as? Map<String, Any>
-                    val messageContent = firstChoice?.get("message") as? Map<String, Any>
-                    messageContent?.get("content") as? String ?: "Lo siento, no pude procesar tu mensaje."
-                } else {
-                    "Lo siento, no pude procesar tu mensaje."
-                }
-            } ?: "Lo siento, no pude procesar tu mensaje."
-            */
-            
-            // Respuesta simulada por ahora
-            simulateAIResponse(message)
-            
-        } catch (e: Exception) {
-            "Lo siento, hubo un error al procesar tu mensaje. Error: ${e.message}"
+        }
+        
+        return when {
+            lastException?.message?.contains("429") == true -> 
+                "El servicio está muy ocupado. Por favor espera unos segundos e intenta de nuevo."
+            lastException?.message?.contains("API key") == true -> 
+                "Error de autenticación. Verifica tu API key."
+            else -> 
+                "Error al procesar tu mensaje: ${lastException?.message ?: "Error desconocido"}"
         }
     }
     
-    /**
-     * Simula una respuesta de IA (reemplaza esto con tu implementación real)
-     */
-    private suspend fun simulateAIResponse(message: String): String {
-        delay(1000) // Simula tiempo de procesamiento
-        
-        return when {
-            message.contains("estación", ignoreCase = true) -> {
-                "Puedo ayudarte con información sobre las estaciones del Metro de Lima. ¿Qué estación específica te interesa?"
-            }
-            message.contains("horario", ignoreCase = true) -> {
-                "Los horarios del Metro de Lima son de 5:00 AM a 11:00 PM de lunes a domingo. ¿Necesitas información sobre alguna línea específica?"
-            }
-            message.contains("ruta", ignoreCase = true) -> {
-                "Te puedo ayudar a planificar tu ruta. ¿Desde qué estación quieres partir y a cuál quieres llegar?"
-            }
-            message.contains("precio", ignoreCase = true) || message.contains("costo", ignoreCase = true) -> {
-                "El precio del pasaje del Metro de Lima es de S/ 2.50 para adultos y S/ 1.25 para estudiantes con carné."
-            }
-            else -> {
-                "Como asistente de MetroLima GO, puedo ayudarte con información sobre estaciones, horarios, rutas, precios y más. ¿En qué más puedo asistirte?"
-            }
-        }
-    }
 }
+
+// Definir la interfaz para Retrofit
+interface AIApiService {
+    @POST("chat/completions")
+    suspend fun sendMessage(
+        @Body request: ChatRequest
+    ): ChatResponse
+}
+
+// Modelos de datos para OpenAI API
+data class ChatRequest(
+    val model: String = "gpt-3.5-turbo",
+    val messages: List<Message>,
+    val max_tokens: Int = 500,
+    val temperature: Double = 0.7
+)
+
+data class Message(
+    val role: String,
+    val content: String
+)
+
+data class ChatResponse(
+    val choices: List<Choice>
+)
+
+data class Choice(
+    val message: Message
+)
 
 /**
  * Ejemplo de uso en ChatScreen:

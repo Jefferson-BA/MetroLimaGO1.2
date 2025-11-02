@@ -31,12 +31,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.data.local.RouteHistory
+import com.tecsup.metrolimago1.data.local.database.AppDatabase
 import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 import com.tecsup.metrolimago1.utils.TranslationUtils
 import com.tecsup.metrolimago1.utils.LocaleUtils
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 
 // Clase para información de rutas
 data class RouteInfo(
@@ -62,9 +67,19 @@ fun PlanificadorRutaScreen(navController: NavController) {
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
     var showRoute by remember { mutableStateOf(false) }
     var routeInfo by remember { mutableStateOf<RouteInfo?>(null) }
+    var alternativeRoutes by remember { mutableStateOf<List<RouteInfo>>(emptyList()) }
 
     // Estado para filtros de líneas
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
+    
+    // Estado para filtros de tiempo y transbordos
+    var maxTime by remember { mutableStateOf("60") } // Minutos máximos
+    var maxTransfers by remember { mutableStateOf("2") } // Transbordos máximos
+    var showFilters by remember { mutableStateOf(false) }
+    
+    // Base de datos para historial
+    val database = remember { AppDatabase.getDatabase(context) }
+    val coroutineScope = rememberCoroutineScope()
     
     // Estado para ubicación del usuario
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -159,6 +174,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
                         selectedDestination = selectedDestination,
                         selectedLines = selectedLines,
                         routeInfo = routeInfo,
+                        alternativeRoutes = alternativeRoutes,
                         onOriginSelected = { selectedOrigin = it },
                         onDestinationSelected = { selectedDestination = it },
                         onLineToggle = { line ->
@@ -182,7 +198,33 @@ fun PlanificadorRutaScreen(navController: NavController) {
                             showRoute = true
                             // Simular cálculo de ruta con Directions API
                             if (selectedOrigin != null && selectedDestination != null) {
-                                routeInfo = calculateRoute(selectedOrigin!!, selectedDestination!!)
+                                val allRoutes = calculateMultipleRoutes(selectedOrigin!!, selectedDestination!!)
+                                
+                                // Aplicar filtros
+                                val filteredRoutes = filterRoutesByTimeAndTransfers(
+                                    allRoutes,
+                                    maxTime.toIntOrNull() ?: 60,
+                                    maxTransfers.toIntOrNull() ?: 2
+                                )
+                                
+                                routeInfo = filteredRoutes.firstOrNull()
+                                alternativeRoutes = filteredRoutes.drop(1)
+                                
+                                // Guardar ruta en el historial
+                                routeInfo?.let { route ->
+                                    coroutineScope.launch {
+                                        val routeHistory = RouteHistory(
+                                            originName = selectedOrigin!!.name,
+                                            originId = selectedOrigin!!.id,
+                                            destinationName = selectedDestination!!.name,
+                                            destinationId = selectedDestination!!.id,
+                                            distance = route.distance,
+                                            duration = route.duration,
+                                            routeType = "fastest" // Por defecto la primera ruta es la más rápida
+                                        )
+                                        database.routeHistoryDao().insert(routeHistory)
+                                    }
+                                }
                             }
                         },
                         onClearRoute = {
@@ -190,6 +232,7 @@ fun PlanificadorRutaScreen(navController: NavController) {
                             selectedOrigin = null
                             selectedDestination = null
                             routeInfo = null
+                            alternativeRoutes = emptyList()
                         },
                         isDarkMode = themeState.isDarkMode,
                         cardColor = cardColor,
@@ -241,6 +284,38 @@ fun PlanificadorRutaScreen(navController: NavController) {
                         )
                     }
                     
+                    // Botón para ver historial de rutas
+                    FloatingActionButton(
+                        onClick = { 
+                            navController.navigate(Screen.RouteHistory.route)
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(16.dp),
+                        containerColor = MetroGreen,
+                        contentColor = White
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = "Historial de rutas"
+                        )
+                    }
+                    
+                    // Botón para filtros
+                    FloatingActionButton(
+                        onClick = { showFilters = true },
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(16.dp),
+                        containerColor = Color(0xFF2196F3),
+                        contentColor = White
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filtros"
+                        )
+                    }
+                    
                     // Botón pequeño de ubicación (solo visible en mapa agrandado)
                     if (showGoogleMap) {
                         FloatingActionButton(
@@ -286,6 +361,7 @@ fun CompactRoutePanel(
     selectedDestination: Station?,
     selectedLines: Set<String>,
     routeInfo: RouteInfo?,
+    alternativeRoutes: List<RouteInfo>,
     onOriginSelected: (Station) -> Unit,
     onDestinationSelected: (Station) -> Unit,
     onLineToggle: (String) -> Unit,
@@ -371,6 +447,33 @@ fun CompactRoutePanel(
                     context = context
                 )
                 Spacer(modifier = Modifier.height(12.dp))
+                
+                // Rutas alternativas
+                if (alternativeRoutes.isNotEmpty()) {
+                    Text(
+                        text = "Rutas alternativas:",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        ),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    
+                    alternativeRoutes.forEachIndexed { index, route ->
+                        AlternativeRouteInfo(
+                            route = route,
+                            index = index + 1,
+                            cardColor = cardColor,
+                            textColor = textColor,
+                            secondaryTextColor = secondaryTextColor,
+                            context = context
+                        )
+                        if (index < alternativeRoutes.size - 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
 
             // Botones de acción compactos
@@ -1030,6 +1133,234 @@ fun calculateRoute(origin: Station, destination: Station): RouteInfo {
         "4. Has llegado a tu destino"
     )
     return RouteInfo(distance, duration, steps)
+}
+
+// Función para calcular múltiples rutas alternativas
+fun calculateMultipleRoutes(origin: Station, destination: Station): List<RouteInfo> {
+    val routes = mutableListOf<RouteInfo>()
+    
+    // Ruta principal (más rápida)
+    val distance1 = "${(1..15).random()} km"
+    val duration1 = "${(5..45).random()} min"
+    val steps1 = listOf(
+        "1. Dirígete a ${origin.name}",
+        "2. Toma el Metro hacia ${destination.name}",
+        "3. Baja en ${destination.name}"
+    )
+    routes.add(RouteInfo(distance1, duration1, steps1))
+    
+    // Ruta alternativa 1 (más corta)
+    val distance2 = "${(1..15).random()} km"
+    val duration2 = "${(5..45).random()} min"
+    val steps2 = listOf(
+        "1. Dirígete a ${origin.name}",
+        "2. Toma el Metro hacia ${destination.name}",
+        "3. Cambia de línea en la estación central",
+        "4. Baja en ${destination.name}"
+    )
+    routes.add(RouteInfo(distance2, duration2, steps2))
+    
+    // Ruta alternativa 2 (más larga pero con menos transbordos)
+    val distance3 = "${(1..15).random()} km"
+    val duration3 = "${(5..45).random()} min"
+    val steps3 = listOf(
+        "1. Dirígete a ${origin.name}",
+        "2. Toma el Metro hacia ${destination.name}",
+        "3. Sin transbordos",
+        "4. Baja en ${destination.name}"
+    )
+    routes.add(RouteInfo(distance3, duration3, steps3))
+    
+    // Ordenar por duración
+    return routes.sortedBy { 
+        it.duration.replace(" min", "").replace("h ", "").toIntOrNull() ?: Int.MAX_VALUE
+    }
+}
+
+// Función para filtrar rutas
+fun filterRoutesByTimeAndTransfers(
+    routes: List<RouteInfo>, 
+    maxTime: Int, 
+    maxTransfers: Int
+): List<RouteInfo> {
+    return routes.filter { route ->
+        // Extraer tiempo en minutos
+        val timeMatch = route.duration.replace(Regex("[^0-9]"), "")
+        val timeMinutes = timeMatch.toIntOrNull() ?: Int.MAX_VALUE
+        
+        // Contar transbordos (buscar palabras clave)
+        val transferCount = when {
+            route.steps.any { it.contains("transbord", ignoreCase = true) } -> 1
+            route.steps.any { it.contains("Cambia de línea", ignoreCase = true) } -> 1
+            route.steps.any { it.contains("Sin transbordos", ignoreCase = true) } -> 0
+            else -> 0
+        }
+        
+        // Filtrar
+        timeMinutes <= maxTime && transferCount <= maxTransfers
+    }
+}
+
+// Panel de filtros
+@Composable
+fun RouteFiltersPanel(
+    maxTime: String,
+    maxTransfers: String,
+    onMaxTimeChange: (String) -> Unit,
+    onMaxTransfersChange: (String) -> Unit,
+    onClose: () -> Unit,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // Título
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Filtros de Ruta",
+                    color = textColor,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                IconButton(onClick = onClose) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cerrar filtros",
+                        tint = secondaryTextColor
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Filtro de tiempo máximo
+            Text(
+                text = "Tiempo máximo (minutos)",
+                color = textColor,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            OutlinedTextField(
+                value = maxTime,
+                onValueChange = onMaxTimeChange,
+                label = { Text("Minutos") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    focusedLabelColor = MetroOrange,
+                    unfocusedLabelColor = secondaryTextColor,
+                    focusedBorderColor = MetroOrange,
+                    unfocusedBorderColor = secondaryTextColor
+                )
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Filtro de transbordos
+            Text(
+                text = "Transbordos máximos",
+                color = textColor,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            OutlinedTextField(
+                value = maxTransfers,
+                onValueChange = onMaxTransfersChange,
+                label = { Text("Cantidad") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    focusedLabelColor = MetroOrange,
+                    unfocusedLabelColor = secondaryTextColor,
+                    focusedBorderColor = MetroOrange,
+                    unfocusedBorderColor = secondaryTextColor
+                )
+            )
+        }
+    }
+}
+
+// Componente para mostrar rutas alternativas
+@Composable
+fun AlternativeRouteInfo(
+    route: RouteInfo,
+    index: Int,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color,
+    context: android.content.Context
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor.copy(alpha = 0.5f)),
+        shape = RoundedCornerShape(8.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MetroOrange.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Alternativa $index:",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MetroOrange
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                
+                Column {
+                    Text(
+                        text = route.duration,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                            color = textColor
+                        )
+                    )
+                    Text(
+                        text = route.distance,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = secondaryTextColor
+                        )
+                    )
+                }
+            }
+            
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Ver ruta",
+                tint = MetroOrange,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
 }
 
 @Composable

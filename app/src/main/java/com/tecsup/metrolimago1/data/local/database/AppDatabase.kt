@@ -5,11 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.tecsup.metrolimago1.data.local.FavoriteStation
+import com.tecsup.metrolimago1.data.local.RouteHistory
 import com.tecsup.metrolimago1.data.local.dao.FavoriteStationDao
+import com.tecsup.metrolimago1.data.local.dao.RouteHistoryDao
 
-@Database(entities = [FavoriteStation::class], version = 1, exportSchema = false)
+@Database(entities = [FavoriteStation::class, RouteHistory::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteStationDao(): FavoriteStationDao
+    abstract fun routeHistoryDao(): RouteHistoryDao
 
     companion object {
         @Volatile
@@ -21,7 +24,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "metrolima_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // Para permitir cambios de esquema
+                    .build()
                 INSTANCE = instance
                 instance
             }

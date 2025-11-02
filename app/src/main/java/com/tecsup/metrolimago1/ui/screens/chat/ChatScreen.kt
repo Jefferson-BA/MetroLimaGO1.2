@@ -29,57 +29,10 @@ import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
 import com.tecsup.metrolimago1.ui.theme.ThemeState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.text.font.FontWeight
+import com.tecsup.metrolimago1.data.service.AIService
 
-// Sistema de respuestas predefinidas
-object ChatResponses {
-    private val responses = mapOf(
-        "hola" to mapOf(
-            "es" to "¡Hola! Soy tu asistente de MetroLima GO. ¿En qué puedo ayudarte?",
-            "en" to "Hello! I'm your MetroLima GO assistant. How can I help you?"
-        ),
-        "horarios" to mapOf(
-            "es" to "Los horarios del Metro de Lima son:\n• Lunes a Viernes: 5:30 AM - 11:00 PM\n• Sábados: 5:30 AM - 11:00 PM\n• Domingos: 6:00 AM - 11:00 PM",
-            "en" to "Metro de Lima operating hours:\n• Monday to Friday: 5:30 AM - 11:00 PM\n• Saturday: 5:30 AM - 11:00 PM\n• Sunday: 6:00 AM - 11:00 PM"
-        ),
-        "precio" to mapOf(
-            "es" to "El precio del pasaje es:\n• Adultos: S/ 1.50\n• Estudiantes: S/ 0.75\n• Adultos mayores: S/ 0.75",
-            "en" to "Ticket prices are:\n• Adults: S/ 1.50\n• Students: S/ 0.75\n• Senior citizens: S/ 0.75"
-        ),
-        "estaciones" to mapOf(
-            "es" to "Las estaciones disponibles son:\n• Línea 1: Villa El Salvador, Pumacahua, San Juan, Atocongo, etc.\n• Línea 2: Ate, Santa Anita, El Agustino, etc.\n• Línea 3: En construcción",
-            "en" to "Available stations are:\n• Line 1: Villa El Salvador, Pumacahua, San Juan, Atocongo, etc.\n• Line 2: Ate, Santa Anita, El Agustino, etc.\n• Line 3: Under construction"
-        ),
-        "ruta" to mapOf(
-            "es" to "Para planificar tu ruta:\n1. Ve a la sección 'Rutas'\n2. Selecciona tu estación de origen\n3. Selecciona tu destino\n4. El sistema te mostrará la mejor ruta",
-            "en" to "To plan your route:\n1. Go to the 'Routes' section\n2. Select your origin station\n3. Select your destination\n4. The system will show you the best route"
-        ),
-        "ayuda" to mapOf(
-            "es" to "Puedo ayudarte con:\n• Horarios del metro\n• Precios de pasajes\n• Estaciones disponibles\n• Planificación de rutas\n• Estado del servicio",
-            "en" to "I can help you with:\n• Metro schedules\n• Ticket prices\n• Available stations\n• Route planning\n• Service status"
-        ),
-        "contacto" to mapOf(
-            "es" to "Para contacto directo:\n• Teléfono: (01) 204-0000\n• Email: info@metrolima.com\n• Web: www.metrolima.com",
-            "en" to "For direct contact:\n• Phone: (01) 204-0000\n• Email: info@metrolima.com\n• Web: www.metrolima.com"
-        )
-    )
-    
-    fun getResponse(input: String, language: String): String {
-        val normalizedInput = input.lowercase().trim()
-        
-        // Buscar coincidencias exactas
-        responses.forEach { (key, translations) ->
-            if (normalizedInput.contains(key)) {
-                return translations[language] ?: translations["es"] ?: "Lo siento, no entiendo tu pregunta."
-            }
-        }
-        
-        // Respuesta por defecto
-        return when (language) {
-            "es" -> "Lo siento, no entiendo tu pregunta. Puedes preguntarme sobre horarios, precios, estaciones o rutas."
-            else -> "Sorry, I don't understand your question. You can ask me about schedules, prices, stations or routes."
-        }
-    }
-}
+// Instancia del servicio de IA
+val aiService = AIService()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +49,7 @@ fun ChatScreen(navController: NavController) {
     var messageText by remember { mutableStateOf("") }
     var messages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var isLoading by remember { mutableStateOf(false) }
+    var currentUserMessage by remember { mutableStateOf("") }
 
     // Mensaje de bienvenida inicial
     LaunchedEffect(Unit) {
@@ -117,21 +71,27 @@ fun ChatScreen(navController: NavController) {
         }
     }
 
-    // Simular respuesta IA
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            kotlinx.coroutines.delay(1500)
-            
-            val currentLanguage = context.resources.configuration.locales[0].language
-            val aiResponse = ChatResponses.getResponse(messageText, currentLanguage)
-            
-            messages = messages + ChatMessage(
-                text = aiResponse,
-                isUser = false,
-                timestamp = System.currentTimeMillis()
-            )
-            
-            isLoading = false
+    // Obtener respuesta real de IA
+    LaunchedEffect(currentUserMessage) {
+        if (currentUserMessage.isNotBlank() && isLoading) {
+            try {
+                val aiResponse = aiService.sendMessage(currentUserMessage)
+                
+                messages = messages + ChatMessage(
+                    text = aiResponse,
+                    isUser = false,
+                    timestamp = System.currentTimeMillis()
+                )
+            } catch (e: Exception) {
+                messages = messages + ChatMessage(
+                    text = "Lo siento, hubo un error al procesar tu mensaje. Error: ${e.message}",
+                    isUser = false,
+                    timestamp = System.currentTimeMillis()
+                )
+            } finally {
+                isLoading = false
+                currentUserMessage = ""
+            }
         }
     }
 
@@ -220,6 +180,7 @@ fun ChatScreen(navController: NavController) {
                                 timestamp = System.currentTimeMillis()
                             )
                             messages = messages + userMessage
+                            currentUserMessage = messageText
                             isLoading = true
                             messageText = ""
                         }

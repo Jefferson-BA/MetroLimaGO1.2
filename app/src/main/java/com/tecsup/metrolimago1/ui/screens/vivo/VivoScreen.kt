@@ -84,6 +84,24 @@ fun VivoScreen(navController: NavController) {
                     secondaryTextColor = secondaryTextColor
                 )
 
+                PricingCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                PaymentMethodsCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
+                SafetyTipsCard(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
                 AlertsCard(
                     cardColor = cardColor,
                     textColor = textColor,
@@ -375,6 +393,292 @@ fun AlertItem(
             text = date,
             color = secondaryTextColor,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)
+        )
+    }
+}
+
+@Composable
+fun PricingCard(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(28.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MonetizationOn,
+                    contentDescription = "Tarifas",
+                    tint = MetroOrange,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Tarifas",
+                    color = textColor,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+            PricingItem(
+                description = "Tarjeta Única - Un viaje",
+                price = "S/ 2.50",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PricingItem(
+                description = "Estudiantes (con carné)",
+                price = "S/ 1.25",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PricingItem(
+                description = "Adultos Mayores (65+)",
+                price = "S/ 1.25",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PricingItem(
+                description = "Personas con Discapacidad",
+                price = "Gratis",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+        }
+    }
+}
+
+@Composable
+fun PricingItem(
+    description: String,
+    price: String,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = description,
+            color = textColor,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = price,
+            color = MetroOrange,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+        )
+    }
+}
+
+@Composable
+fun PaymentMethodsCard(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(28.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CreditCard,
+                    contentDescription = "Métodos de Pago",
+                    tint = MetroGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Métodos de Pago",
+                    color = textColor,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+            Text(
+                text = "Puedes pagar con:",
+                color = secondaryTextColor,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            PaymentMethodItem(
+                icon = Icons.Default.Payment,
+                title = "Tarjeta de Débito/Crédito",
+                description = "En las máquinas expendedoras",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PaymentMethodItem(
+                icon = Icons.Default.QrCode,
+                title = "Código QR",
+                description = "Con tu aplicación móvil",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PaymentMethodItem(
+                icon = Icons.Default.Language,
+                title = "Pago en Línea",
+                description = "Recarga tu tarjeta por internet",
+                textColor = textColor,
+                secondaryTextColor = secondaryTextColor
+            )
+        }
+    }
+}
+
+@Composable
+fun PaymentMethodItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    description: String,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = MetroOrange,
+            modifier = Modifier.size(24.dp)
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = textColor,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+            )
+            Text(
+                text = description,
+                color = secondaryTextColor,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+@Composable
+fun SafetyTipsCard(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(28.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Shield,
+                    contentDescription = "Consejos de Seguridad",
+                    tint = MetroGreen,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Consejos de Seguridad",
+                    color = textColor,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+            SafetyTipItem(
+                icon = Icons.Default.Warning,
+                tip = "Mantén una distancia segura del andén",
+                textColor = textColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SafetyTipItem(
+                icon = Icons.Default.DirectionsWalk,
+                tip = "Usa las escaleras o escaleras mecánicas en orden",
+                textColor = textColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SafetyTipItem(
+                icon = Icons.Default.People,
+                tip = "Respeta la fila y espera tu turno",
+                textColor = textColor
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SafetyTipItem(
+                icon = Icons.Default.Phone,
+                tip = "Reporta cualquier incidente al personal",
+                textColor = textColor
+            )
+        }
+    }
+}
+
+@Composable
+fun SafetyTipItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tip: String,
+    textColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MetroOrange,
+            modifier = Modifier.size(20.dp)
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        Text(
+            text = tip,
+            color = textColor,
+            style = MaterialTheme.typography.bodySmall
         )
     }
 }

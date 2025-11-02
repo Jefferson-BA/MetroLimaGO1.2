@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -78,7 +79,10 @@ fun HomeScreen(navController: NavController) {
                 )
 
                 SearchBar(
-                    onSearchClick = { _ -> navController.navigate(Screen.Estaciones.route) },
+                    onSearchClick = { query -> 
+                        // Navegar al mapa grande
+                        navController.navigate(Screen.Maps.route)
+                    },
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor,
@@ -149,65 +153,173 @@ fun SearchBar(
     context: android.content.Context
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var isSearching by remember { mutableStateOf(false) }
+    var searchResults by remember { mutableStateOf<List<Pair<String, LatLng>>>(emptyList()) }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(25.dp)
-    ) {
-        Row(
+    Column {
+        // Barra de búsqueda principal
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = CardDefaults.cardColors(containerColor = cardColor),
+            shape = RoundedCornerShape(25.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = TranslationUtils.getText(context, "search"),
-                tint = secondaryTextColor,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = TranslationUtils.getText(context, "search"),
+                    tint = secondaryTextColor,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
 
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = {
-                    Text(
-                        text = "¿A dónde vas?",
-                        color = secondaryTextColor
-                    )
-                },
-                modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                ),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                singleLine = true
-            )
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { newQuery ->
+                        searchQuery = newQuery
+                        if (newQuery.length >= 2) {
+                            isSearching = true
+                            searchResults = simulatePlaceSearch(newQuery)
+                        } else {
+                            isSearching = false
+                            searchResults = emptyList()
+                        }
+                    },
+                    placeholder = {
+                        Text(
+                            text = "¿A dónde vas?",
+                            color = secondaryTextColor
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    singleLine = true
+                )
 
-            if (searchQuery.isNotEmpty()) {
-                IconButton(
-                    onClick = { onSearchClick(searchQuery) },
-                    modifier = Modifier.size(32.dp)
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(
+                        onClick = { 
+                            onSearchClick(searchQuery)
+                            isSearching = false
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = TranslationUtils.getText(context, "search"),
+                            tint = MetroOrange,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Panel de resultados de búsqueda
+        if (isSearching && searchResults.isNotEmpty()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .heightIn(max = 250.dp),
+                colors = CardDefaults.cardColors(containerColor = cardColor),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(vertical = 8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = TranslationUtils.getText(context, "search"),
-                        tint = MetroOrange,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    searchResults.forEachIndexed { index, result ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSearchClick(result.first)
+                                    isSearching = false
+                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Place,
+                                contentDescription = "Lugar",
+                                tint = MetroOrange,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
+                            
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = result.first,
+                                    color = textColor,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                )
+                                Text(
+                                    text = "Ver en mapa",
+                                    color = secondaryTextColor,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "Ir",
+                                tint = MetroOrange,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        
+                        if (index < searchResults.size - 1) {
+                            HorizontalDivider(
+                                color = secondaryTextColor.copy(alpha = 0.2f),
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+// Función para simular búsqueda de lugares
+fun simulatePlaceSearch(query: String): List<Pair<String, LatLng>> {
+    val places = listOf(
+        "Mall Plaza San Miguel" to com.google.android.gms.maps.model.LatLng(-12.0784, -77.0932),
+        "Larcomar, Miraflores" to com.google.android.gms.maps.model.LatLng(-12.1325, -77.0230),
+        "Plaza Mayor de Lima" to com.google.android.gms.maps.model.LatLng(-12.0464, -77.0428),
+        "Malecón de Miraflores" to com.google.android.gms.maps.model.LatLng(-12.1187, -77.0362),
+        "Museo de Arte de Lima" to com.google.android.gms.maps.model.LatLng(-12.0702, -77.0373),
+        "Kennedy Park" to com.google.android.gms.maps.model.LatLng(-12.1256, -77.0239),
+        "San Borja" to com.google.android.gms.maps.model.LatLng(-12.1028, -76.9542),
+        "Centro de Lima" to com.google.android.gms.maps.model.LatLng(-12.0464, -77.0428),
+        "Callao" to com.google.android.gms.maps.model.LatLng(-12.0567, -77.1184),
+        "San Isidro" to com.google.android.gms.maps.model.LatLng(-12.0971, -77.0304)
+    )
+    
+    return places.filter { 
+        it.first.contains(query, ignoreCase = true) 
+    }.take(5)
 }
 
 @Composable

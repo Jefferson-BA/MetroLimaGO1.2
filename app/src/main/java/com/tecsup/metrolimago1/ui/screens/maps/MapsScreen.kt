@@ -280,7 +280,7 @@ fun MapsScreen(navController: NavController) {
                 }
             }
             
-            // Panel de filtros flotante
+            // Panel de filtros flotante (optimizado)
             Card(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -926,4 +926,25 @@ fun MapControlButtons(
             }
         }
     }
+}
+
+// Función auxiliar para simular búsqueda de lugares
+// En producción, esto debería usar la API de Google Places
+fun simulatePlaceSearch(query: String): List<Pair<String, LatLng>> {
+    val places = listOf(
+        "Mall Plaza San Miguel" to LatLng(-12.0784, -77.0932),
+        "Larcomar, Miraflores" to LatLng(-12.1325, -77.0230),
+        "Plaza Mayor de Lima" to LatLng(-12.0464, -77.0428),
+        "Malecón de Miraflores" to LatLng(-12.1187, -77.0362),
+        "Museo de Arte de Lima" to LatLng(-12.0702, -77.0373),
+        "Kennedy Park" to LatLng(-12.1256, -77.0239),
+        "San Borja" to LatLng(-12.1028, -76.9542),
+        "Centro de Lima" to LatLng(-12.0464, -77.0428),
+        "Callao" to LatLng(-12.0567, -77.1184),
+        "San Isidro" to LatLng(-12.0971, -77.0304)
+    )
+    
+    return places.filter { 
+        it.first.contains(query, ignoreCase = true) 
+    }.take(5)
 }

@@ -15,6 +15,7 @@ import com.tecsup.metrolimago1.ui.screens.chat.ChatScreen
 import com.tecsup.metrolimago1.ui.screens.splash.SplashScreen
 import com.tecsup.metrolimago1.ui.screens.vivo.VivoScreen
 import com.tecsup.metrolimago1.ui.screens.maps.MapsScreen
+import com.tecsup.metrolimago1.ui.screens.rutas.RouteHistoryScreen
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -25,7 +26,9 @@ sealed class Screen(val route: String) {
         fun createRoute(estacionId: String) = "estaciones/$estacionId"
     }
     object Rutas : Screen("rutas")
-    object Maps : Screen("maps")
+    object Maps : Screen("maps") {
+        fun createRoute(searchQuery: String? = null) = "maps"
+    }
     object Favoritos : Screen("favoritos")
     object LineDetail : Screen("lines/{lineId}") {
         fun createRoute(lineId: String) = "lines/$lineId"
@@ -33,6 +36,7 @@ sealed class Screen(val route: String) {
     object Configuracion : Screen("configuracion")
     object Chat : Screen("chat")
     object Vivo : Screen("vivo")
+    object RouteHistory : Screen("route_history")
 }
 
 @Composable
@@ -103,6 +107,10 @@ fun MainNavGraph() {
 
         composable(Screen.Vivo.route) {
             VivoScreen(navController = navController)
+        }
+
+        composable(Screen.RouteHistory.route) {
+            RouteHistoryScreen(navController = navController)
         }
     }
 }
