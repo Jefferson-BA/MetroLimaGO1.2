@@ -5,6 +5,10 @@ plugins {
     alias(libs.plugins.google.ksp)
 }
 
+// NOTA: El plugin de Google Services se aplica condicionalmente más abajo
+// Si obtienes un error sobre google-services.json faltante, sigue las instrucciones
+// en FIREBASE_GEMINI_SETUP.md para obtener el archivo desde Firebase Console
+
 android {
     namespace = "com.tecsup.metrolimago1"
     compileSdk = 34
@@ -94,4 +98,19 @@ dependencies {
     
     // Para manejar archivos .env
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    
+    // Coil para cargar imágenes desde URLs
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    
+    // Firebase AI Logic (Gemini)
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.google.firebase:firebase-ai")
+}
+
+// Aplicar Google Services plugin solo si existe google-services.json
+// Esto permite que el proyecto compile sin el archivo de configuración de Firebase
+// Una vez que agregues google-services.json desde Firebase Console, el plugin se aplicará automáticamente
+val googleServicesFile = file("google-services.json")
+if (googleServicesFile.exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }

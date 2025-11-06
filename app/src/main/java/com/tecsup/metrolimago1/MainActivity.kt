@@ -16,10 +16,21 @@ import com.tecsup.metrolimago1.navigation.MainNavGraph
 import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
 import com.tecsup.metrolimago1.ui.theme.ThemeState
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
+import com.tecsup.metrolimago1.utils.ConfigManager
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Inicializar Firebase (si no está ya inicializado)
+        if (FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseApp.initializeApp(this)
+        }
+        
+        // Inicializar ConfigManager
+        ConfigManager.initialize(applicationContext)
+        
         enableEdgeToEdge()
         setContent {
             val themeState = remember { ThemeState() }

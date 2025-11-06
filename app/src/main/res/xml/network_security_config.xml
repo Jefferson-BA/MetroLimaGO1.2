@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Permitir conexiones HTTP (cleartext) para desarrollo local -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Para emulador Android -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- Para dispositivo físico con IP local -->
+        <domain includeSubdomains="true">172.20.10.4</domain>
+        <!-- También permitir localhost por si acaso -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+    
+    <!-- Por defecto, solo permitir HTTPS (producción) -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+
