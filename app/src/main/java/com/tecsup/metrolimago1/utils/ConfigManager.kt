@@ -36,7 +36,9 @@ object ConfigManager {
     }
 
     fun getMetroLimaBaseUrl(): String {
-        return properties?.getProperty("METRO_LIMA_BASE_URL", "https://api.metrolima.pe") ?: "https://api.metrolima.pe"
+        // Si no hay config.properties, usar URL por defecto para desarrollo local
+        return properties?.getProperty("METRO_LIMA_BASE_URL", "http://10.0.2.2:8000/api/") 
+            ?: "http://10.0.2.2:8000/api/" // Para emulador Android
     }
 
     fun isDebugMaps(): Boolean {

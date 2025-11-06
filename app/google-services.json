@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813076260138",
+    "project_id": "metrolimago-5a832",
+    "storage_bucket": "metrolimago-5a832.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813076260138:android:83e53c159a3f9ff942aa53",
+        "android_client_info": {
+          "package_name": "com.tecsup.metrolimago1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813076260138-fv99hko59i1fetdv7mbr4hos060ha5ke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsFCkA3yEf3s-L8L35ldSgAWfCxJo7iaA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813076260138-fv99hko59i1fetdv7mbr4hos060ha5ke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

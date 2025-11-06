@@ -19,11 +19,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import androidx.core.content.ContextCompat
+import android.util.Log
 import androidx.navigation.NavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -35,6 +39,8 @@ import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.data.local.FavoriteStation
 import com.tecsup.metrolimago1.data.local.database.AppDatabase
+import com.tecsup.metrolimago1.data.remote.StationService
+import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
@@ -53,8 +59,13 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
     val textColor = if (themeState.isDarkMode) White else Color(0xFF1C1C1C)
     val secondaryTextColor = if (themeState.isDarkMode) LightGray else Color(0xFF666666)
 
-    val station = MockStations.findById(estacionId)
+    // Estado para la estación (obtenida de la API o mock)
+    var station by remember { mutableStateOf<Station?>(null) }
+    var isLoadingStation by remember { mutableStateOf(true) }
     var showGoogleMap by remember { mutableStateOf(true) }
+    
+    // Servicio de API
+    val stationService = remember { StationService() }
 
     // Estado para favoritos
     val database = remember { AppDatabase.getDatabase(context) }
@@ -86,6 +97,37 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
             } catch (e: SecurityException) {
                 // Manejar error de permisos
             }
+        }
+    }
+
+    // Obtener estación desde la API o usar mock como fallback
+    LaunchedEffect(estacionId) {
+        if (estacionId != null) {
+            isLoadingStation = true
+            
+            Log.d("EstacionDetailScreen", "Obteniendo estación con ID: $estacionId")
+            
+            try {
+                // Intentar obtener desde la API
+                val apiStation = stationService.getStationById(estacionId)
+                if (apiStation != null) {
+                    Log.d("EstacionDetailScreen", "Estación obtenida de API: ${apiStation.name}, imageUrl: ${apiStation.imageUrl}")
+                    station = apiStation
+                } else {
+                    Log.w("EstacionDetailScreen", "API no devolvió estación, usando mock")
+                    station = MockStations.findById(estacionId)
+                }
+            } catch (e: Exception) {
+                // Si falla, usar datos mock
+                Log.e("EstacionDetailScreen", "Error al obtener estación de API: ${e.message}", e)
+                station = MockStations.findById(estacionId)
+            } finally {
+                isLoadingStation = false
+                Log.d("EstacionDetailScreen", "Carga completada. Estación: ${station?.name}")
+            }
+        } else {
+            station = null
+            isLoadingStation = false
         }
     }
 
@@ -194,10 +236,13 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
 
                     // Botón para mostrar ruta
                     if (userLocation != null && station != null) {
+                        val currentStation = station
                         IconButton(
                             onClick = {
                                 showRoute = true
-                                routeInfo = calculateRouteFromUserLocation(userLocation!!, station)
+                                currentStation?.let {
+                                    routeInfo = calculateRouteFromUserLocation(userLocation!!, it)
+                                }
                             }
                         ) {
                             Icon(
@@ -226,7 +271,32 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
             GlobalBottomNavBar(navController = navController, currentRoute = Screen.Estaciones.route)
         }
     ) { paddingValues ->
-        if (station == null) {
+        if (isLoadingStation) {
+            // Mostrar indicador de carga
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        color = MetroOrange,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Cargando estación...",
+                        color = textColor,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        } else if (station == null) {
             // Estación no encontrada
             Box(
                 modifier = Modifier
@@ -261,13 +331,15 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 }
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(backgroundColor)
-                    .verticalScroll(rememberScrollState())
-                    .padding(paddingValues)
-            ) {
+            // Usar let para hacer smart cast
+            station?.let { currentStation ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(backgroundColor)
+                        .verticalScroll(rememberScrollState())
+                        .padding(paddingValues)
+                ) {
                 // Mapa de Google Maps
                 Card(
                     modifier = Modifier
@@ -285,12 +357,12 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                                 cameraPositionState = rememberCameraPositionState {
                                     position = if (userLocation != null) {
                                         // Centrar entre usuario y estación
-                                        val centerLat = (userLocation!!.latitude + station.latitude) / 2
-                                        val centerLng = (userLocation!!.longitude + station.longitude) / 2
+                                        val centerLat = (userLocation!!.latitude + currentStation.latitude) / 2
+                                        val centerLng = (userLocation!!.longitude + currentStation.longitude) / 2
                                         CameraPosition.fromLatLngZoom(LatLng(centerLat, centerLng), 14f)
                                     } else {
                                         CameraPosition.fromLatLngZoom(
-                                            LatLng(station.latitude, station.longitude),
+                                            LatLng(currentStation.latitude, currentStation.longitude),
                                             16f
                                         )
                                     }
@@ -308,9 +380,9 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                             ) {
                                 // Marcador de la estación
                                 Marker(
-                                    state = MarkerState(position = LatLng(station.latitude, station.longitude)),
-                                    title = station.name,
-                                    snippet = "${station.line} - ${station.address}"
+                                    state = MarkerState(position = LatLng(currentStation.latitude, currentStation.longitude)),
+                                    title = currentStation.name,
+                                    snippet = "${currentStation.line} - ${currentStation.address}"
                                 )
 
                                 // Marcador de ubicación del usuario
@@ -326,7 +398,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                                 if (showRoute && userLocation != null) {
                                     val routePoints = listOf(
                                         userLocation!!,
-                                        LatLng(station.latitude, station.longitude)
+                                        LatLng(currentStation.latitude, currentStation.longitude)
                                     )
                                     Polyline(
                                         points = routePoints,
@@ -363,7 +435,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = station.name,
+                                        text = currentStation.name,
                                         color = secondaryTextColor,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -383,46 +455,60 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     }
                 }
 
-                // Detalles de la estación (combinado: info + estado + línea)
-                StationDetailsCard(
-                    station = station,
-                    cardColor = cardColor,
-                    textColor = textColor,
-                    secondaryTextColor = secondaryTextColor,
-                    navController = navController
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Información de ruta (si está disponible)
-                if (routeInfo != null) {
-                    RouteInfoCard(
-                        routeInfo = routeInfo!!,
-                        cardColor = cardColor,
-                        textColor = textColor,
-                        secondaryTextColor = secondaryTextColor,
-                        context = context
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
-                }
-                
-                // Servicios Cercanos (si existen)
-                if (station.nearbyServices.isNotEmpty()) {
-                    NearbyServicesCard(
-                        services = station.nearbyServices,
+
+                    // Card de imagen de la estación
+                    StationImageCard(
+                        imageUrl = currentStation.imageUrl,
+                        stationName = currentStation.name,
                         cardColor = cardColor,
                         textColor = textColor,
                         secondaryTextColor = secondaryTextColor
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Detalles de la estación (combinado: info + estado + línea)
+                    StationDetailsCard(
+                        station = currentStation,
+                        cardColor = cardColor,
+                        textColor = textColor,
+                        secondaryTextColor = secondaryTextColor,
+                        navController = navController
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Información de ruta (si está disponible)
+                    if (routeInfo != null) {
+                        RouteInfoCard(
+                            routeInfo = routeInfo!!,
+                            cardColor = cardColor,
+                            textColor = textColor,
+                            secondaryTextColor = secondaryTextColor,
+                            context = context
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    
+                    // Servicios Cercanos (si existen)
+                    if (currentStation.nearbyServices.isNotEmpty()) {
+                        NearbyServicesCard(
+                            services = currentStation.nearbyServices,
+                            cardColor = cardColor,
+                            textColor = textColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    
+                    // Información de Tarifas
+                    FareInfoCard(
+                        cardColor = cardColor,
+                        textColor = textColor,
+                        secondaryTextColor = secondaryTextColor
+                    )
                 }
-                
-                // Información de Tarifas
-                FareInfoCard(
-                    cardColor = cardColor,
-                    textColor = textColor,
-                    secondaryTextColor = secondaryTextColor
-                )
             }
         }
     }
@@ -943,6 +1029,73 @@ fun FareInfoCard(
                     color = textColor,
                     style = MaterialTheme.typography.bodySmall
                 )
+            }
+        }
+    }
+}
+
+// Componente para mostrar la imagen de la estación
+@Composable
+fun StationImageCard(
+    imageUrl: String,
+    stationName: String,
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (imageUrl.isNotEmpty() && imageUrl.isNotBlank()) {
+                // Mostrar imagen desde la URL
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Imagen de $stationName",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // Mostrar mensaje cuando no hay imagen
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BrokenImage,
+                        contentDescription = "Error de carga",
+                        tint = secondaryTextColor.copy(alpha = 0.6f),
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Error de carga",
+                        color = textColor,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Esta estación está en construcción o no cuenta con conexión a internet",
+                        color = secondaryTextColor,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
         }
     }

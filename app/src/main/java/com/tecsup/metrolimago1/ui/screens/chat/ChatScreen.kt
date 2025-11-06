@@ -29,16 +29,16 @@ import com.tecsup.metrolimago1.ui.theme.MetroLimaGO1Theme
 import com.tecsup.metrolimago1.ui.theme.ThemeState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.text.font.FontWeight
-import com.tecsup.metrolimago1.data.service.AIService
-
-// Instancia del servicio de IA
-val aiService = AIService()
+import com.tecsup.metrolimago1.data.service.GeminiService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(navController: NavController) {
     val themeState = LocalThemeState.current
     val context = LocalContext.current
+    
+    // Instancia del servicio de Gemini (lazy para evitar inicialización temprana)
+    val geminiService = remember { GeminiService() }
 
     // Colores dinámicos según el tema
     val cardColor = if (themeState.isDarkMode) CardGray else LightCard
@@ -71,11 +71,41 @@ fun ChatScreen(navController: NavController) {
         }
     }
 
-    // Obtener respuesta real de IA
+    // Obtener respuesta de Gemini
     LaunchedEffect(currentUserMessage) {
         if (currentUserMessage.isNotBlank() && isLoading) {
             try {
-                val aiResponse = aiService.sendMessage(currentUserMessage)
+                // Construir historial de conversación (últimos 5 pares de mensajes)
+                val conversationHistory = mutableListOf<Pair<String, String>>()
+                var i = messages.size - 1
+                var pairsCollected = 0
+                
+                // Recorrer mensajes hacia atrás para construir el historial
+                while (i >= 0 && pairsCollected < 5) {
+                    val assistantMsg = messages.getOrNull(i)
+                    if (assistantMsg != null && !assistantMsg.isUser) {
+                        // Buscar el mensaje del usuario anterior
+                        var j = i - 1
+                        while (j >= 0) {
+                            val userMsg = messages[j]
+                            if (userMsg.isUser) {
+                                conversationHistory.add(0, Pair(userMsg.text, assistantMsg.text))
+                                pairsCollected++
+                                i = j - 1
+                                break
+                            }
+                            j--
+                        }
+                        if (j < 0) break
+                    } else {
+                        i--
+                    }
+                }
+                
+                val aiResponse = geminiService.sendMessage(
+                    message = currentUserMessage,
+                    conversationHistory = conversationHistory
+                )
                 
                 messages = messages + ChatMessage(
                     text = aiResponse,
