@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.navigation.Screen
 import kotlinx.coroutines.delay
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -48,7 +50,7 @@ fun Splash(alpha: Float) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.fondo),
+            painter = painterResource(id = R.drawable.loading),
             contentDescription = "Fondo MetroLima",
             modifier = Modifier
                 .fillMaxSize()
@@ -59,32 +61,8 @@ fun Splash(alpha: Float) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo MetroLima GO",
-                modifier = Modifier
-                    .size(200.dp)
-                    .alpha(alpha)
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "MetroLima GO",
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.alpha(alpha)
-            )
             
             Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Tu compañero de viaje",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 16.sp,
-                modifier = Modifier.alpha(alpha)
-            )
         }
 
         CircularProgressIndicator(
@@ -96,4 +74,11 @@ fun Splash(alpha: Float) {
             strokeWidth = 3.dp
         )
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "SplashScreen Preview")
+@Composable
+fun SplashScreenPreview() {
+    val navController = rememberNavController()
+    SplashScreen(navController = navController)
 }
