@@ -227,8 +227,8 @@ fun MetroLinesOverlay() {
         )
     }
 
-    // Línea 3 - Azul
-    val linea3Stations = MockStations.getStationsByLine("Línea 3")
+    // Metropolitano - Azul
+    val linea3Stations = MockStations.getStationsByLine("Metropolitano")
     if (linea3Stations.isNotEmpty()) {
         val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
         Polyline(

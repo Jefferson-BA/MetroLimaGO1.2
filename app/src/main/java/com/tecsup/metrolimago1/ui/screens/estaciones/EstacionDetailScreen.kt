@@ -121,10 +121,10 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 // Si falla, usar datos mock
                 Log.e("EstacionDetailScreen", "Error al obtener estación de API: ${e.message}", e)
                 station = MockStations.findById(estacionId)
-            } finally {
-                isLoadingStation = false
-                Log.d("EstacionDetailScreen", "Carga completada. Estación: ${station?.name}")
             }
+            
+            isLoadingStation = false
+            Log.d("EstacionDetailScreen", "Carga completada. Estación: ${station?.name}")
         } else {
             station = null
             isLoadingStation = false
@@ -458,6 +458,10 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Card de imagen de la estación
+                    // Log para debug antes de llamar al componente
+                    LaunchedEffect(currentStation.imageUrl) {
+                        Log.d("EstacionDetailScreen", "Llamando StationImageCard con imageUrl: '${currentStation.imageUrl}' para estación: ${currentStation.name}")
+                    }
                     StationImageCard(
                         imageUrl = currentStation.imageUrl,
                         stationName = currentStation.name,
@@ -562,7 +566,7 @@ fun StationDetailsCard(
                     val lineId = when (station.line) {
                         "Línea 1" -> "LINEA_1"
                         "Línea 2" -> "LINEA_2"
-                        "Línea 3" -> "LINEA_3"
+                        "Metropolitano" -> "LINEA_3"
                         else -> "LINEA_1"
                     }
                     navController.navigate(Screen.LineDetail.createRoute(lineId))
@@ -575,7 +579,7 @@ fun StationDetailsCard(
                             when (station.line) {
                                 "Línea 1" -> MetroOrange
                                 "Línea 2" -> MetroGreen
-                                "Línea 3" -> Color(0xFF2196F3)
+                                "Metropolitano" -> Color(0xFF2196F3)
                                 else -> secondaryTextColor
                             },
                             RoundedCornerShape(6.dp)
@@ -1043,6 +1047,9 @@ fun StationImageCard(
     textColor: Color,
     secondaryTextColor: Color
 ) {
+    // Log para debug
+    Log.d("StationImageCard", "StationImageCard llamado para: $stationName, imageUrl: '$imageUrl', isEmpty: ${imageUrl.isEmpty()}, isBlank: ${imageUrl.isBlank()}")
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1058,14 +1065,23 @@ fun StationImageCard(
         ) {
             if (imageUrl.isNotEmpty() && imageUrl.isNotBlank()) {
                 // Mostrar imagen desde la URL
+                val context = LocalContext.current
+                Log.d("StationImageCard", "Intentando cargar imagen: $imageUrl")
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
+                    model = ImageRequest.Builder(context)
                         .data(imageUrl)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Imagen de $stationName",
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    onError = { error ->
+                        Log.e("StationImageCard", "Error al cargar imagen: ${error.result.throwable.message}")
+                        Log.e("StationImageCard", "URL de imagen: $imageUrl")
+                    },
+                    onSuccess = {
+                        Log.d("StationImageCard", "Imagen cargada exitosamente: $imageUrl")
+                    }
                 )
             } else {
                 // Mostrar mensaje cuando no hay imagen

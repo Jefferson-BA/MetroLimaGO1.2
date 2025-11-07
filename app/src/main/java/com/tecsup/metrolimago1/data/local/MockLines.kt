@@ -42,7 +42,7 @@ object MockLines {
         ),
         Line(
             id = "LINEA_3",
-            name = "Línea 3",
+            name = "Metropolitano",
             color = "#2196F3", // Azul
             status = LineStatus.CONSTRUCTION,
             description = "En construcción - Conectará el Callao con San Juan de Lurigancho",
@@ -53,7 +53,7 @@ object MockLines {
                 LatLng(-12.0563, -77.1184), // Centro
                 LatLng(-11.9800, -77.0700)  // San Juan de Lurigancho
             ),
-            stations = MockStations.stations.filter { it.line == "Línea 3" }
+            stations = MockStations.stations.filter { it.line == "Metropolitano" }
         )
     )
 

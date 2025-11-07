@@ -318,9 +318,9 @@ fun LineFilterButtons(
                 )
             )
 
-            // Botón Línea 3
+            // Botón Metropolitano
             FilterChip(
-                onClick = { onLineToggle("Línea 3") },
+                onClick = { onLineToggle("Metropolitano") },
                 label = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -334,7 +334,7 @@ fun LineFilterButtons(
                         Text(stringResource(R.string.line_3))
                     }
                 },
-                selected = selectedLines.contains("Línea 3"),
+                selected = selectedLines.contains("Metropolitano"),
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF2196F3),
                     selectedLabelColor = White,

@@ -630,7 +630,7 @@ fun CompactStationSelector(
                                                 when (station.line) {
                                                     "Línea 1" -> MetroOrange
                                                     "Línea 2" -> MetroGreen
-                                                    "Línea 3" -> Color(0xFF2196F3)
+                                                    "Metropolitano" -> Color(0xFF2196F3)
                                                     else -> secondaryTextColor
                                                 },
                                                 RoundedCornerShape(4.dp)
@@ -947,7 +947,7 @@ fun SimpleMapView(
 fun MetroLinesOverlay(selectedLines: Set<String>) {
     // Si no hay líneas seleccionadas, mostrar todas
     val linesToShow = if (selectedLines.isEmpty()) {
-        setOf("Línea 1", "Línea 2", "Línea 3")
+        setOf("Línea 1", "Línea 2", "Metropolitano")
     } else {
         selectedLines
     }
@@ -978,9 +978,9 @@ fun MetroLinesOverlay(selectedLines: Set<String>) {
         }
     }
 
-    // Línea 3 - Azul
-    if (linesToShow.contains("Línea 3")) {
-        val linea3Stations = MockStations.getStationsByLine("Línea 3")
+    // Metropolitano - Azul
+    if (linesToShow.contains("Metropolitano")) {
+        val linea3Stations = MockStations.getStationsByLine("Metropolitano")
         if (linea3Stations.isNotEmpty()) {
             val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
             Polyline(
@@ -1061,9 +1061,9 @@ fun LineFilterButtons(
                 )
             )
             
-            // Botón Línea 3
+            // Botón Metropolitano
             FilterChip(
-                onClick = { onLineToggle("Línea 3") },
+                onClick = { onLineToggle("Metropolitano") },
                 label = { 
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -1074,10 +1074,10 @@ fun LineFilterButtons(
                                 .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Línea 3")
+                        Text("Metropolitano")
                     }
                 },
-                selected = selectedLines.contains("Línea 3"),
+                selected = selectedLines.contains("Metropolitano"),
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF2196F3),
                     selectedLabelColor = White,

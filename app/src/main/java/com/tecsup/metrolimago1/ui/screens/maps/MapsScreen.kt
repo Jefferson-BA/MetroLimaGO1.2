@@ -338,14 +338,14 @@ fun MapsScreen(navController: NavController) {
                         
                         FilterChip(
                             onClick = { 
-                                selectedLines = if (selectedLines.contains("Línea 3")) {
-                                    selectedLines - "Línea 3"
+                                selectedLines = if (selectedLines.contains("Metropolitano")) {
+                                    selectedLines - "Metropolitano"
                                 } else {
-                                    selectedLines + "Línea 3"
+                                    selectedLines + "Metropolitano"
                                 }
                             },
-                            label = { Text("L3") },
-                            selected = selectedLines.contains("Línea 3"),
+                            label = { Text("Metro") },
+                            selected = selectedLines.contains("Metropolitano"),
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = Color(0xFF2196F3),
                                 selectedLabelColor = White
@@ -523,7 +523,7 @@ fun CompactRoutePanel(
 fun MetroLinesOverlay(selectedLines: Set<String>) {
     // Si no hay líneas seleccionadas, mostrar todas
     val linesToShow = if (selectedLines.isEmpty()) {
-        setOf("Línea 1", "Línea 2", "Línea 3")
+        setOf("Línea 1", "Línea 2", "Metropolitano")
     } else {
         selectedLines
     }
@@ -554,9 +554,9 @@ fun MetroLinesOverlay(selectedLines: Set<String>) {
         }
     }
 
-    // Línea 3 - Azul
-    if (linesToShow.contains("Línea 3")) {
-        val linea3Stations = MockStations.getStationsByLine("Línea 3")
+    // Metropolitano - Azul
+    if (linesToShow.contains("Metropolitano")) {
+        val linea3Stations = MockStations.getStationsByLine("Metropolitano")
         if (linea3Stations.isNotEmpty()) {
             val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
             Polyline(
@@ -637,11 +637,11 @@ fun LineFilterSection(
                 )
             )
             
-            // Botón "Línea 3"
+            // Botón "Metropolitano"
             FilterChip(
-                onClick = { onLineSelected("Línea 3") },
-                label = { Text("Línea 3") },
-                selected = selectedLine == "Línea 3",
+                onClick = { onLineSelected("Metropolitano") },
+                label = { Text("Metropolitano") },
+                selected = selectedLine == "Metropolitano",
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF2196F3),
                     selectedLabelColor = White

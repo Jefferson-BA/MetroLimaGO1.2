@@ -27,7 +27,7 @@
     <string name="stations_filter_all">Todas</string>
     <string name="stations_filter_line1">Línea 1</string>
     <string name="stations_filter_line2">Línea 2</string>
-    <string name="stations_filter_line3">Línea 3</string>
+    <string name="stations_filter_line3">Metropolitano</string>
     <string name="stations_filter_lines">Filtrar Líneas del Metro</string>
     <string name="stations_showing_lines">Mostrando %d líneas</string>
     <string name="stations_line">Línea</string>
@@ -35,7 +35,7 @@
     <string name="stations_description">Descripción</string>
     <string name="line_1">Línea 1</string>
     <string name="line_2">Línea 2</string>
-    <string name="line_3">Línea 3</string>
+    <string name="line_3">Metropolitano</string>
     
     <!-- Station Details -->
     <string name="station_details_title">Detalles de la Estación</string>

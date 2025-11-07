@@ -10,6 +10,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 /**
  * Servicio para obtener estaciones desde la API de Django
@@ -22,9 +24,12 @@ class StationService {
             level = HttpLoggingInterceptor.Level.BODY
         }
         
-        // OkHttpClient con interceptor de logging
+        // OkHttpClient con interceptor de logging y timeout aumentado
         val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .build()
         
         // Obtener URL base desde ConfigManager o usar default
@@ -42,10 +47,15 @@ class StationService {
             defaultUrl
         }
         
+        // Configurar Gson para manejar campos opcionales y nulls correctamente
+        val gson = GsonBuilder()
+            .serializeNulls() // Incluir campos null en la serialización
+            .create()
+        
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
     
@@ -61,7 +71,13 @@ class StationService {
             Log.d("StationService", "Intentando obtener todas las estaciones...")
             val response = apiService.getAllStations()
             Log.d("StationService", "Respuesta paginada: count=${response.count}, results=${response.results.size}")
-            response.results.map { it.toDomainModel() }
+            val stations = response.results.map { dto ->
+                Log.d("StationService", "Estación DTO: ${dto.name}, imageUrl: ${dto.imageUrl}")
+                val station = dto.toDomainModel()
+                Log.d("StationService", "Estación convertida: ${station.name}, imageUrl: ${station.imageUrl}")
+                station
+            }
+            stations
         } catch (e: Exception) {
             Log.e("StationService", "Error al obtener estaciones: ${e.message}", e)
             Log.e("StationService", "Tipo de error: ${e.javaClass.simpleName}")
@@ -77,9 +93,12 @@ class StationService {
         return try {
             Log.d("StationService", "Intentando obtener estación con ID: $id")
             val stationDto = apiService.getStationById(id)
-            Log.d("StationService", "Estación obtenida: ${stationDto.name}, imageUrl: ${stationDto.imageUrl}")
+            Log.d("StationService", "Estación obtenida: ${stationDto.name}")
+            Log.d("StationService", "imageUrl en DTO: '${stationDto.imageUrl}', isEmpty: ${stationDto.imageUrl.isEmpty()}")
+            // Log del DTO completo para debug
+            Log.d("StationService", "DTO completo - id: ${stationDto.id}, name: ${stationDto.name}, line: ${stationDto.line}, imageUrl: '${stationDto.imageUrl}'")
             val station = stationDto.toDomainModel()
-            Log.d("StationService", "Estación convertida: ${station.name}, imageUrl: ${station.imageUrl}")
+            Log.d("StationService", "Estación convertida: ${station.name}, imageUrl: '${station.imageUrl}'")
             station
         } catch (e: Exception) {
             Log.e("StationService", "Error al obtener estación $id: ${e.message}", e)
@@ -117,11 +136,11 @@ private fun StationDto.toDomainModel(): Station {
         address = address,
         latitude = latitude.toDoubleOrNull() ?: 0.0,
         longitude = longitude.toDoubleOrNull() ?: 0.0,
-        description = description,
+        description = description ?: "",
         openingTime = openingTime,
         closingTime = closingTime,
         status = status.toStationStatus(),
-        imageUrl = imageUrl ?: "",
+        imageUrl = imageUrl,
         nearbyServices = emptyList() // Los servicios cercanos no vienen de la API por ahora
     )
 }

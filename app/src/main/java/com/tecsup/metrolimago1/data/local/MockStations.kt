@@ -82,17 +82,17 @@ object MockStations {
         Station("LIM-19", "San Miguel", "Línea 2", "Av. San Miguel", -12.0600, -77.1100, "Acceso al puerto"),
         Station("LIM-20", "Callao", "Línea 2", "Av. Callao", -12.0500, -77.1300, "Terminal oeste"),
         
-        // Línea 3 - Comas a Chorrillos (En construcción)
-        Station("LIM-21", "Comas", "Línea 3", "Av. Comas", -11.9800, -77.0700, "Norte de Lima", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-22", "Independencia", "Línea 3", "Av. Independencia", -12.0000, -77.0500, "Distrito Independencia", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-23", "Rímac", "Línea 3", "Av. Rímac", -12.0200, -77.0300, "Distrito Rímac", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-24", "Cercado de Lima", "Línea 3", "Av. Cercado", -12.0464, -77.0428, "Centro histórico", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-25", "La Victoria", "Línea 3", "Av. La Victoria", -12.0600, -77.0200, "Distrito comercial", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-26", "Lince", "Línea 3", "Av. Lince", -12.0800, -77.0300, "Distrito Lince", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-27", "Jesús María", "Línea 3", "Av. Jesús María", -12.0900, -77.0400, "Distrito Jesús María", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-28", "Magdalena", "Línea 3", "Av. Magdalena", -12.1000, -77.0500, "Distrito Magdalena", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-29", "Pueblo Libre", "Línea 3", "Av. Pueblo Libre", -12.0950, -77.0600, "Barrio tradicional", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
-        Station("LIM-30", "Chorrillos", "Línea 3", "Av. Chorrillos", -12.1600, -77.0100, "Terminal sur", "05:00", "23:00", StationStatus.CONSTRUCTION, "")
+        // Metropolitano - Comas a Chorrillos (En construcción)
+        Station("LIM-21", "Comas", "Metropolitano", "Av. Comas", -11.9800, -77.0700, "Norte de Lima", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-22", "Independencia", "Metropolitano", "Av. Independencia", -12.0000, -77.0500, "Distrito Independencia", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-23", "Rímac", "Metropolitano", "Av. Rímac", -12.0200, -77.0300, "Distrito Rímac", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-24", "Cercado de Lima", "Metropolitano", "Av. Cercado", -12.0464, -77.0428, "Centro histórico", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-25", "La Victoria", "Metropolitano", "Av. La Victoria", -12.0600, -77.0200, "Distrito comercial", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-26", "Lince", "Metropolitano", "Av. Lince", -12.0800, -77.0300, "Distrito Lince", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-27", "Jesús María", "Metropolitano", "Av. Jesús María", -12.0900, -77.0400, "Distrito Jesús María", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-28", "Magdalena", "Metropolitano", "Av. Magdalena", -12.1000, -77.0500, "Distrito Magdalena", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-29", "Pueblo Libre", "Metropolitano", "Av. Pueblo Libre", -12.0950, -77.0600, "Barrio tradicional", "05:00", "23:00", StationStatus.CONSTRUCTION, ""),
+        Station("LIM-30", "Chorrillos", "Metropolitano", "Av. Chorrillos", -12.1600, -77.0100, "Terminal sur", "05:00", "23:00", StationStatus.CONSTRUCTION, "")
     )
 
     // Coordenadas de Lima para centrar el mapa
