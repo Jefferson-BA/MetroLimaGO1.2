@@ -28,7 +28,7 @@ class StationService {
             .build()
         
         // Obtener URL base desde ConfigManager o usar default
-        // Si ConfigManager no está inicializado, usar localhost por defecto
+        // Si ConfigManager no está inicializado, usar URL de producción en Render
         val baseUrl = try {
             val url = ConfigManager.getMetroLimaBaseUrl()
             // Asegurar que la URL termine con /
@@ -36,20 +36,8 @@ class StationService {
             Log.d("StationService", "Usando URL base de API: $finalUrl")
             finalUrl
         } catch (e: Exception) {
-            // Si ConfigManager no está inicializado, usar localhost por defecto
-            // IMPORTANTE: Cambia esta IP por la IP de tu máquina donde corre Django
-            // En Windows: ipconfig en CMD para ver tu IPv4
-            // En Linux/Mac: ifconfig o ip addr
-            
-            // IMPORTANTE: Cambia esta URL según tu caso:
-            // - Si usas EMULADOR Android: usa "http://10.0.2.2:8000/api/"
-            // - Si usas DISPOSITIVO FÍSICO: usa la IP de tu máquina "http://172.20.10.4:8000/api/"
-            // 
-            // Para encontrar tu IP: ipconfig (Windows) o ifconfig (Linux/Mac)
-            // Recompila la app después de cambiar esta URL
-            
-            val defaultUrl = "http://10.0.2.2:8000/api/" // Para EMULADOR
-            // val defaultUrl = "http://172.20.10.4:8000/api/" // Para DISPOSITIVO FÍSICO - Descomenta esta línea y comenta la anterior
+            // Si ConfigManager no está inicializado, usar URL de producción en Render
+            val defaultUrl = "https://metrolima-api.onrender.com/api/" // URL de producción en Render
             Log.w("StationService", "ConfigManager no inicializado, usando URL por defecto: $defaultUrl")
             defaultUrl
         }
@@ -70,9 +58,13 @@ class StationService {
      */
     suspend fun getAllStations(): List<Station> {
         return try {
-            val stationsDto = apiService.getAllStations()
-            stationsDto.map { it.toDomainModel() }
+            Log.d("StationService", "Intentando obtener todas las estaciones...")
+            val response = apiService.getAllStations()
+            Log.d("StationService", "Respuesta paginada: count=${response.count}, results=${response.results.size}")
+            response.results.map { it.toDomainModel() }
         } catch (e: Exception) {
+            Log.e("StationService", "Error al obtener estaciones: ${e.message}", e)
+            Log.e("StationService", "Tipo de error: ${e.javaClass.simpleName}")
             e.printStackTrace()
             emptyList()
         }
@@ -102,9 +94,12 @@ class StationService {
      */
     suspend fun getStationsByLine(line: String): List<Station> {
         return try {
+            Log.d("StationService", "Obteniendo estaciones de línea: $line")
             val stationsDto = apiService.getStationsByLine(line)
+            Log.d("StationService", "Estaciones de línea $line: ${stationsDto.size}")
             stationsDto.map { it.toDomainModel() }
         } catch (e: Exception) {
+            Log.e("StationService", "Error al obtener estaciones por línea: ${e.message}", e)
             e.printStackTrace()
             emptyList()
         }
