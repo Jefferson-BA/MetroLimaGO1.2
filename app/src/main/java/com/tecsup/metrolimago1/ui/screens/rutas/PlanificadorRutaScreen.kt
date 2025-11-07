@@ -415,7 +415,7 @@ fun CompactRoutePanel(
                     selectedStation = selectedOrigin,
                     onStationSelected = onOriginSelected,
                     stations = getFilteredStations(selectedLines),
-                    icon = Icons.Default.FlightTakeoff,
+                    icon = Icons.Default.DirectionsBus,
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor,
@@ -428,7 +428,7 @@ fun CompactRoutePanel(
                     selectedStation = selectedDestination,
                     onStationSelected = onDestinationSelected,
                     stations = getFilteredStations(selectedLines),
-                    icon = Icons.Default.FlightLand,
+                    icon = Icons.Default.DirectionsBus,
                     cardColor = cardColor,
                     textColor = textColor,
                     secondaryTextColor = secondaryTextColor,
@@ -880,7 +880,7 @@ fun SimpleMapView(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.FlightTakeoff,
+                                        imageVector = Icons.Default.DirectionsBus,
                                         contentDescription = "Origen",
                                         tint = MetroOrange,
                                         modifier = Modifier.size(16.dp)
@@ -900,7 +900,7 @@ fun SimpleMapView(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.FlightLand,
+                                        imageVector = Icons.Default.DirectionsBus,
                                         contentDescription = "Destino",
                                         tint = MetroGreen,
                                         modifier = Modifier.size(16.dp)
