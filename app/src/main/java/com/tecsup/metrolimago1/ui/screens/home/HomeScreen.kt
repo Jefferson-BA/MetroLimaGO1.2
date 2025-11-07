@@ -138,6 +138,14 @@ fun HomeScreen(navController: NavController) {
                     }
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                SafetyTipsSection(
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor
+                )
+
                 Spacer(modifier = Modifier.height(80.dp))
             }
         }
@@ -759,6 +767,68 @@ fun FavoriteStationsCard(
                 modifier = Modifier.size(24.dp)
             )
         }
+    }
+}
+
+@Composable
+fun SafetyTipsSection(
+    cardColor: Color,
+    textColor: Color,
+    secondaryTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(25.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerifiedUser,
+                    contentDescription = "Consejos de seguridad",
+                    tint = MetroOrange,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Consejos de seguridad y buenas prácticas",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SafetyTipItem("Mantén tus pertenencias a la vista.", secondaryTextColor)
+            Spacer(modifier = Modifier.height(8.dp))
+            SafetyTipItem("Respeta la línea amarilla en el andén.", secondaryTextColor)
+            Spacer(modifier = Modifier.height(8.dp))
+            SafetyTipItem("Cede el asiento a quien lo necesite.", secondaryTextColor)
+        }
+    }
+}
+
+@Composable
+fun SafetyTipItem(text: String, textColor: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MetroGreen,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
+        )
     }
 }
 
