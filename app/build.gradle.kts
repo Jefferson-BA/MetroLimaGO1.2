@@ -50,6 +50,11 @@ android {
 
 dependencies {
 
+    // Excluir versiones antiguas de annotations para evitar duplicados
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+    }
+
     // Dependencias usando el catálogo 'libs'
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.core.ktx)
@@ -59,7 +64,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material:material-icons-extended")
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

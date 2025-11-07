@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.tecsup.metrolimago1.data.local.MockLines
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.ui.theme.*
@@ -233,6 +234,26 @@ fun MetroLinesOverlay() {
         val linea3Points = linea3Stations.map { LatLng(it.latitude, it.longitude) }
         Polyline(
             points = linea3Points,
+            color = Color(0xFF2196F3),
+            width = 6f
+        )
+    }
+
+    // Corredor Morado
+    val corredorMoradoLine = MockLines.findById("CORREDOR_MORADO")
+    if (corredorMoradoLine != null && corredorMoradoLine.route.isNotEmpty()) {
+        Polyline(
+            points = corredorMoradoLine.route,
+            color = Color(0xFF9C27B0),
+            width = 6f
+        )
+    }
+
+    // Corredor Azul
+    val corredorAzulLine = MockLines.findById("CORREDOR_AZUL")
+    if (corredorAzulLine != null && corredorAzulLine.route.isNotEmpty()) {
+        Polyline(
+            points = corredorAzulLine.route,
             color = Color(0xFF2196F3),
             width = 6f
         )

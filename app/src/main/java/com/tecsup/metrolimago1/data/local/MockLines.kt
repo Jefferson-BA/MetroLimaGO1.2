@@ -54,6 +54,53 @@ object MockLines {
                 LatLng(-11.9800, -77.0700)  // San Juan de Lurigancho
             ),
             stations = MockStations.stations.filter { it.line == "Metropolitano" }
+        ),
+        Line(
+            id = "CORREDOR_MORADO",
+            name = "Corredor Morado",
+            color = "#9C27B0", // Morado
+            status = LineStatus.OPERATIONAL,
+            description = "Rutas 404, 405, 409 - Conecta San Juan de Lurigancho con San Isidro y Magdalena",
+            openingDate = "Operativo",
+            operatingHours = "05:00 - 23:00",
+            route = listOf(
+                LatLng(-11.9685000, -77.0001000), // La Capilla (Terminal Norte SJL)
+                LatLng(-11.9560733, -76.9940003), // Bayóvar (Integración Línea 1)
+                LatLng(-12.0520000, -77.0295000), // Mercado de Flores (Troncal)
+                LatLng(-12.0560000, -77.0310000), // Grau (Nuevo)
+                LatLng(-12.0620000, -77.0375000), // Plaza Bolognesi
+                LatLng(-12.0640000, -77.0320000), // 28 de Julio
+                LatLng(-12.0785000, -77.0310000), // México
+                LatLng(-12.0945000, -77.0360000), // Javier Prado
+                LatLng(-12.1005000, -77.0395000), // Carnaval y Moreyra (Terminal Sur San Isidro)
+                LatLng(-12.0950000, -77.0760000)  // La Virgen (Terminal Oeste Magdalena)
+            ),
+            stations = MockStations.stations.filter { it.line == "Corredor Morado" }
+        ),
+        Line(
+            id = "CORREDOR_AZUL",
+            name = "Corredor Azul",
+            color = "#2196F3", // Azul
+            status = LineStatus.OPERATIONAL,
+            description = "Servicio Troncal 301 y Rutas Complementarias 303, 336 - Conecta Rímac con Barranco",
+            openingDate = "Operativo",
+            operatingHours = "05:00 - 23:00",
+            route = listOf(
+                LatLng(-12.01630, -77.02100), // Amancaes (Terminal Norte Rímac)
+                LatLng(-12.02550, -77.02750), // La Colonia
+                LatLng(-12.03450, -77.03350), // Chira
+                LatLng(-12.04000, -77.03480), // Virú
+                LatLng(-12.06200, -77.03900), // E. Villar
+                LatLng(-12.07250, -77.03780), // Manuel Segura
+                LatLng(-12.08310, -77.03850), // Tomás Guido
+                LatLng(-12.10090, -77.03510), // Angamos
+                LatLng(-12.11050, -77.03250), // Piura
+                LatLng(-12.11500, -77.03050), // Pardo (Terminal 336)
+                LatLng(-12.12050, -77.02700), // Larco
+                LatLng(-12.13700, -77.02270), // Balta
+                LatLng(-12.13810, -77.02250)  // Plaza Butters (Terminal Sur Barranco)
+            ),
+            stations = MockStations.stations.filter { it.line == "Corredor Azul" }
         )
     )
 

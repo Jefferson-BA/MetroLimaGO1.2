@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,7 +21,10 @@ import androidx.navigation.NavController
 import com.tecsup.metrolimago1.R
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
 import com.tecsup.metrolimago1.data.local.MockStations
+import com.tecsup.metrolimago1.data.remote.StationService
 import com.tecsup.metrolimago1.navigation.Screen
+import android.util.Log
+import kotlinx.coroutines.launch
 import com.tecsup.metrolimago1.ui.theme.*
 import com.tecsup.metrolimago1.ui.theme.LocalThemeState
 
@@ -37,6 +41,36 @@ fun ListaEstacionesScreen(navController: NavController) {
 
     var query by remember { mutableStateOf("") }
     var selectedLines by remember { mutableStateOf(setOf<String>()) }
+    
+    // Estado para estaciones (desde API o mock)
+    var stations by remember { mutableStateOf<List<com.tecsup.metrolimago1.domain.models.Station>>(MockStations.stations) }
+    var isLoadingStations by remember { mutableStateOf(false) }
+    
+    // Servicio de API
+    val stationService = remember { StationService() }
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Cargar estaciones desde la API al iniciar
+    LaunchedEffect(Unit) {
+        isLoadingStations = true
+        try {
+            Log.d("ListaEstacionesScreen", "Intentando obtener estaciones desde API...")
+            val apiStations = stationService.getAllStations()
+            if (apiStations.isNotEmpty()) {
+                Log.d("ListaEstacionesScreen", "Estaciones obtenidas de API: ${apiStations.size}")
+                stations = apiStations
+            } else {
+                Log.w("ListaEstacionesScreen", "API no devolvió estaciones, usando mock")
+                stations = MockStations.stations
+            }
+        } catch (e: Exception) {
+            Log.e("ListaEstacionesScreen", "Error al obtener estaciones de API: ${e.message}", e)
+            // Usar datos mock como fallback
+            stations = MockStations.stations
+        } finally {
+            isLoadingStations = false
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -109,7 +143,7 @@ fun ListaEstacionesScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Lista de estaciones con filtrado mejorado
-            val filtered = MockStations.stations.filter { station ->
+            val filtered = stations.filter { station ->
                 // Filtro por líneas seleccionadas
                 val lineMatch = if (selectedLines.isEmpty()) {
                     true // Si no hay líneas seleccionadas, mostrar todas
@@ -266,81 +300,146 @@ fun LineFilterButtons(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Botón Línea 1
-            FilterChip(
-                onClick = { onLineToggle("Línea 1") },
-                label = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(MetroOrange, RoundedCornerShape(4.dp))
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(stringResource(R.string.line_1))
-                    }
-                },
-                selected = selectedLines.contains("Línea 1"),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroOrange,
-                    selectedLabelColor = White,
-                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+            // Primera fila: Línea 1, Línea 2, Metropolitano
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Botón Línea 1
+                FilterChip(
+                    onClick = { onLineToggle("Línea 1") },
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(MetroOrange, RoundedCornerShape(4.dp))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(stringResource(R.string.line_1), fontSize = 12.sp)
+                        }
+                    },
+                    selected = selectedLines.contains("Línea 1"),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MetroOrange,
+                        selectedLabelColor = White,
+                        containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
-            )
 
-            // Botón Línea 2
-            FilterChip(
-                onClick = { onLineToggle("Línea 2") },
-                label = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(MetroGreen, RoundedCornerShape(4.dp))
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(stringResource(R.string.line_2))
-                    }
-                },
-                selected = selectedLines.contains("Línea 2"),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MetroGreen,
-                    selectedLabelColor = White,
-                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                // Botón Línea 2
+                FilterChip(
+                    onClick = { onLineToggle("Línea 2") },
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(MetroGreen, RoundedCornerShape(4.dp))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(stringResource(R.string.line_2), fontSize = 12.sp)
+                        }
+                    },
+                    selected = selectedLines.contains("Línea 2"),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MetroGreen,
+                        selectedLabelColor = White,
+                        containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
-            )
 
-            // Botón Metropolitano
-            FilterChip(
-                onClick = { onLineToggle("Metropolitano") },
-                label = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(stringResource(R.string.line_3))
-                    }
-                },
-                selected = selectedLines.contains("Metropolitano"),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF2196F3),
-                    selectedLabelColor = White,
-                    containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                // Botón Metropolitano
+                FilterChip(
+                    onClick = { onLineToggle("Metropolitano") },
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Metropolita", fontSize = 12.sp)
+                        }
+                    },
+                    selected = selectedLines.contains("Metropolitano"),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = Color(0xFF2196F3),
+                        selectedLabelColor = White,
+                        containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
-            )
+            }
+
+            // Segunda fila: Corredor Morado, Corredor Azul
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Botón Corredor Morado
+                FilterChip(
+                    onClick = { onLineToggle("Corredor Morado") },
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(Color(0xFF9C27B0), RoundedCornerShape(4.dp))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Corredor Morado", fontSize = 12.sp)
+                        }
+                    },
+                    selected = selectedLines.contains("Corredor Morado"),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = Color(0xFF9C27B0),
+                        selectedLabelColor = White,
+                        containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+
+                // Botón Corredor Azul
+                FilterChip(
+                    onClick = { onLineToggle("Corredor Azul") },
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(Color(0xFF2196F3), RoundedCornerShape(4.dp))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Corredor Azul", fontSize = 12.sp)
+                        }
+                    },
+                    selected = selectedLines.contains("Corredor Azul"),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = Color(0xFF2196F3),
+                        selectedLabelColor = White,
+                        containerColor = secondaryTextColor.copy(alpha = 0.1f)
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.tecsup.metrolimago1.components.GlobalBottomNavBar
+import com.tecsup.metrolimago1.data.local.MockLines
 import com.tecsup.metrolimago1.data.local.MockStations
 import com.tecsup.metrolimago1.domain.models.Station
 import com.tecsup.metrolimago1.navigation.Screen
@@ -566,6 +568,30 @@ fun MetroLinesOverlay(selectedLines: Set<String>) {
             )
         }
     }
+
+    // Corredor Morado
+    if (linesToShow.contains("Corredor Morado")) {
+        val corredorMoradoLine = MockLines.findById("CORREDOR_MORADO")
+        if (corredorMoradoLine != null && corredorMoradoLine.route.isNotEmpty()) {
+            Polyline(
+                points = corredorMoradoLine.route,
+                color = Color(0xFF9C27B0),
+                width = 6f
+            )
+        }
+    }
+
+    // Corredor Azul
+    if (linesToShow.contains("Corredor Azul")) {
+        val corredorAzulLine = MockLines.findById("CORREDOR_AZUL")
+        if (corredorAzulLine != null && corredorAzulLine.route.isNotEmpty()) {
+            Polyline(
+                points = corredorAzulLine.route,
+                color = Color(0xFF2196F3),
+                width = 6f
+            )
+        }
+    }
 }
 
 // Función para calcular ruta (simula Directions API)
@@ -640,8 +666,30 @@ fun LineFilterSection(
             // Botón "Metropolitano"
             FilterChip(
                 onClick = { onLineSelected("Metropolitano") },
-                label = { Text("Metropolitano") },
+                label = { Text("Metropolita", fontSize = 12.sp) },
                 selected = selectedLine == "Metropolitano",
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF2196F3),
+                    selectedLabelColor = White
+                )
+            )
+            
+            // Botón "Corredor Morado"
+            FilterChip(
+                onClick = { onLineSelected("Corredor Morado") },
+                label = { Text(TranslationUtils.getText(context, "corredor_morado")) },
+                selected = selectedLine == "Corredor Morado",
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Color(0xFF9C27B0),
+                    selectedLabelColor = White
+                )
+            )
+            
+            // Botón "Corredor Azul"
+            FilterChip(
+                onClick = { onLineSelected("Corredor Azul") },
+                label = { Text(TranslationUtils.getText(context, "corredor_azul")) },
+                selected = selectedLine == "Corredor Azul",
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF2196F3),
                     selectedLabelColor = White

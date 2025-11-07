@@ -111,7 +111,7 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 // Intentar obtener desde la API
                 val apiStation = stationService.getStationById(estacionId)
                 if (apiStation != null) {
-                    Log.d("EstacionDetailScreen", "Estación obtenida de API: ${apiStation.name}, imageUrl: ${apiStation.imageUrl}")
+                    Log.d("EstacionDetailScreen", "Estación obtenida de API: ${apiStation.name}, imageUrl: '${apiStation.imageUrl}'")
                     station = apiStation
                 } else {
                     Log.w("EstacionDetailScreen", "API no devolvió estación, usando mock")
@@ -119,7 +119,16 @@ fun EstacionDetailScreen(navController: NavController, estacionId: String?) {
                 }
             } catch (e: Exception) {
                 // Si falla, usar datos mock
-                Log.e("EstacionDetailScreen", "Error al obtener estación de API: ${e.message}", e)
+                val errorMessage = when {
+                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> 
+                        "Sin conexión a internet o servidor no disponible"
+                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                        "Tiempo de espera agotado"
+                    else -> e.message ?: "Error desconocido"
+                }
+                Log.e("EstacionDetailScreen", "Error al obtener estación de API: $errorMessage", e)
+                Log.e("EstacionDetailScreen", "Tipo de error: ${e.javaClass.simpleName}")
+                // Usar datos mock como fallback
                 station = MockStations.findById(estacionId)
             }
             
@@ -567,6 +576,8 @@ fun StationDetailsCard(
                         "Línea 1" -> "LINEA_1"
                         "Línea 2" -> "LINEA_2"
                         "Metropolitano" -> "LINEA_3"
+                        "Corredor Morado" -> "CORREDOR_MORADO"
+                        "Corredor Azul" -> "CORREDOR_AZUL"
                         else -> "LINEA_1"
                     }
                     navController.navigate(Screen.LineDetail.createRoute(lineId))
@@ -580,6 +591,8 @@ fun StationDetailsCard(
                                 "Línea 1" -> MetroOrange
                                 "Línea 2" -> MetroGreen
                                 "Metropolitano" -> Color(0xFF2196F3)
+                                "Corredor Morado" -> Color(0xFF9C27B0)
+                                "Corredor Azul" -> Color(0xFF2196F3)
                                 else -> secondaryTextColor
                             },
                             RoundedCornerShape(6.dp)
@@ -1066,23 +1079,61 @@ fun StationImageCard(
             if (imageUrl.isNotEmpty() && imageUrl.isNotBlank()) {
                 // Mostrar imagen desde la URL
                 val context = LocalContext.current
+                var hasError by remember { mutableStateOf(false) }
+                
                 Log.d("StationImageCard", "Intentando cargar imagen: $imageUrl")
+                Log.d("StationImageCard", "URL completa: $imageUrl")
+                
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(imageUrl)
                         .crossfade(true)
+                        .error(android.R.drawable.ic_menu_report_image) // Icono de error por defecto
+                        .placeholder(android.R.drawable.ic_menu_gallery) // Placeholder mientras carga
                         .build(),
                     contentDescription = "Imagen de $stationName",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     onError = { error ->
+                        hasError = true
                         Log.e("StationImageCard", "Error al cargar imagen: ${error.result.throwable.message}")
                         Log.e("StationImageCard", "URL de imagen: $imageUrl")
+                        Log.e("StationImageCard", "Excepción completa: ${error.result.throwable}")
+                        error.result.throwable.printStackTrace()
                     },
                     onSuccess = {
+                        hasError = false
                         Log.d("StationImageCard", "Imagen cargada exitosamente: $imageUrl")
                     }
                 )
+                
+                // Mostrar mensaje de error si falla la carga
+                if (hasError) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.5f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.BrokenImage,
+                                contentDescription = "Error de carga",
+                                tint = Color.White,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "No se pudo cargar la imagen",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
             } else {
                 // Mostrar mensaje cuando no hay imagen
                 Column(

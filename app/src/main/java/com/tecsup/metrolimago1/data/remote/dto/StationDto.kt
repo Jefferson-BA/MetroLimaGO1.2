@@ -13,13 +13,13 @@ data class StationDto(
     val address: String,
     val latitude: String, // La API devuelve String
     val longitude: String, // La API devuelve String
-    val description: String,
+    val description: String? = "",
     @SerializedName("opening_time")
     val openingTime: String = "05:00",
     @SerializedName("closing_time")
     val closingTime: String = "23:00",
     val status: String, // "OPERATIONAL", "MAINTENANCE", etc.
     @SerializedName("image_url")
-    val imageUrl: String? = null
+    val imageUrl: String = ""
 )
 
