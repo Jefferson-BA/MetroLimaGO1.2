@@ -11,7 +11,7 @@ data class Station(
     val openingTime: String = "05:00",
     val closingTime: String = "23:00",
     val status: StationStatus = StationStatus.OPERATIONAL,
-    val imageUrl: String = "",
+    val imageUrl: String? = "",
     val nearbyServices: List<NearbyService> = emptyList()
 )
 

@@ -10,7 +10,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 /**
@@ -94,7 +93,7 @@ class StationService {
             Log.d("StationService", "Intentando obtener estación con ID: $id")
             val stationDto = apiService.getStationById(id)
             Log.d("StationService", "Estación obtenida: ${stationDto.name}")
-            Log.d("StationService", "imageUrl en DTO: '${stationDto.imageUrl}', isEmpty: ${stationDto.imageUrl.isEmpty()}")
+            Log.d("StationService", "imageUrl en DTO: '${stationDto.imageUrl}', isEmpty: ${stationDto.imageUrl?.isEmpty()}")
             // Log del DTO completo para debug
             Log.d("StationService", "DTO completo - id: ${stationDto.id}, name: ${stationDto.name}, line: ${stationDto.line}, imageUrl: '${stationDto.imageUrl}'")
             val station = stationDto.toDomainModel()

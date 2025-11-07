@@ -29,7 +29,6 @@ import coil.request.ImageRequest
 import androidx.core.content.ContextCompat
 import android.util.Log
 import androidx.navigation.NavController
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -1041,14 +1040,14 @@ fun FareInfoCard(
 // Componente para mostrar la imagen de la estación
 @Composable
 fun StationImageCard(
-    imageUrl: String,
+    imageUrl: String?,
     stationName: String,
     cardColor: Color,
     textColor: Color,
     secondaryTextColor: Color
 ) {
     // Log para debug
-    Log.d("StationImageCard", "StationImageCard llamado para: $stationName, imageUrl: '$imageUrl', isEmpty: ${imageUrl.isEmpty()}, isBlank: ${imageUrl.isBlank()}")
+    Log.d("StationImageCard", "StationImageCard llamado para: $stationName, imageUrl: '$imageUrl', isEmpty: ${imageUrl?.isEmpty()}, isBlank: ${imageUrl?.isBlank()}")
     
     Card(
         modifier = Modifier
@@ -1063,7 +1062,7 @@ fun StationImageCard(
                 .height(250.dp),
             contentAlignment = Alignment.Center
         ) {
-            if (imageUrl.isNotEmpty() && imageUrl.isNotBlank()) {
+            if (imageUrl?.isNotEmpty() == true && imageUrl?.isNotBlank() == true) {
                 // Mostrar imagen desde la URL
                 val context = LocalContext.current
                 Log.d("StationImageCard", "Intentando cargar imagen: $imageUrl")
